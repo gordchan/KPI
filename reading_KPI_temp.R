@@ -42,9 +42,8 @@ test_value.c <- matrix(seq(0.01, 0.40, 0.01), nrow = 4, ncol = 10, byrow = TRUE)
 test_value.t <- matrix(seq(0.01, 0.40, 0.01), nrow = 4, ncol = 10, byrow = TRUE)
 test_value.p <- matrix(seq(0.01, 0.36, 0.01), nrow = 4, ncol = 10, byrow = TRUE)
 
-AE_WT <- read_all_sheets("source/AE WT May15.xlsx")
-AE_WT <- AE_WT$Sheet4
-AE_WT <- AE_WT[c(3:4,6:10),]
+AE_WT <- read_range("source/AE WT May15.xlsx", 5:12, 1:14)
+
     
 # Define CellBlocks -------------------------------------------------------
 
