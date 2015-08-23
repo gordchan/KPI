@@ -45,15 +45,14 @@ read_range <- function (x, r, c){
             var_col_i <- which(is.na(all_range[1,]))
             
             for (i in 1:length(var_col_i)){
-                
                 all_range[1,i] <- paste("var",i, sep = "")
             }
     
     names(all_range) <- all_range[1,]
+        all_range <- all_range[-c(1,2),]
     
-    colnames(t) <- t$var1
-    
-    all_range <- all_range[-c(1,2),]
+    all_range$var1 <- gsub("(^ *)", "", all_range$var1)
+        rownames(all_range) <- all_range$var1
     
     all_range
     
