@@ -53,7 +53,7 @@ read_range <- function (x, r, c){
     
     all_range$var1 <- gsub("(^ *)", "", all_range$var1)
         rownames(all_range) <- all_range$var1
-    
+
     all_range
     
 }

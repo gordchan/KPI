@@ -1,18 +1,21 @@
 
-# Libraries ---------------------------------------------------------------
+# I. Libraries ---------------------------------------------------------------
 
 require("xlsx")
+require("dplyr")
 
-source("read_all_sheets.R")
+source("read_xlsx.R")
 
-# Filepath table ----------------------------------------------------------
 
-report.month <- "May15"
+# II. Create filepath table ----------------------------------------------------------
+
+report.month <- " May15" ## Keep leading zero to keep as text in excel
+report.period <- "Jun14-May15"
 
     filenames <- rbind(
-        paste("KWC Clinical KPI ", report.month, ".xls", sep = ""),
-        paste("Clinical KPI SOP WT ", report.month, ".xls", sep = ""),
-        paste("Clinical KPI Trend ", report.month, ".xls", sep = "")
+        paste("KWC Clinical KPI", report.month, ".xls", sep = ""),
+        paste("Clinical KPI SOP WT", report.month, ".xls", sep = ""),
+        paste("Clinical KPI Trend", report.month, ".xls", sep = "")
     )
     
     filepaths <- rbind(
@@ -23,36 +26,42 @@ report.month <- "May15"
 
 KPI_files <- data.frame(filenames, filepaths, stringsAsFactors = FALSE)
 
-# Loading xls report ------------------------------------------------------
+# III. Loading xls report ------------------------------------------------------
 
 as.KPI <- loadWorkbook(KPI_files$filepaths[1])
     sheets.KPI <- getSheets(as.KPI)
 
 # as.SOP <- loadWorkbook(KPI_files$filepaths[2])
-#     sheets.KPI <- getSheets(as.SOP)
+#     sheets.SOP <- getSheets(as.SOP)
 #     
 # as.TRE <- loadWorkbook(KPI_files$filepaths[3])
-#     sheets.KPI <- getSheets(as.TRE)
+#     sheets.TRE <- getSheets(as.TRE)
 
 
-# Loading KPI source data -------------------------------------------------
+# IV. Loading KPI source data -------------------------------------------------
 
-
-test_value.c <- matrix(seq(0.01, 0.40, 0.01), nrow = 4, ncol = 10, byrow = TRUE)
-test_value.t <- matrix(seq(0.01, 0.40, 0.01), nrow = 4, ncol = 10, byrow = TRUE)
-test_value.p <- matrix(seq(0.01, 0.36, 0.01), nrow = 4, ncol = 10, byrow = TRUE)
-
-AE_WT <- read_range("source/AE WT May15.xlsx", 5:12, 1:14)
-
+    source("process_kpi.R")
     
-# Define CellBlocks -------------------------------------------------------
+# Update reporting month and period ---------------------------------------
 
-AE_KWC.c <- CellBlock(sheets.KPI$source, 3, 3, 4, 10)
-AE_KWC.t <- CellBlock(sheets.KPI$source, 3, 13, 4, 10)
-AE_KWC.p <- CellBlock(sheets.KPI$source, 3, 32, 4, 10)
+reporting <- CellBlock(sheets.KPI$source, 1, 2, 2, 1)
 
-    CB.setMatrixData(AE_KWC.c, test_value.c, 1, 1)
-    CB.setMatrixData(AE_KWC.t, test_value.t, 1, 1)
-    CB.setMatrixData(AE_KWC.p, test_value.p, 1, 1)
+    CB.setMatrixData(reporting, as.matrix(c(report.month, report.period)), 1, 1)
 
-            saveWorkbook(as.KPI, KPI_files$filepaths[1])
+# Update A&E wait time ----------------------------------------------------
+
+# AE_WT.cb.c <- CellBlock(sheets.KPI$source, 3, 3, 4, 10)
+# AE_WT.cb.t <- CellBlock(sheets.KPI$source, 3, 13, 4, 10)
+# AE_WT.cb.p <- CellBlock(sheets.KPI$source, 3, 32, 4, 10)
+# 
+#     CB.setMatrixData(AE_WT.cb.c, AE_WT.prod, 1, 1)
+#     CB.setMatrixData(AE_WT.cb.t, AE_WT.prod, 1, 1)
+#     CB.setMatrixData(AE_WT.cb.p, AE_WT.prod, 1, 1)
+    
+addDataFrame(AE_WT.prod, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=3, startColumn=3)
+addDataFrame(AE_WT.prod, sheets.KPI$source, col.names=FALSE, row.names=FALSE,  startRow=3, startColumn=13)
+addDataFrame(AE_WT.prod, sheets.KPI$source, col.names=FALSE, row.names=FALSE,  startRow=3, startColumn=23)
+
+# Saving xls reports ----------------------------------------------------
+
+    saveWorkbook(as.KPI, KPI_files$filepaths[1])
