@@ -1,32 +1,36 @@
+# Reading KPI Template
+#
+# To load Excel KPI template and write in consolidated KPI data.
+#
+# Gordon CHAN
+#
+# Aug 2015
 
-# I. Libraries ---------------------------------------------------------------
+# Libraries -----------------------------------------------------------------------
 
 require("xlsx")
 require("dplyr")
+require("lubridate")
 
 source("read_xlsx.R")
 
+# Reporting period --------------------------------------------------------
 
-# II. Create filepath table ----------------------------------------------------------
+report.year <- "15"
+report.month <- paste(month(5, label = TRUE, abbr = TRUE), report.year, sep = "")
+    report.month_ <- paste(" ", report.month, sep = "") ## Keep leading zero to keep as text in excel
+prev.month <- paste(month(5-1, label = TRUE, abbr = TRUE), report.year, sep = "")
+report.period <- paste(prev.month, report.month, sep = "-")
 
-report.month <- " May15" ## Keep leading zero to keep as text in excel
-report.period <- "Jun14-May15"
+# Create filepath table ----------------------------------------------------------
 
-    filenames <- rbind(
-        paste("KWC Clinical KPI", report.month, ".xls", sep = ""),
-        paste("Clinical KPI SOP WT", report.month, ".xls", sep = ""),
-        paste("Clinical KPI Trend", report.month, ".xls", sep = "")
-    )
-    
-    filepaths <- rbind(
-        file.path("template", filenames[1]),
-        file.path("template", filenames[2]),
-        file.path("template", filenames[3])
-    )
+KPI_files <- 
+    data.frame(
+        filenames = list.files("template", pattern = "(\\.xlsx?$)", full.names = FALSE),
+        filepaths = list.files("template", pattern = "(\\.xlsx?$)", full.names = TRUE), 
+    stringsAsFactors = FALSE)
 
-KPI_files <- data.frame(filenames, filepaths, stringsAsFactors = FALSE)
-
-# III. Loading xls report ------------------------------------------------------
+# Loading xls report ------------------------------------------------------
 
 as.KPI <- loadWorkbook(KPI_files$filepaths[1])
     sheets.KPI <- getSheets(as.KPI)
@@ -38,30 +42,25 @@ as.KPI <- loadWorkbook(KPI_files$filepaths[1])
 #     sheets.TRE <- getSheets(as.TRE)
 
 
-# IV. Loading KPI source data -------------------------------------------------
+# Load and prepare KPI source data -----------------------------------
 
     source("process_kpi.R")
     
-# Update reporting month and period ---------------------------------------
+# Update reporting month and period -----------------------------------
 
 reporting <- CellBlock(sheets.KPI$source, 1, 2, 2, 1)
 
     CB.setMatrixData(reporting, as.matrix(c(report.month, report.period)), 1, 1)
 
-# Update A&E wait time ----------------------------------------------------
+# Update A&E wait time -----------------------------------------------
 
-# AE_WT.cb.c <- CellBlock(sheets.KPI$source, 3, 3, 4, 10)
-# AE_WT.cb.t <- CellBlock(sheets.KPI$source, 3, 13, 4, 10)
-# AE_WT.cb.p <- CellBlock(sheets.KPI$source, 3, 32, 4, 10)
-# 
-#     CB.setMatrixData(AE_WT.cb.c, AE_WT.prod, 1, 1)
-#     CB.setMatrixData(AE_WT.cb.t, AE_WT.prod, 1, 1)
-#     CB.setMatrixData(AE_WT.cb.p, AE_WT.prod, 1, 1)
-    
 addDataFrame(AE_WT.prod, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=3, startColumn=3)
-addDataFrame(AE_WT.prod, sheets.KPI$source, col.names=FALSE, row.names=FALSE,  startRow=3, startColumn=13)
-addDataFrame(AE_WT.prod, sheets.KPI$source, col.names=FALSE, row.names=FALSE,  startRow=3, startColumn=23)
+addDataFrame(AE_WT.prod, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=3, startColumn=13)
+addDataFrame(AE_WT.prod, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=3, startColumn=23)
 
 # Saving xls reports ----------------------------------------------------
 
     saveWorkbook(as.KPI, KPI_files$filepaths[1])
+#     saveWorkbook(as.SOP, KPI_files$filepaths[2])
+#     saveWorkbook(as.TRE, KPI_files$filepaths[3])
+    

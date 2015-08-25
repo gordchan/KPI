@@ -1,3 +1,14 @@
+# Read XLSX
+#
+# Collection of custom functions to handle I/O with excel spreadsheets.
+#
+# Gordon CHAN
+#
+# Aug 2015
+
+
+# read_all_sheets ---------------------------------------------------------
+
 ## A function to return all sheets in xlsx to a list with dataframe elements
 
 read_all_sheets <- function (x){
@@ -19,6 +30,9 @@ read_all_sheets <- function (x){
   all_sheets
   
 }
+
+
+# read_range --------------------------------------------------------------
 
 ## A function to return a specific range of a sheet from a excel spreadsheets file
 
