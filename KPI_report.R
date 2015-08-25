@@ -26,19 +26,33 @@ report.period <- paste(prev.month, report.month, sep = "-")
 
 KPI_files <- 
     data.frame(
-        filenames = list.files("template", pattern = "(\\.xlsx?$)", full.names = FALSE),
-        filepaths = list.files("template", pattern = "(\\.xlsx?$)", full.names = TRUE), 
+        tempnames = list.files("template", pattern = "(\\.xls$)", full.names = FALSE),
+        temppaths = list.files("template", pattern = "(\\.xls$)", full.names = TRUE), 
     stringsAsFactors = FALSE)
 
-# Loading xls report ------------------------------------------------------
+KPI_files <- KPI_files %>%
+    mutate(filepaths = gsub("(\\.xls$)", paste(report.month_, ".xls", sep = ""), temppaths)) %>%
+        mutate(filepaths = gsub("(^template)", "report", filepaths)) %>%
+            arrange(desc(tempnames))
 
-as.KPI <- loadWorkbook(KPI_files$filepaths[1])
+# Copy template for use as blank report -------------------------------------------
+
+for (i in 1:nrow(KPI_files)){
+    file.copy(from = KPI_files$temppaths[i],
+              to = KPI_files$filepaths[i],
+              overwrite = TRUE,
+              copy.mode = TRUE, copy.date = FALSE)
+}
+
+# Loading xls template ------------------------------------------------------
+
+as.KPI <- loadWorkbook(KPI_files$temppaths[1])
     sheets.KPI <- getSheets(as.KPI)
 
-# as.SOP <- loadWorkbook(KPI_files$filepaths[2])
+# as.SOP <- loadWorkbook(KPI_files$temppaths[2])
 #     sheets.SOP <- getSheets(as.SOP)
 #     
-# as.TRE <- loadWorkbook(KPI_files$filepaths[3])
+# as.TRE <- loadWorkbook(KPI_files$temppaths[3])
 #     sheets.TRE <- getSheets(as.TRE)
 
 
