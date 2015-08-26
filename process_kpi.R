@@ -13,7 +13,7 @@
 #
 # ii. Generate file table according to reporting month period specified
 
-kpi_source_helper <- function(m){
+kpi_source_helper <- function(Mmm){
     
     require("xlsx")
     require("dplyr")
@@ -38,21 +38,21 @@ kpi_source_helper <- function(m){
                             colIndex = 4)
         source.kpi <<- source.kpi %>% filter(!is.na(Query.Name)) %>%
             mutate(filename = paste(Query.Name, ".xlsx", sep = "")) %>%
-            mutate(filepath = file.path("source", m, filename))
+            mutate(filepath = file.path("source", Mmm, filename))
     
     source.tre <<- read.xlsx("source/KPI items.xlsx",
                             sheetName = "TRE",
                             colIndex = 4)
         source.tre <<- source.tre %>% filter(!is.na(Query.Name)) %>%
             mutate(filename = paste(Query.Name, ".xlsx", sep = "")) %>%
-            mutate(filepath = file.path("source", m, filename))    
+            mutate(filepath = file.path("source", Mmm, filename))    
     
     source.sop <<- read.xlsx("source/KPI items.xlsx",
                             sheetName = "SOP",
                             colIndex = 4)
         source.sop <<- source.sop %>% filter(!is.na(Query.Name)) %>%
             mutate(filename = paste(Query.Name, ".xlsx", sep = "")) %>%
-            mutate(filepath = file.path("source", m, filename))    
+            mutate(filepath = file.path("source", Mmm, filename))    
 }
 
 
@@ -85,9 +85,9 @@ kpi.t <- function(kpi.sn){
 
 # kpi.1 Access (A&E waiting time) ------------------------------------------------------
 
-kpi.1 <- function(m = report.month){
+kpi.1 <- function(Mmm){
     
-kpi_source_helper(m)
+kpi_source_helper(Mmm)
     
     path <- grep("(.*kpi.1.*)", source.kpi$filepath, value = TRUE)
     
@@ -105,7 +105,7 @@ kpi_source_helper(m)
     
     AE_WT <- AE_WT[row.index,]
     
-    row.names(AE_WT.frame) <- row.names(AE_WT)
+    # row.names(AE_WT.frame) <- row.names(AE_WT)
     
     for (i in 1:length(AE_WT.frame)){
         if (names(AE_WT.frame)[i] %in% names(AE_WT)){
@@ -134,3 +134,82 @@ kpi_source_helper(m)
     
     AE_WT.prod
 }
+
+# kpi.2 Access(SOP waiting time) ------------------------------------------
+
+kpi.2 <- function(Mmm, specialty = "Ovr"){
+    
+    kpi_source_helper(Mmm)
+    
+#     SOP.specialty <- data.frame(
+#         specialty = c("ENT" , "GYN" , "MED" , "OPH" , "ORT" , "PAE" , "PSY" , "SUR"),
+#         specialty.df = paste("SOP_WT.", SOP.specialty, sep = ""))
+    
+    path <- grep("(.*kpi.2.*)", source.kpi$filepath, value = TRUE)
+    
+    SOP_WT <- read_range(path, 5:28, 1:55)
+        row.index <- c(3:4, 10, 14, 20)
+
+    SOP_WT.frame <- empty.frame
+    
+            for (i in 1:length(row.index)){
+                SOP_WT.frame[i,] <- rep(NA, length(SOP_WT.frame))
+            }
+    
+    # Split data into dataframes per specialty and show NA data
+    
+    SOP_WT <- SOP_WT[row.index,]
+    
+    colnames(SOP_WT) <- gsub("( Mgt)", "", colnames(SOP_WT))
+    
+    for (i in 1:(length(SOP_WT)-1)){
+        SOP_WT[,i+1] <- as.numeric(SOP_WT[,i+1])
+    }
+    
+    ### NEED TO INSERT HA OVERALL DATA ###
+    
+    if (specialty=="ENT"){
+            SOP_WT.Spl <- SOP_WT[,c(1,2:6)]
+    } else if (specialty=="GYN"){
+            SOP_WT.Spl <- SOP_WT[,c(1,7:12)] 
+    } else if (specialty=="MED"){
+            SOP_WT.Spl <- SOP_WT[,c(1,13:19)]
+    } else if (specialty=="OPH"){
+            SOP_WT.Spl <- SOP_WT[,c(1,20:23)]
+    } else if (specialty=="ORT"){
+            SOP_WT.Spl <- SOP_WT[,c(1,24:30)]
+    } else if (specialty=="PAE"){
+            SOP_WT.Spl <- SOP_WT[,c(1,31:46)]
+    } else if (specialty=="PSY"){
+            SOP_WT.Spl <- SOP_WT[,c(1,37:40)]
+    } else if (specialty=="SUR"){
+            SOP_WT.Spl <- SOP_WT[,c(1,41:47)]
+    } else if (specialty=="Ovr"){
+            SOP_WT.Spl <- SOP_WT[,c(1,48:55)]
+    }
+
+
+    for (i in 1:length(SOP_WT.frame)){
+        if (names(SOP_WT.frame)[i] %in% names(SOP_WT.Spl)){
+            SOP_WT.frame[i] <- SOP_WT.Spl[names(SOP_WT.frame)[i]]
+        }
+    }
+    
+    # Convert percentage into decimals
+    
+    percent_row <- c(3:4)
+    
+    for (i in 1:length(percent_row)){
+            SOP_WT.frame[percent_row[i],] <- sapply(SOP_WT.frame[percent_row[i],], FUN = function(x) ifelse(is.numeric(x), x/100, x))
+    }
+    
+    # Replace NA with N.A. for production use in Excel
+    
+    SOP_WT.prod <- apply(SOP_WT.frame, 2, FUN = function(x){ifelse(is.na(x), "N.A.", x)})
+    
+    # Return production ready dataframe
+    
+    SOP_WT.prod
+    
+}
+
