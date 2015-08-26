@@ -19,18 +19,27 @@ source("process_kpi.R")
 
 to.YY <- 15 ## Input from func
     from.YY <- to.YY - 1
+        prev.from.YY <- from.YY - 1
 
 to.month <- 5 ## Input from func
     to.Mmm <- month(to.month, label = TRUE, abbr = TRUE)
-    from.Mnn <- month(to.month + 1, label = TRUE, abbr = TRUE)
+    from.Mmm <- month(to.month + 1, label = TRUE, abbr = TRUE)
 
 to.MmmYY <- paste(to.Mmm , to.YY, sep = "")
     to.MmmYY_ <- paste(" ", to.MmmYY, sep = "") # Keep leading zero for use as text in Excel
-    prev.MmmYY <- paste(to.Mmm, from.YY, sep = "")
-    
-from.MmmYY <- paste(from.Mnn, from.YY, sep = "")
 
-report.period <- paste(from.MmmYY, to.MmmYY, sep = "-")
+from.MmmYY <- paste(from.Mmm, from.YY, sep = "")
+
+prev.to.MmmYY <- paste(to.Mmm, from.YY, sep = "")
+prev.from.MmmYY <- paste(from.Mmm, prev.from.YY, sep = "")
+
+cy.period <- paste(from.MmmYY, to.MmmYY, sep = "-")
+py.period <- paste(prev.from.MmmYY, prev.to.MmmYY, sep = "-")
+
+dates <- data.frame(dates = c(to.MmmYY_,
+                    cy.period,
+                    py.period),
+                    stringsAsFactors = FALSE)
 
 # Create filepath table ----------------------------------------------------------
 
@@ -73,53 +82,63 @@ as.KPI <- loadWorkbook(KPI_files$temp.paths[1])
         kpi.1.t <- kpi.t("kpi.1")
         kpi.1.p <- kpi.1(prev.MmmYY)
     # kpi.2
+        # kpi.2.c <- kpi.2(to.MmmYY)
         kpi.2.t <- kpi.t("kpi.2")
+        # kpi.2.p <- kpi.2(prev.MmmYY)
     # kpi.3
+        # kpi.3.c <- kpi.3(to.MmmYY)
         kpi.3.t <- kpi.t("kpi.3")
+        # kpi.3.p <- kpi.3(prev.MmmYY)
     # kpi.4
+        # kpi.4.c <- kpi.4(to.MmmYY)
         kpi.4.t <- kpi.t("kpi.4")
+        # kpi.4.p <- kpi.4(prev.MmmYY)
     # kpi.5
+        # kpi.5.c <- kpi.5(to.MmmYY)
         kpi.5.t <- kpi.t("kpi.5")
+        # kpi.5.p <- kpi.5(prev.MmmYY)
     # kpi.6
+        # kpi.6.c <- kpi.6(to.MmmYY)
         kpi.6.t <- kpi.t("kpi.6")
+        # kpi.6.p <- kpi.6(prev.MmmYY)
     # kpi.7
+        # kpi.7.c <- kpi.7(to.MmmYY)
         kpi.7.t <- kpi.t("kpi.7")
+        # kpi.7.p <- kpi.7(prev.MmmYY)
 
 # Update reporting month and period -----------------------------------
 
-reporting.dates <- CellBlock(sheets.KPI$source, 1, 2, 2, 1)
-
-    CB.setMatrixData(reporting.dates, as.matrix(c(to.MmmYY_, report.period)), 1, 1)
+    addDataFrame(dates, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=1, startColumn=2)
 
 # Update A&E wait time -----------------------------------------------
     # kpi.1
-        addDataFrame(kpi.1.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=3, startColumn=3)
-        addDataFrame(kpi.1.t, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=3, startColumn=13)
-        addDataFrame(kpi.1.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=3, startColumn=22)
+        addDataFrame(kpi.1.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=4, startColumn=3)
+        addDataFrame(kpi.1.t, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=4, startColumn=13)
+        addDataFrame(kpi.1.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=4, startColumn=22)
     # kpi.2
-        # addDataFrame(kpi.2.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=7, startColumn=3)
-        addDataFrame(kpi.2.t, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=7, startColumn=13)
-        # addDataFrame(kpi.2.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=7, startColumn=22)
+        # addDataFrame(kpi.2.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=8, startColumn=3)
+        addDataFrame(kpi.2.t, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=8, startColumn=13)
+        # addDataFrame(kpi.2.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=8, startColumn=22)
     # kpi.3
-        # addDataFrame(kpi.3.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=12, startColumn=3)
-        addDataFrame(kpi.3.t, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=12, startColumn=13)
-        # addDataFrame(kpi.3.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=12, startColumn=22)
+        # addDataFrame(kpi.3.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=13, startColumn=3)
+        addDataFrame(kpi.3.t, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=13, startColumn=13)
+        # addDataFrame(kpi.3.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=13, startColumn=22)
     # kpi.4
-        # addDataFrame(kpi.4.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=16, startColumn=3)
-        addDataFrame(kpi.4.t, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=16, startColumn=13)
-        # addDataFrame(kpi.4.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=16, startColumn=22)
+        # addDataFrame(kpi.4.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=17, startColumn=3)
+        addDataFrame(kpi.4.t, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=17, startColumn=13)
+        # addDataFrame(kpi.4.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=17, startColumn=22)
     # kpi.5
-        # addDataFrame(kpi.5.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=19, startColumn=3)
-        addDataFrame(kpi.5.t, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=19, startColumn=13)
-        # addDataFrame(kpi.5.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=19, startColumn=22)
+        # addDataFrame(kpi.5.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=20, startColumn=3)
+        addDataFrame(kpi.5.t, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=20, startColumn=13)
+        # addDataFrame(kpi.5.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=20, startColumn=22)
     # kpi.6
-        # addDataFrame(kpi.6.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=22, startColumn=3)
-        addDataFrame(kpi.6.t, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=22, startColumn=13)
-        # addDataFrame(kpi.6.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=22, startColumn=22)
+        # addDataFrame(kpi.6.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=23, startColumn=3)
+        addDataFrame(kpi.6.t, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=23, startColumn=13)
+        # addDataFrame(kpi.6.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=23, startColumn=22)
     # kpi.7
-        # addDataFrame(kpi.7.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=24, startColumn=3)
-        addDataFrame(kpi.7.t, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=24, startColumn=13)
-        # addDataFrame(kpi.7.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=24, startColumn=22)
+        # addDataFrame(kpi.7.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=25, startColumn=3)
+        addDataFrame(kpi.7.t, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=25, startColumn=13)
+        # addDataFrame(kpi.7.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=25, startColumn=22)
 
 # Saving xls reports ----------------------------------------------------
 
