@@ -53,8 +53,13 @@ read_range <- function (x, ri, ci){
         
         }
     }
-            all_range[1,] <- gsub("(^Overall \\(|\\))", "", all_range[1,])
-            all_range[1,] <- gsub("Overall$", "HA", all_range[1,])
+        if (sum(grepl("Overall", all_range[1,]))==2){
+                all_range[1,] <- gsub("(^Overall \\(|\\))", "", all_range[1,])
+                all_range[1,] <- gsub("Overall$", "HA", all_range[1,]) ## Will be triggered if KWC is repeated in same axis
+        } else {
+                all_range[1,] <- gsub("Overall$", "KWC", all_range[1,])
+        }
+
             
             var_col_i <- which(is.na(all_range[1,]))
             
@@ -66,7 +71,7 @@ read_range <- function (x, ri, ci){
         all_range <- all_range[-c(1,2),]
     
     all_range$var1 <- gsub("(^ *)", "", all_range$var1)
-        rownames(all_range) <- all_range$var1
+        # rownames(all_range) <- all_range$var1 ## Will casue error if row names are redundant
 
     all_range
     
