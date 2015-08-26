@@ -7,10 +7,10 @@
 # Aug 2015
 
 
-# y = 15
+# y = 2015
 # m = 5
 
-kpi_report <- function(y = 15, m = 5){
+kpi_report <- function(y = 2015, m = 5){
 
 # Libraries -----------------------------------------------------------------------
 
@@ -21,11 +21,20 @@ require("lubridate")
 source("read_xlsx.R")
 source("process_kpi.R")
 
+
+# Validate function input -------------------------------------------------
+
+    if(nchar(y)!=4 | !is.numeric(y)){
+        return("Please input a year in 4 digits")
+    } else if(!is.numeric(m)){
+        return("Please input a month in integers")
+    }
+
 # Reporting period --------------------------------------------------------
 
-to.YY <- y ## Input from func
-    from.YY <- to.YY - 1
-        prev.from.YY <- from.YY - 1
+to.YY <- paste(unlist(strsplit(as.character(y), ""))[3:4], collapse = "") ## Input from func
+from.YY <- paste(unlist(strsplit(as.character(y-1), ""))[3:4], collapse = "") ## Input from func
+prev.from.YY <- paste(unlist(strsplit(as.character(y-2), ""))[3:4], collapse = "") ## Input from func
 
 to.month <- m ## Input from func
     to.Mmm <- month(to.month, label = TRUE, abbr = TRUE)
