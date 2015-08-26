@@ -205,7 +205,14 @@ kpi.2 <- function(Mmm, specialty = "Ovr"){
     
     # Replace NA with N.A. for production use in Excel
     
-    SOP_WT.prod <- apply(SOP_WT.frame, 2, FUN = function(x){ifelse(is.na(x), "N.A.", x)})
+    SOP_WT.prod <- data.frame(apply(SOP_WT.frame, 2, FUN = function(x){ifelse(is.na(x), "N.A.", x)}), stringsAsFactors = FALSE)
+    
+    for (i in 1:ncol(SOP_WT.prod)){
+        if ("N.A." %in% SOP_WT.prod[,i]){
+        } else {
+                SOP_WT.prod[,i] <- as.numeric(SOP_WT.prod[,i])
+        }
+    }
     
     # Return production ready dataframe
     
