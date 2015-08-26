@@ -6,6 +6,12 @@
 #
 # Aug 2015
 
+
+# y = 15
+# m = 5
+
+kpi_report <- function(y = 15, m = 5){
+
 # Libraries -----------------------------------------------------------------------
 
 require("xlsx")
@@ -17,11 +23,11 @@ source("process_kpi.R")
 
 # Reporting period --------------------------------------------------------
 
-to.YY <- 15 ## Input from func
+to.YY <- y ## Input from func
     from.YY <- to.YY - 1
         prev.from.YY <- from.YY - 1
 
-to.month <- 5 ## Input from func
+to.month <- m ## Input from func
     to.Mmm <- month(to.month, label = TRUE, abbr = TRUE)
     from.Mmm <- month(to.month + 1, label = TRUE, abbr = TRUE)
 
@@ -80,31 +86,31 @@ as.KPI <- loadWorkbook(KPI_files$temp.paths[1])
     # kpi.1
         kpi.1.c <- kpi.1(to.MmmYY)
         kpi.1.t <- kpi.t("kpi.1")
-        kpi.1.p <- kpi.1(prev.MmmYY)
+        kpi.1.p <- kpi.1(prev.to.MmmYY)
     # kpi.2
         # kpi.2.c <- kpi.2(to.MmmYY)
         kpi.2.t <- kpi.t("kpi.2")
-        # kpi.2.p <- kpi.2(prev.MmmYY)
+        # kpi.2.p <- kpi.2(prev.to.MmmYY)
     # kpi.3
         # kpi.3.c <- kpi.3(to.MmmYY)
         kpi.3.t <- kpi.t("kpi.3")
-        # kpi.3.p <- kpi.3(prev.MmmYY)
+        # kpi.3.p <- kpi.3(prev.to.MmmYY)
     # kpi.4
         # kpi.4.c <- kpi.4(to.MmmYY)
         kpi.4.t <- kpi.t("kpi.4")
-        # kpi.4.p <- kpi.4(prev.MmmYY)
+        # kpi.4.p <- kpi.4(prev.to.MmmYY)
     # kpi.5
         # kpi.5.c <- kpi.5(to.MmmYY)
         kpi.5.t <- kpi.t("kpi.5")
-        # kpi.5.p <- kpi.5(prev.MmmYY)
+        # kpi.5.p <- kpi.5(prev.to.MmmYY)
     # kpi.6
         # kpi.6.c <- kpi.6(to.MmmYY)
         kpi.6.t <- kpi.t("kpi.6")
-        # kpi.6.p <- kpi.6(prev.MmmYY)
+        # kpi.6.p <- kpi.6(prev.to.MmmYY)
     # kpi.7
         # kpi.7.c <- kpi.7(to.MmmYY)
         kpi.7.t <- kpi.t("kpi.7")
-        # kpi.7.p <- kpi.7(prev.MmmYY)
+        # kpi.7.p <- kpi.7(prev.to.MmmYY)
 
 # Update reporting month and period -----------------------------------
 
@@ -149,4 +155,4 @@ as.KPI$setForceFormulaRecalculation(TRUE)
     saveWorkbook(as.KPI, KPI_files$file.paths[1])
 #     saveWorkbook(as.SOP, KPI_files$file.paths[2])
 #     saveWorkbook(as.TRE, KPI_files$file.paths[3])
-    
+}
