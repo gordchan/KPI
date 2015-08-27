@@ -99,7 +99,7 @@ as.KPI <- loadWorkbook(KPI_files$temp.paths[1])
     # kpi.2
         kpi.2.c <- kpi.2(to.MmmYY)
         kpi.2.t <- kpi.t("kpi.2")
-        # kpi.2.p <- kpi.2(prev.to.MmmYY)
+        kpi.2.p <- kpi.2(prev.to.MmmYY)
     # kpi.3
         # kpi.3.c <- kpi.3(to.MmmYY)
         kpi.3.t <- kpi.t("kpi.3")
@@ -133,7 +133,7 @@ as.KPI <- loadWorkbook(KPI_files$temp.paths[1])
     # kpi.2
         addDataFrame(kpi.2.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=8, startColumn=3)
         addDataFrame(kpi.2.t, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=8, startColumn=13)
-        # addDataFrame(kpi.2.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=8, startColumn=22)
+        addDataFrame(kpi.2.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=8, startColumn=22)
     # kpi.3
         # addDataFrame(kpi.3.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=13, startColumn=3)
         addDataFrame(kpi.3.t, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=13, startColumn=13)
