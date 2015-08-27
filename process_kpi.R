@@ -145,9 +145,11 @@ kpi.2 <- function(Mmm, specialty = "Ovr"){
 #         specialty = c("ENT" , "GYN" , "MED" , "OPH" , "ORT" , "PAE" , "PSY" , "SUR"),
 #         specialty.df = paste("SOP_WT.", SOP.specialty, sep = ""))
     
-    path <- grep("(.*kpi.2.*)", source.kpi$filepath, value = TRUE)
+    path <- grep("(.*kpi.2 S.*)", source.kpi$filepath, value = TRUE)
+    path.HA <- grep("(.*kpi.2.HA.*)", source.kpi$filepath, value = TRUE)
     
     SOP_WT <- read_range(path, 5:28, 1:55)
+    SOP_WT.HA <- read_range(path.HA, 5:28, 1:10)
         row.index <- c(3:4, 10, 14, 20)
 
     SOP_WT.frame <- empty.frame
@@ -159,33 +161,39 @@ kpi.2 <- function(Mmm, specialty = "Ovr"){
     # Split data into dataframes per specialty and show NA data
     
     SOP_WT <- SOP_WT[row.index,]
+    SOP_WT.HA <- SOP_WT.HA[row.index,]
     
     colnames(SOP_WT) <- gsub("( Mgt)", "", colnames(SOP_WT))
+    colnames(SOP_WT.HA) <- gsub("( Inst.$)", "", colnames(SOP_WT.HA))
     
     for (i in 1:(length(SOP_WT)-1)){
         SOP_WT[,i+1] <- as.numeric(SOP_WT[,i+1])
     }
     
+    for (i in 1:(length(SOP_WT.HA)-1)){
+        SOP_WT.HA[,i+1] <- as.numeric(SOP_WT.HA[,i+1])
+    }
+    
     ### NEED TO INSERT HA OVERALL DATA ###
     
     if (specialty=="ENT"){
-            SOP_WT.Spl <- SOP_WT[,c(1,2:6)]
+            SOP_WT.Spl <- cbind(SOP_WT[,c(1,2:6)], SOP_WT.HA[,c(2,1)])
     } else if (specialty=="GYN"){
-            SOP_WT.Spl <- SOP_WT[,c(1,7:12)] 
+            SOP_WT.Spl <- cbind(SOP_WT[,c(1,7:12)], SOP_WT.HA[,c(3,1)]) 
     } else if (specialty=="MED"){
-            SOP_WT.Spl <- SOP_WT[,c(1,13:19)]
+            SOP_WT.Spl <- cbind(SOP_WT[,c(1,13:19)], SOP_WT.HA[,c(4,1)])
     } else if (specialty=="OPH"){
-            SOP_WT.Spl <- SOP_WT[,c(1,20:23)]
+            SOP_WT.Spl <- cbind(SOP_WT[,c(1,20:23)], SOP_WT.HA[,c(5,1)])
     } else if (specialty=="ORT"){
-            SOP_WT.Spl <- SOP_WT[,c(1,24:30)]
+            SOP_WT.Spl <- cbind(SOP_WT[,c(1,24:30)], SOP_WT.HA[,c(6,1)])
     } else if (specialty=="PAE"){
-            SOP_WT.Spl <- SOP_WT[,c(1,31:46)]
+            SOP_WT.Spl <- cbind(SOP_WT[,c(1,31:46)], SOP_WT.HA[,c(7,1)])
     } else if (specialty=="PSY"){
-            SOP_WT.Spl <- SOP_WT[,c(1,37:40)]
+            SOP_WT.Spl <- cbind(SOP_WT[,c(1,37:40)], SOP_WT.HA[,c(8,1)])
     } else if (specialty=="SUR"){
-            SOP_WT.Spl <- SOP_WT[,c(1,41:47)]
+            SOP_WT.Spl <- cbind(SOP_WT[,c(1,41:47)], SOP_WT.HA[,c(9,1)])
     } else if (specialty=="Ovr"){
-            SOP_WT.Spl <- SOP_WT[,c(1,48:55)]
+            SOP_WT.Spl <- cbind(SOP_WT[,c(1,48:55)], SOP_WT.HA[,c(10,1)])
     }
 
 
