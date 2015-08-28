@@ -41,25 +41,12 @@ kpi_source_helper <- function(Mmm){
                               KCH = numeric(0),
                               KWH = numeric(0),
                               NLTH = numeric(0),
-                              OLMH = numeric(0),
+                              OLM = numeric(0),
                               PMH = numeric(0),
-                              WTSH = numeric(0),
+                              WTS = numeric(0),
                               YCH = numeric(0),
                               KWC = numeric(0),
                               HA = numeric(0))
-    
-    # Empty dataframe with CDARS hospital abbreviations
-    
-    empty.frame.cdars <<- data.frame(CMC = numeric(0),
-                               KCH = numeric(0),
-                               KWH = numeric(0),
-                               NLTH = numeric(0),
-                               OLM = numeric(0),
-                               PMH = numeric(0),
-                               WTS = numeric(0),
-                               YCH = numeric(0),
-                               KWC = numeric(0),
-                               HA = numeric(0))
     
     # File table
     # KPI targets
@@ -326,7 +313,7 @@ kpi.5 <- function(kpi, Mmm){
     Bed.alos <- read_range(path, 6:20, c(1,18:32))
         row.index <- c(13)
     
-    Bed.frame <- empty.frame.cdars
+    Bed.frame <- empty.frame
         for (i in 1:(length(row.index)*2)){
             Bed.frame[i,] <- rep(NA, length(Bed.frame))
         }
@@ -405,7 +392,7 @@ kpi.10 <- function(Mnn, show_specialty = FALSE){
     
         if (show_specialty == FALSE){
             
-            URR.frame <- empty.frame.cdars
+            URR.frame <- empty.frame
                 URR.frame[1,] <- NA
             
             row.index <- 20
