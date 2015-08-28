@@ -93,17 +93,23 @@ as.KPI <- loadWorkbook(KPI_files$temp.paths[1])
 # Load and prepare KPI source data -----------------------------------
 
     # kpi.1
-        kpi.1.c <- kpi.1(to.MmmYY)
         kpi.1.t <- kpi.t("kpi.1")
+        kpi.1.c <- kpi.1(to.MmmYY)
         kpi.1.p <- kpi.1(prev.to.MmmYY)
     # kpi.2
-        kpi.2.c <- kpi.2(to.MmmYY)
         kpi.2.t <- kpi.t("kpi.2")
+        kpi.2.c <- kpi.2(to.MmmYY)
         kpi.2.p <- kpi.2(prev.to.MmmYY)
     # kpi.3
-        # kpi.3.c <- kpi.3(to.MmmYY)
         kpi.3.t <- kpi.t("kpi.3")
-        # kpi.3.p <- kpi.3(prev.to.MmmYY)
+        # kpi.3.1.c <- kpi.10(to.MmmYY)
+        # kpi.3.1.p <- kpi.10(prev.to.MmmYY)
+        # kpi.3.2.c <- kpi.10(to.MmmYY)
+        # kpi.3.2.p <- kpi.10(prev.to.MmmYY)
+        # kpi.3.3.c <- kpi.10(to.MmmYY)
+        # kpi.3.3.p <- kpi.10(prev.to.MmmYY)
+        kpi.3.4.c <- kpi.10(to.MmmYY)
+        kpi.3.4.p <- kpi.10(prev.to.MmmYY)
     # kpi.4
         # kpi.4.c <- kpi.4(to.MmmYY)
         kpi.4.t <- kpi.t("kpi.4")
@@ -128,16 +134,28 @@ as.KPI <- loadWorkbook(KPI_files$temp.paths[1])
 # Update A&E wait time -----------------------------------------------
     # kpi.1
         addDataFrame(kpi.1.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=4, startColumn=3)
+        
         addDataFrame(kpi.1.t, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=4, startColumn=13)
+        
         addDataFrame(kpi.1.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=4, startColumn=22)
     # kpi.2
         addDataFrame(kpi.2.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=8, startColumn=3)
+        
         addDataFrame(kpi.2.t, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=8, startColumn=13)
+        
         addDataFrame(kpi.2.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=8, startColumn=22)
     # kpi.3
-        # addDataFrame(kpi.3.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=13, startColumn=3)
+        # addDataFrame(kpi.3.1.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=13, startColumn=3)
+        # addDataFrame(kpi.3.2.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=14, startColumn=3)
+        # addDataFrame(kpi.3.3.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=15, startColumn=3)
+        addDataFrame(kpi.3.4.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=16, startColumn=3)
+        
         addDataFrame(kpi.3.t, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=13, startColumn=13)
-        # addDataFrame(kpi.3.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=13, startColumn=22)
+        
+        # addDataFrame(kpi.3.1.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=13, startColumn=22)
+        # addDataFrame(kpi.3.2.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=14, startColumn=22)
+        # addDataFrame(kpi.3.3.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=15, startColumn=22)
+        addDataFrame(kpi.3.4.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=16, startColumn=22)
     # kpi.4
         # addDataFrame(kpi.4.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=17, startColumn=3)
         addDataFrame(kpi.4.t, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=17, startColumn=13)
