@@ -32,25 +32,61 @@ kpi_source_helper <- function(Mmm){
                               HA = numeric(0))
     
     # File table
-    
-    source.kpi <<- read.xlsx("source/KPI items.xlsx",
+    # Clinical KPI
+
+    source.kpi <- read.xlsx("source/KPI items.xlsx",
                             sheetName = "KPI",
-                            colIndex = 4)
+                            colIndex = 4,
+                            stringsAsFactors = FALSE)
+    
+    source.HA.kpi <- read.xlsx("source/KPI items.xlsx",
+                            sheetName = "KPI",
+                            colIndex = 5,
+                            stringsAsFactors = FALSE)
+            names(source.HA.kpi) <- "Query.Name"
+    
+    source.kpi <- bind_rows(source.kpi, source.HA.kpi)
+
         source.kpi <<- source.kpi %>% filter(!is.na(Query.Name)) %>%
+            distinct(Query.Name) %>% arrange(Query.Name) %>%
             mutate(filename = paste(Query.Name, ".xlsx", sep = "")) %>%
             mutate(filepath = file.path("source", Mmm, filename))
     
-    source.tre <<- read.xlsx("source/KPI items.xlsx",
-                            sheetName = "TRE",
-                            colIndex = 4)
+    # KPI Trend
+    source.tre <- read.xlsx("source/KPI items.xlsx",
+                            sheetName = "KPI",
+                            colIndex = 4,
+                            stringsAsFactors = FALSE)
+        
+    source.HA.tre <- read.xlsx("source/KPI items.xlsx",
+                            sheetName = "KPI",
+                            colIndex = 5,
+                            stringsAsFactors = FALSE)
+        names(source.HA.tre) <- "Query.Name"
+        
+        source.tre <- bind_rows(source.tre, source.HA.tre)
+        
         source.tre <<- source.tre %>% filter(!is.na(Query.Name)) %>%
+            distinct(Query.Name) %>% arrange(Query.Name) %>%
             mutate(filename = paste(Query.Name, ".xlsx", sep = "")) %>%
             mutate(filepath = file.path("source", Mmm, filename))    
     
-    source.sop <<- read.xlsx("source/KPI items.xlsx",
-                            sheetName = "SOP",
-                            colIndex = 4)
+    # SOP KPI
+    source.sop <- read.xlsx("source/KPI items.xlsx",
+                            sheetName = "KPI",
+                            colIndex = 4,
+                            stringsAsFactors = FALSE)
+        
+    source.HA.sop <- read.xlsx("source/KPI items.xlsx",
+                            sheetName = "KPI",
+                            colIndex = 5,
+                            stringsAsFactors = FALSE)
+    names(source.HA.sop) <- "Query.Name"
+        
+        source.sop <- bind_rows(source.sop, source.HA.sop)
+        
         source.sop <<- source.sop %>% filter(!is.na(Query.Name)) %>%
+            distinct(Query.Name) %>% arrange(Query.Name) %>%
             mutate(filename = paste(Query.Name, ".xlsx", sep = "")) %>%
             mutate(filepath = file.path("source", Mmm, filename))    
 }
