@@ -7,6 +7,21 @@
 # Aug 2015
 
 
+# Set value for function development --------------------------------------
+
+mock <- function(){
+    require("xlsx")
+    require("dplyr")
+    require("lubridate")
+    
+    source("read_xlsx.R")
+    
+    Mmm<<-"May15"
+    
+}
+
+mock()
+
 # Helper function to help with reading source file ----------------------------------------
 
 # i. Initialise empty dataframe for use by each measurements
@@ -17,6 +32,8 @@ kpi_source_helper <- function(Mmm){
     
     require("xlsx")
     require("dplyr")
+    
+    if(!exists("read_range", mode="function")) source("read_xlsx.R")
     
     # Empty dataframe
     
@@ -39,12 +56,17 @@ kpi_source_helper <- function(Mmm){
                                NLTH = numeric(0),
                                OLM = numeric(0),
                                PMH = numeric(0),
-                               WTSH = numeric(0),
+                               WTS = numeric(0),
                                YCH = numeric(0),
                                KWC = numeric(0),
                                HA = numeric(0))
     
     # File table
+    # KPI targets
+    
+    target.kpi <<- data.frame(filename = c("targets.csv")) %>% mutate(filepath = file.path("target", Mmm, filename))
+ 
+    
     # Clinical KPI
 
     source.kpi <- read.xlsx("source/KPI items.xlsx",
@@ -120,24 +142,30 @@ kpi_source_helper <- function(Mmm){
 #
 # Accept input of kpi. s/n (i.e. "kpi.1" to "kpi.7")
 
-kpi.t <- function(kpi.sn){
+kpi.t <- function(i, Mmm){
     
-    require("dplyr")
+    kpi_source_helper(Mmm)
     
     # KPI targets
     
-    targets <- read.csv(file.path("target", "targets.csv"), stringsAsFactors = FALSE)
+    path <- target.kpi$filepath
     
-    # Construct regex from the input kpi. s/n
+    targets <- read.csv(path, stringsAsFactors = FALSE)
     
-    kpi.regex <- paste("^", kpi.sn, sep = "")
+    rownames(targets) <- targets$KPI
+    
+    targets <- targets[,-1]
     
     # Filter KPI targets dataframe to return needed targets
     
-    target.req <- targets %>% filter(grepl(kpi.regex, KPI)) %>%
-                                select(-KPI)
+    target.prod <- targets[i,]
     
-    target.req
+    # Replace NA with N.A. for user in Excel
+    
+    target.prod <- lapply(target.prod, function(x){ifelse(is.na(x), "N.A.", x)})
+        target.prod <- data.frame(target.prod)
+    
+    target.prod
 }
 
 
@@ -285,7 +313,81 @@ kpi.2 <- function(Mmm, specialty = "Ovr"){
     
 }
 
-# kpi.10 Quality - Unplanned Readmission Rate within 28 days for general inpatients
+
+# kpi.5 Efficiency --------------------------------------------------------
+
+kpi.5 <- function(kpi, Mmm){
+    
+    kpi_source_helper(Mmm)
+    
+    path <- grep("(.*kpi.5 .*)", source.kpi$filepath, value = TRUE)
+    
+    Bed.occ <- read_range(path, 6:20, 1:17)
+    Bed.alos <- read_range(path, 6:20, c(1,18:32))
+        row.index <- c(13)
+    
+    Bed.frame <- empty.frame.cdars
+        for (i in 1:(length(row.index)*2)){
+            Bed.frame[i,] <- rep(NA, length(Bed.frame))
+        }
+    
+    # Convert to numeric class
+        
+        for (i in 1:(ncol(Bed.occ)-1)){
+            Bed.occ[,i+1] <- as.numeric(Bed.occ[,i+1])
+        }
+    
+        for (i in 1:(ncol(Bed.alos)-1)){
+            Bed.alos[,i+1] <- as.numeric(Bed.alos[,i+1])
+        }
+    
+    # Conver IP bed occupancy rate to decimal percentage
+        
+        for (i in 1:ncol(Bed.occ)){
+            Bed.occ[,i] <- sapply(Bed.occ[,i], FUN = function(x){ifelse(is.numeric(x), x/100, x)})
+        }
+    
+    # Subset dataframes with row_index
+    
+    Bed.occ <- Bed.occ[row.index,]
+    Bed.alos <- Bed.alos[row.index,]
+    
+    # Combine Occ & ALOS as single dataframe
+        
+    for (i in 1:ncol(Bed.frame)){
+        if (names(Bed.frame)[i] %in% names(Bed.occ)){
+            Bed.frame[1,i] <- Bed.occ[names(Bed.frame)[i]]
+            }
+        }
+        
+    for (i in 1:ncol(Bed.frame)){
+        if (names(Bed.frame)[i] %in% names(Bed.alos)){
+            Bed.frame[2,i] <- Bed.alos[names(Bed.frame)[i]]
+            }
+        }
+    
+    # Select Occ or ALOS data
+    
+    
+    if (kpi=="kpi.5.2"){
+        Bed.frame <- Bed.frame[1,]
+    } else if (kpi=="kpi.5.3"){
+        Bed.frame <- Bed.frame[2,]
+    }
+    
+    # Replace NA with N.A. for use in Excel
+
+    Bed.prod <- lapply(Bed.frame, function(x){ifelse(is.na(x), "N.A.", x)})
+        Bed.prod <- data.frame(Bed.prod)
+    
+    # Return production dataframe
+    
+    Bed.prod
+    
+}
+    
+
+# kpi.3.4 & 10 Quality - Unplanned Readmission Rate within 28 days for g --------
 
 kpi.10 <- function(Mnn, show_specialty = FALSE){
     
