@@ -125,7 +125,7 @@ kpi.1 <- function(Mmm){
     
 kpi_source_helper(Mmm)
     
-    path <- grep("(.*kpi.1.*)", source.kpi$filepath, value = TRUE)
+    path <- grep("(.*kpi.1 .*)", source.kpi$filepath, value = TRUE)
     
     AE_WT <- read_range(path, 5:12, 1:14)
     
@@ -181,8 +181,8 @@ kpi.2 <- function(Mmm, specialty = "Ovr"){
 #         specialty = c("ENT" , "GYN" , "MED" , "OPH" , "ORT" , "PAE" , "PSY" , "SUR"),
 #         specialty.df = paste("SOP_WT.", SOP.specialty, sep = ""))
     
-    path <- grep("(.*kpi.2 S.*)", source.kpi$filepath, value = TRUE)
-    path.HA <- grep("(.*kpi.2.HA.*)", source.kpi$filepath, value = TRUE)
+    path <- grep("(.*kpi.2 .*)", source.kpi$filepath, value = TRUE)
+    path.HA <- grep("(.*kpi.2.HA .*)", source.kpi$filepath, value = TRUE)
     
     SOP_WT <- read_range(path, 5:28, 1:55)
     SOP_WT.HA <- read_range(path.HA, 5:28, 1:10)
