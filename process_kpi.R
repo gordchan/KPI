@@ -113,6 +113,9 @@ kpi_source_helper <- function(Mmm){
 
 # KPI targets -------------------------------------------------------------
 
+## * Need to convert to numeric where possible *
+## * Need to calculate some items's target! *
+
 # Return stored KPI targets according to the input kpi. s/n value
 #
 # Accept input of kpi. s/n (i.e. "kpi.1" to "kpi.7")
@@ -316,7 +319,7 @@ kpi.10 <- function(Mnn, show_specialty = FALSE){
             URR.frame <- URR
         }
 
-    # Convert to decimal percentage
+    # Convert to decimal percentage *(Need to consider if requried for show_specialty=TRUE)*
     
     for (i in 1:ncol(URR.frame)){
             URR.frame[,i] <- sapply(URR.frame[,i], FUN = function(x){ifelse(is.numeric(x), x/100, x)})
@@ -324,18 +327,20 @@ kpi.10 <- function(Mnn, show_specialty = FALSE){
     
     # Replace NA with N.A. for use in Excel
     
-    URR.prod <- data.frame(apply(URR.frame, 2, FUN = function(x){ifelse(is.na(x), "N.A.", x)}), stringsAsFactors = FALSE)
-    
-    for (i in 1:ncol(URR.prod)){
-        if ("N.A." %in% URR.prod[,i]){
-        } else {
-            URR.prod[,i] <- as.numeric(URR.prod[,i])
-        }
+    if (nrow(URR.frame)>1){
+        URR.prod <- data.frame(apply(URR.frame, 2, FUN = function(x){ifelse(is.na(x), "N.A.", x)}), stringsAsFactors = FALSE)
+    } else if (nrow(URR.frame)==1){
+        URR.prod <- lapply(URR.frame, function(x){ifelse(is.na(x), "N.A.", x)})
+        URR.prod <-data.frame(URR.prod)
     }
     
-    if(show_specialty==FALSE){
-        URR.prod <- t(URR.prod)
-    }
+    
+#     for (i in 1:ncol(URR.prod)){
+#         if ("N.A." %in% URR.prod[,i]){
+#         } else {
+#             URR.prod[,i] <- as.numeric(URR.prod[,i])
+#         }
+#     }
     
     # Return production ready dataframe
     
