@@ -108,8 +108,12 @@ as.KPI <- loadWorkbook(KPI_files$temp.paths[1])
         kpi.3.4.c <- kpi.10(to.MmmYY)
         kpi.3.4.p <- kpi.10(prev.to.MmmYY)
     # kpi.4
-        # kpi.4.c <- kpi.4(to.MmmYY)
-        # kpi.4.p <- kpi.4(prev.to.MmmYY)
+        kpi.4.1.c <- kpi.4.1(to.MmmYY)
+        kpi.4.1.p <- kpi.4.1(prev.to.MmmYY)
+        kpi.4.2.c <- kpi.4.2(to.MmmYY)
+        kpi.4.2.p <- kpi.4.2(prev.to.MmmYY)
+        # kpi.4.3.c <- kpi.4.3(to.MmmYY)
+        # kpi.4.3.p <- kpi.4.3(prev.to.MmmYY)
     # kpi.5
         # kpi.5.1.c <- kpi.5(to.MmmYY)
         # kpi.5.1.p <- kpi.5(prev.to.MmmYY)
@@ -153,9 +157,14 @@ as.KPI <- loadWorkbook(KPI_files$temp.paths[1])
         # addDataFrame(kpi.3.3.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=15, startColumn=22)
         addDataFrame(kpi.3.4.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=16, startColumn=22)
     # kpi.4
-        # addDataFrame(kpi.4.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=17, startColumn=3)
+        addDataFrame(kpi.4.1.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=17, startColumn=3)
+        addDataFrame(kpi.4.2.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=18, startColumn=3)
+        # addDataFrame(kpi.4.3.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=19, startColumn=3)
 
-        # addDataFrame(kpi.4.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=17, startColumn=22)
+        addDataFrame(kpi.4.1.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=17, startColumn=22)
+        addDataFrame(kpi.4.2.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=18, startColumn=22)
+        # addDataFrame(kpi.4.3.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=19, startColumn=22)
+        
     # kpi.5
         # addDataFrame(kpi.5.1.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=20, startColumn=3)
         addDataFrame(kpi.5.2.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=21, startColumn=3)
