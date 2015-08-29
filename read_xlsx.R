@@ -87,3 +87,37 @@ raw_range <- function (input, ri, ci){
                            keepFormulas=FALSE, stringsAsFactors = FALSE)
     raw_range
 }
+
+
+# Read (semi-)fuzzy range --------------------------------------------------------
+
+# Read table of uncertain length given approx. lower bound of rows
+#
+# with the number of columns assumed known. It searches for the end of table 
+#
+# assuming the last column would contain only table data, but no text in other cells.
+
+fuzzy_range <- function (input, fuzzy.ri, ci){
+    
+    require("dplyr")
+    
+    # Read spreadsheet with deliberate over read to accomodate variations in table length
+    
+    fuzzy_range <- read.xlsx(file=input, sheetIndex=1, rowIndex=fuzzy.ri, colIndex=ci,
+                           as.data.frame=TRUE, header=FALSE, colClasses=NA,
+                           keepFormulas=FALSE, stringsAsFactors = FALSE)
+    
+    # Search for end of table
+    
+    for (i in 1:nrow(fuzzy_range)){
+        if (!is.na(fuzzy_range[i,ncol(fuzzy_range)]) & is.na(fuzzy_range[(i+1),ncol(fuzzy_range)])){
+            eor <- i
+        }
+    }
+    
+    # Cut non-table rows
+    
+    fuzzy_range <- fuzzy_range[1:eor,]
+    
+    fuzzy_range
+}
