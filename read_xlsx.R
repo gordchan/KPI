@@ -36,12 +36,10 @@ read_all_sheets <- function (x){
 
 ## A function to return a specific range of a sheet from a excel spreadsheets file
 
-read_range <- function (x, ri, ci){
+read_range <- function (input, ri, ci){
     
     require("xlsx")
-    
-    input <- x
-    
+
     all_range <- read.xlsx(file=input, sheetIndex=1, rowIndex=ri, colIndex=ci,
               as.data.frame=TRUE, header=FALSE, colClasses=NA,
               keepFormulas=FALSE, stringsAsFactors = FALSE)
@@ -75,4 +73,17 @@ read_range <- function (x, ri, ci){
 
     all_range
     
+}
+
+
+# Read raw range ----------------------------------------------------------
+
+raw_range <- function (input, ri, ci){
+    
+    require("xlsx")
+    
+    raw_range <- read.xlsx(file=input, sheetIndex=1, rowIndex=ri, colIndex=ci,
+                           as.data.frame=TRUE, header=FALSE, colClasses=NA,
+                           keepFormulas=FALSE, stringsAsFactors = FALSE)
+    raw_range
 }
