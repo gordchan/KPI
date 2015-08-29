@@ -16,7 +16,9 @@ mock <- function(){
     
     source("read_xlsx.R")
     
-    Mmm<<-"May15"
+    Mmm <<- "May15"
+    
+    path <<- file.path("source", Mmm, "kpi.4.1 Stroke.xlsx")
     
 }
 
@@ -333,13 +335,17 @@ kpi_source_helper(Mmm)
     Stroke.frame[1,] <- NA
     
     
-    Stroke <- raw_range(path, 138:163, 1:5)
+    Stroke <- fuzzy_range(path, 138:170, 1:5)
     
         names(Stroke) <- c("cluster", "institution", "ASU", "other", "total")
     
-    row.index <- c(5,7,9,12,13:18,22,25,26)
+    # row.index <- c(5,7,9,12,13:18,22,25,26)
+        
+        Stroke$institution <- gsub("^Subtotal.*", "Subtotal", Stroke$institution)
+        
+        Stroke <- Stroke[-c(1:2),] %>% filter(cluster == "KW" | institution == "Subtotal" | is.na(institution))
     
-    Stroke <- Stroke[row.index,]
+    # Stroke <- Stroke[row.index,]
     
         Stroke[nrow(Stroke),1] <- "HA"
         
@@ -401,7 +407,7 @@ kpi.4.2 <- function(Mmm){
     Hip.frame[1,] <- NA
     
     
-    Hip <- raw_range(path, 84:108, 1:6)
+    Hip <- fuzzy_range(path, 84:110, 1:6)
     
     names(Hip) <- c("cluster", "institution", "within_2", "between_2_to_4", "other", "total")
     
