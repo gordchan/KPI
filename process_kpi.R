@@ -232,10 +232,6 @@ kpi.2 <- function(Mmm, specialty = "Ovr"){
     
     kpi_source_helper(Mmm)
     
-#     SOP.specialty <- data.frame(
-#         specialty = c("ENT" , "GYN" , "MED" , "OPH" , "ORT" , "PAE" , "PSY" , "SUR"),
-#         specialty.df = paste("SOP_WT.", SOP.specialty, sep = ""))
-    
     path <- grep("(.*kpi.2 .*)", source.kpi$filepath, value = TRUE)
     path.HA <- grep("(.*kpi.2.HA .*)", source.kpi$filepath, value = TRUE)
     
@@ -339,13 +335,9 @@ kpi_source_helper(Mmm)
     
         names(Stroke) <- c("cluster", "institution", "ASU", "other", "total")
     
-    # row.index <- c(5,7,9,12,13:18,22,25,26)
-        
         Stroke$institution <- gsub("^Subtotal.*", "Subtotal", Stroke$institution)
         
         Stroke <- Stroke[-c(1:2),] %>% filter(cluster == "KW" | institution == "Subtotal" | is.na(institution))
-    
-    # Stroke <- Stroke[row.index,]
     
         Stroke[nrow(Stroke),1] <- "HA"
         
@@ -395,8 +387,6 @@ kpi_source_helper(Mmm)
     
 }
 
-
-
 kpi.4.2 <- function(Mmm){
     
     kpi_source_helper(Mmm)
@@ -411,13 +401,9 @@ kpi.4.2 <- function(Mmm){
     
     names(Hip) <- c("cluster", "institution", "within_2", "between_2_to_4", "other", "total")
     
-    # row.index <- c(5,7,9,12,13:17,21,24,25)
-    
     Hip$institution <- gsub("^Subtotal.*", "Subtotal", Hip$institution)
     
     Hip <- Hip[-c(1:2),] %>% filter(cluster == "KW" | institution == "Subtotal" | is.na(institution))
-    
-    # Hip <- Hip[row.index,]
     
     Hip[nrow(Hip),1] <- "HA"
     
@@ -465,6 +451,50 @@ kpi.4.2 <- function(Mmm){
     
     Hip.prod
     
+}
+
+kpi.4.3 <- function(Mmm){
+    
+    kpi_source_helper(Mmm)
+    
+    path <- grep("(.*kpi.4.3 .*)", source.kpi$filepath, value = TRUE)
+    
+    AMI.frame <- empty.frame
+    AMI.frame[1,] <- NA
+    
+    AMI <- raw_range(path, 36:44, 1:2)
+    AMI.HA <- raw_range(path, 36:43, 10:11)
+    
+    names(AMI) <- AMI[1,]
+        AMI <- AMI[-1,]
+    names(AMI.HA) <- AMI.HA[1,]
+        AMI.HA <- AMI.HA[-1,]
+        
+    AMI <- AMI %>% t() %>% as.data.frame(stringsAsFactors = FALSE)
+    AMI.HA <- AMI.HA %>% t() %>% as.data.frame(stringsAsFactors = FALSE)
+    
+    AMI <- cbind(AMI, AMI.HA)
+    
+    names(AMI) <- AMI[1,]
+
+    AMI <- AMI[-1,]
+
+    AMI <- data.frame(lapply(AMI[1,], FUN = function(x) as.numeric(x)))
+
+    for (i in 1:length(AMI.frame)){
+        if (names(AMI.frame)[i] %in% names(AMI)){
+            AMI.frame[i] <- AMI[names(AMI.frame)[i]]
+        }
+    }
+    
+    # Replace NA with N.A. for use in Excel
+    
+    AMI.prod <- lapply(AMI.frame, function(x){ifelse(is.na(x), "N.A.", x)})
+    AMI.prod <- data.frame(AMI.prod)
+    
+    # Return production dataframe
+    
+    AMI.prod
 }
 
 # kpi.5 Efficiency --------------------------------------------------------
@@ -612,6 +642,81 @@ kpi.5 <- function(kpi, Mmm){
     
 }
     
+
+# kpi.6 Waiting time for elective Total Joint Replacement -----------------
+
+kpi.6 <- function(kpi, Mmm){
+    
+    kpi_source_helper(Mmm)
+    
+    if (kpi == "kpi.6.1"){
+        
+        regex <- "(.*kpi.6.1 .*)"
+        regex.HA <- "(.*kpi.6.1.HA .*)"
+        
+    } else if (kpi == "kpi.6.2"){
+        
+        regex <- "(.*kpi.6.2 .*)"
+        regex.HA <- "(.*kpi.6.2.HA .*)"
+        
+    }
+    
+    path <- grep(regex, source.kpi$filepath, value = TRUE)
+    path.HA <- grep(regex.HA, source.kpi$filepath, value = TRUE)
+    
+    TJR.frame <- empty.frame
+    TJR.frame[1,] <- NA
+    
+    TJR <- raw_range(path, 35:40, 1:3)
+    TJR.HA <- raw_range(path.HA, 35:43, 1:3)
+    
+    TJR[1,] <- gsub("( [0-9]{2})", "", TJR[1,])
+    TJR.HA[1,] <- gsub("( [0-9]{2})", "", TJR.HA[1,])
+    
+    names(TJR) <- TJR[1,]
+    names(TJR.HA) <- TJR.HA[1,]
+    
+    TJR.HA$Institution <- gsub("( Overall$)", "", TJR.HA$Institution)
+    
+    # Select period column
+    
+    Mmm.regex <- paste("(- ", Mmm, "$)", sep = "")
+    
+    TJR <- TJR[grepl("Institution", names(TJR)) | grepl(Mmm.regex, names(TJR))]
+    TJR.HA <- TJR.HA[grepl("Institution", names(TJR.HA)) | grepl(Mmm.regex, names(TJR.HA))]
+    
+    TJR <- TJR[-1,] %>% t() %>% as.data.frame(stringsAsFactors = FALSE)
+    TJR.HA <- TJR.HA[-1,] %>% t() %>% as.data.frame(stringsAsFactors = FALSE)
+    
+    # Reformat
+    
+    names(TJR) <- TJR[1,]
+    names(TJR.HA) <- TJR.HA[1,]
+    
+    TJR <- TJR[-1,]
+    TJR.HA <- TJR.HA[-1,]
+    
+    TJR <- data.frame(lapply(TJR[1,], FUN = function(x) as.numeric(x)))
+    TJR.HA <- data.frame(lapply(TJR.HA[1,], FUN = function(x) as.numeric(x)))
+    
+    TJR <- cbind(TJR, TJR.HA)
+    
+    for (i in 1:ncol(TJR.frame)){
+        if (names(TJR.frame)[i] %in% names(TJR)){
+            TJR.frame[i] <- TJR[names(TJR.frame)[i]]
+        }
+    }
+    
+    # Replace NA with N.A. for use in Excel
+    
+    TJR.prod <- lapply(TJR.frame, function(x){ifelse(is.na(x), "N.A.", x)})
+    TJR.prod <- data.frame(TJR.prod)
+    
+    # Return production dataframe
+    
+    TJR.prod
+ 
+}
 
 # kpi.3.4 & 10 Quality - Unplanned Readmission Rate within 28 days for g --------
 
