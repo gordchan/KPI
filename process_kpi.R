@@ -315,6 +315,102 @@ kpi.2 <- function(Mmm, specialty = "Ovr"){
 }
 
 
+# kpi.3 Quality ----------------------------------------------------------
+
+kpi.3.3 <- function(Mmm, trend = FALSE, row){
+    
+    require("tidyr")
+    
+    kpi_source_helper(Mmm)
+    
+    path <- grep("(.*kpi.3.3 .*)", source.kpi$filepath, value = TRUE)
+    
+    MRSA.frame <- empty.frame
+    
+    MRSA <- fuzzy_range(path, 12:470, 1:8)
+    
+    names(MRSA) <- MRSA[1,]
+    MRSA <- MRSA[-1,] %>% select(Period, Hospital, contains("acute"))
+    
+    names(MRSA) <- gsub("(^No. of )", "", names(MRSA))
+    names(MRSA) <- gsub("(^.*/.*$)", "per_1000_PD", names(MRSA))
+    names(MRSA) <- gsub("( )", "_", names(MRSA))
+    names(MRSA) <- gsub("(_Bacteremia)", "", names(MRSA))
+    
+    
+    for (i in 1:3){
+        MRSA[,i+2] <- as.numeric(MRSA[,i+2])
+    }
+    
+    MRSA.HA <- MRSA %>% group_by(Period) %>%
+        summarise(Hospital = "HA", MRSA_in_Acute_Beds = sum(MRSA_in_Acute_Beds), Acute_Patient_Days = sum(Acute_Patient_Days)) %>%
+        mutate(per_1000_PD = MRSA_in_Acute_Beds/Acute_Patient_Days*1000)
+    
+    MRSA <- bind_rows(MRSA, MRSA.HA) %>%
+        filter(Hospital %in% c(names(MRSA.frame), "NLT")) %>% arrange(Period, Hospital)
+    
+    if(trend==TRUE){
+        
+        MRSA.req <- MRSA %>% select(-MRSA_in_Acute_Beds, -Acute_Patient_Days) %>% spread(key = Period, value = per_1000_PD)
+        
+        MRSA.HA.req <- MRSA.req
+        
+        MRSA.req <- MRSA.req %>% filter(Hospital!="HA")
+        MRSA.HA.req <- MRSA.HA.req %>% filter(Hospital=="HA")
+        
+        MRSA.req <- bind_rows(MRSA.req, MRSA.HA.req)
+        
+        # return row as specified
+        
+        MRSA.prod <- MRSA.req[row,]
+        
+        # Replace NA with N.A. for Excel use
+        
+        MRSA.prod <- data.frame(lapply(MRSA.prod, FUN = function(x){ifelse(is.na(x), "N.A.", x)}), stringsAsFactors = FALSE)
+        
+
+        
+    }else{
+        
+        MRSA.req <- MRSA %>% ungroup() %>% group_by(Hospital) %>%
+            summarise(MRSA_in_Acute_Beds = sum(MRSA_in_Acute_Beds), Acute_Patient_Days = sum(Acute_Patient_Days)) %>%
+            mutate(per_1000_PD = MRSA_in_Acute_Beds/Acute_Patient_Days*1000) %>%
+            select(-MRSA_in_Acute_Beds, -Acute_Patient_Days) %>%
+            t() %>% as.data.frame(stringsAsFactors=FALSE)
+            
+        names(MRSA.req) <- MRSA.req[1,]
+        MRSA.req <- MRSA.req[-1,]
+        
+        # Fill empty frame
+        
+        names(MRSA.req) <- gsub("NLT", "NLTH", names(MRSA.req))
+        
+        MRSA.frame[1,] <- NA
+        
+        for (i in 1:length(MRSA.frame)){
+            if (names(MRSA.frame)[i] %in% names(MRSA.req)){
+                MRSA.frame[i] <- MRSA.req[names(MRSA.frame)[i]]
+            }
+        }
+        
+        # Replace NA with N.A. for Excel use
+        
+        MRSA.prod <- data.frame(apply(MRSA.frame, 2, FUN = function(x){ifelse(is.na(x), "N.A.", x)}), stringsAsFactors = FALSE)
+        
+        for (i in 1:ncol(MRSA.prod)){
+            if ("N.A." %in% MRSA.prod[,i]){
+            } else {
+                MRSA.prod[,i] <- as.numeric(MRSA.prod[,i])
+            }
+        }
+        
+    }
+    
+# Return production ready dataframe
+    
+    MRSA.prod
+}
+
 # kpi.4 Disease specific Quality Indicator --------------------------------
 
 #
