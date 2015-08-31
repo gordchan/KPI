@@ -395,7 +395,7 @@ kpi.3.3 <- function(Mmm, trend = FALSE, row){
         
         # Replace NA with N.A. for Excel use
         
-        MRSA.prod <- data.frame(apply(MRSA.frame, 2, FUN = function(x){ifelse(is.na(x), "N.A.", x)}), stringsAsFactors = FALSE)
+        MRSA.prod <- data.frame(lapply(MRSA.frame, FUN = function(x){ifelse(is.na(x), "N.A.", x)}), stringsAsFactors = FALSE)
         
         for (i in 1:ncol(MRSA.prod)){
             if ("N.A." %in% MRSA.prod[,i]){
