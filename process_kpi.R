@@ -346,19 +346,25 @@ kpi.3.3 <- function(Mmm, trend = FALSE, row){
         summarise(Hospital = "HA", MRSA_in_Acute_Beds = sum(MRSA_in_Acute_Beds), Acute_Patient_Days = sum(Acute_Patient_Days)) %>%
         mutate(per_1000_PD = MRSA_in_Acute_Beds/Acute_Patient_Days*1000)
     
-    MRSA <- bind_rows(MRSA, MRSA.HA) %>%
-        filter(Hospital %in% c(names(MRSA.frame), "NLT")) %>% arrange(Period, Hospital)
+    MRSA <- MRSA %>% filter(Hospital %in% c(names(MRSA.frame), "NLT")) %>% arrange(Period, Hospital)
+    
+    MRSA.KWC <- MRSA %>% group_by(Period) %>%
+        summarise(Hospital = "KWC", MRSA_in_Acute_Beds = sum(MRSA_in_Acute_Beds), Acute_Patient_Days = sum(Acute_Patient_Days)) %>%
+        mutate(per_1000_PD = MRSA_in_Acute_Beds/Acute_Patient_Days*1000)
+    
+    MRSA <- bind_rows(MRSA, MRSA.KWC, MRSA.HA)
     
     if(trend==TRUE){
         
         MRSA.req <- MRSA %>% select(-MRSA_in_Acute_Beds, -Acute_Patient_Days) %>% spread(key = Period, value = per_1000_PD)
+
+        MRSA.KWC.req <- MRSA.req %>% filter(Hospital=="KWC")
+        MRSA.HA.req <- MRSA.req %>% filter(Hospital=="HA")
+        MRSA.req <- MRSA.req %>% filter(Hospital!="HA" & Hospital!="KWC") %>%
+            filter(Hospital!="KCH" & Hospital!="WTS")
+
         
-        MRSA.HA.req <- MRSA.req
-        
-        MRSA.req <- MRSA.req %>% filter(Hospital!="HA")
-        MRSA.HA.req <- MRSA.HA.req %>% filter(Hospital=="HA")
-        
-        MRSA.req <- bind_rows(MRSA.req, MRSA.HA.req)
+        MRSA.req <- bind_rows(MRSA.req, MRSA.KWC.req, MRSA.HA.req)
         
         # return row as specified
         
@@ -414,7 +420,7 @@ kpi.3.3 <- function(Mmm, trend = FALSE, row){
 # kpi.4 Disease specific Quality Indicator --------------------------------
 
 #
-# Need to be rewritten to cater for variable number of rows
+# Used fuzzy_range to cater for variable number of rows
 #
 
 kpi.4.1 <- function(Mmm){
