@@ -36,11 +36,11 @@ read_all_sheets <- function (x){
 
 ## A function to return a specific range of a sheet from a excel spreadsheets file
 
-read_range <- function (input, ri, ci){
+read_range <- function (input, ri, ci, si = 1){
     
     require("xlsx")
 
-    all_range <- read.xlsx(file=input, sheetIndex=1, rowIndex=ri, colIndex=ci,
+    all_range <- read.xlsx(file=input, sheetIndex=si, rowIndex=ri, colIndex=ci,
               as.data.frame=TRUE, header=FALSE, colClasses=NA,
               keepFormulas=FALSE, stringsAsFactors = FALSE)
     
@@ -78,11 +78,11 @@ read_range <- function (input, ri, ci){
 
 # Read raw range ----------------------------------------------------------
 
-raw_range <- function (input, ri, ci){
+raw_range <- function (input, ri, ci, si = 1){
     
     require("xlsx")
     
-    raw_range <- read.xlsx(file=input, sheetIndex=1, rowIndex=ri, colIndex=ci,
+    raw_range <- read.xlsx(file=input, sheetIndex=si, rowIndex=ri, colIndex=ci,
                            as.data.frame=TRUE, header=FALSE, colClasses=NA,
                            keepFormulas=FALSE, stringsAsFactors = FALSE)
     raw_range
@@ -97,13 +97,13 @@ raw_range <- function (input, ri, ci){
 #
 # assuming the last column would contain only table data, but no text in other cells.
 
-fuzzy_range <- function (input, fuzzy.ri, ci){
+fuzzy_range <- function (input, fuzzy.ri, ci, si = 1){
     
     require("dplyr")
     
     # Read spreadsheet with deliberate over read to accomodate variations in table length
     
-    fuzzy_range <- read.xlsx(file=input, sheetIndex=1, rowIndex=fuzzy.ri, colIndex=ci,
+    fuzzy_range <- read.xlsx(file=input, sheetIndex=si, rowIndex=fuzzy.ri, colIndex=ci,
                            as.data.frame=TRUE, header=FALSE, colClasses=NA,
                            keepFormulas=FALSE, stringsAsFactors = FALSE)
     
