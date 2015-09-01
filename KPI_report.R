@@ -124,8 +124,8 @@ as.KPI <- loadWorkbook(KPI_files$temp.paths[1])
     # kpi.6
         kpi.6.1.c <- kpi.6("kpi.6.1", to.MmmYY)
         kpi.6.1.p <- kpi.6("kpi.6.1", prev.to.MmmYY)
-#         kpi.6.2.c <- kpi.6.2(to.MmmYY)
-#         kpi.6.2.p <- kpi.6.2(prev.to.MmmYY)
+        kpi.6.2.c <- kpi.6("kpi.6.2", to.MmmYY)
+        kpi.6.2.p <- kpi.6("kpi.6.2", prev.to.MmmYY)
     # kpi.7
         # kpi.7.c <- kpi.7(to.MmmYY)
         # kpi.7.p <- kpi.7(prev.to.MmmYY)
@@ -176,10 +176,10 @@ as.KPI <- loadWorkbook(KPI_files$temp.paths[1])
         addDataFrame(kpi.5.3.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=22, startColumn=22)
     # kpi.6
         addDataFrame(kpi.6.1.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=23, startColumn=3)
-        # addDataFrame(kpi.6.2.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=24, startColumn=3)
+        addDataFrame(kpi.6.2.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=24, startColumn=3)
         
         addDataFrame(kpi.6.1.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=23, startColumn=22)
-        # addDataFrame(kpi.6.2.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=24, startColumn=22)
+        addDataFrame(kpi.6.2.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=24, startColumn=22)
     # kpi.7
         # addDataFrame(kpi.7.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=25, startColumn=3)
 

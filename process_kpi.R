@@ -749,63 +749,74 @@ kpi.5 <- function(kpi, Mmm){
 
 kpi.6 <- function(kpi, Mmm){
     
+    require("dplyr")
+    
     kpi_source_helper(Mmm)
-    
-    if (kpi == "kpi.6.1"){
+
+        regex <- "(.*kpi.6 .*)"
+        regex.HA <- "(.*kpi.6.HA .*)"
         
-        regex <- "(.*kpi.6.1 .*)"
-        regex.HA <- "(.*kpi.6.1.HA .*)"
-        
-    } else if (kpi == "kpi.6.2"){
-        
-        regex <- "(.*kpi.6.2 .*)"
-        regex.HA <- "(.*kpi.6.2.HA .*)"
-        
-    }
-    
+
     path <- grep(regex, source.kpi$filepath, value = TRUE)
     path.HA <- grep(regex.HA, source.kpi$filepath, value = TRUE)
     
     TJR.frame <- empty.frame
     TJR.frame[1,] <- NA
     
-    TJR <- raw_range(path, 35:40, 1:3)
-    TJR.HA <- raw_range(path.HA, 35:43, 1:3)
+    TJR <- fuzzy_range(path, 10:26, 1:5, 2)
+    TJR.HA <- raw_range(path.HA, 10:26, 1:5, 2)
     
-    TJR[1,] <- gsub("( [0-9]{2})", "", TJR[1,])
-    TJR.HA[1,] <- gsub("( [0-9]{2})", "", TJR.HA[1,])
-    
-    names(TJR) <- TJR[1,]
-    names(TJR.HA) <- TJR.HA[1,]
-    
-    TJR.HA$Institution <- gsub("( Overall$)", "", TJR.HA$Institution)
-    
-    # Select period column
-    
-    Mmm.regex <- paste("(- ", Mmm, "$)", sep = "")
-    
-    TJR <- TJR[grepl("Institution", names(TJR)) | grepl(Mmm.regex, names(TJR))]
-    TJR.HA <- TJR.HA[grepl("Institution", names(TJR.HA)) | grepl(Mmm.regex, names(TJR.HA))]
-    
-    TJR <- TJR[-1,] %>% t() %>% as.data.frame(stringsAsFactors = FALSE)
-    TJR.HA <- TJR.HA[-1,] %>% t() %>% as.data.frame(stringsAsFactors = FALSE)
-    
-    # Reformat
+    TJR[,1] <- gsub("( [0-9]{2})", "", TJR[,1])
+    TJR.HA[,1] <- gsub("( [0-9]{2})", "", TJR.HA[,1])
     
     names(TJR) <- TJR[1,]
     names(TJR.HA) <- TJR.HA[1,]
     
     TJR <- TJR[-1,]
-    TJR.HA <- TJR.HA[-1,]
+    TJR$Institution <- gsub("(^ )", "", TJR$Institution)
     
-    TJR <- data.frame(lapply(TJR[1,], FUN = function(x) as.numeric(x)))
-    TJR.HA <- data.frame(lapply(TJR.HA[1,], FUN = function(x) as.numeric(x)))
+    TJR.HA$Institution <- gsub("( Overall$)", "", TJR.HA$Institution)
+    TJR.HA$Institution <- gsub("(^ )", "", TJR.HA$Institution)
     
-    TJR <- cbind(TJR, TJR.HA)
+    TJR.HA <- TJR.HA %>% filter(Institution=="HA")
+
+    TJR <- bind_rows(TJR, TJR.HA) %>% arrange(Period)
     
+    names(TJR) <- c("Period", "Institution", "percentile.90", "Case_Performed", "Notional")
+    
+    TJR$Case_Performed <- gsub(",", "", TJR$Case_Performed)
+    
+    # Select period column
+    
+    Mmm.regex <- paste("(- ", Mmm, "$)", sep = "")
+    
+    TJR <- TJR %>% filter(grepl(Mmm.regex, Period))
+    
+    # Select 90 percentile OR notional Waiting Time
+    
+    if (kpi=="kpi.6.1"){
+        
+        TJR.req <- TJR %>% select(Institution, percentile.90) %>%
+            t() %>% as.data.frame(stringsAsFactors=FALSE)
+        
+    } else if (kpi=="kpi.6.2"){
+        
+        TJR.req <- TJR %>% select(Institution, Notional) %>%
+            t() %>% as.data.frame(stringsAsFactors=FALSE)
+        
+    }
+    
+    # Reformat
+    
+    names(TJR.req) <- TJR.req[1,]
+    
+    TJR.req <- TJR.req[-1,]
+
+    TJR.req <- data.frame(lapply(TJR.req[1,], FUN = function(x) as.numeric(x)))
+
     for (i in 1:ncol(TJR.frame)){
-        if (names(TJR.frame)[i] %in% names(TJR)){
-            TJR.frame[i] <- TJR[names(TJR.frame)[i]]
+        if (names(TJR.frame)[i] %in% names(TJR.req)){
+            TJR.frame[i] <- TJR.req[names(TJR.frame)[i]]
         }
     }
     
