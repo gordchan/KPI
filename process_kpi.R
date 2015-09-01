@@ -317,6 +317,100 @@ kpi.2 <- function(Mmm, specialty = "Ovr"){
 
 # kpi.3 Quality ----------------------------------------------------------
 
+kpi.3 <- function(kpi, Mmm){
+    
+    kpi_source_helper(Mmm)
+    
+    SAR.frame <- empty.frame
+    SAR.frame[1,] <- NA
+    
+    if(kpi=="kpi.3.1"){
+        path.1st <- grep("(.*kpi.3.1.1 .*)", source.kpi$filepath, value = TRUE)
+        path.adm <- grep("(.*kpi.3.1.2 .*)", source.kpi$filepath, value = TRUE)
+        
+        SAR.1st <- fuzzy_range(path.1st, 67:240, 1:22)
+        SAR.adm <- fuzzy_range(path.adm, 116:290, 1:22)
+        
+        for (i in 1:4){
+            SAR.1st[1,i] <- SAR.1st[2,i]
+            SAR.adm[1,i] <- SAR.adm[2,i]
+        }
+        
+        names(SAR.1st) <- SAR.1st[1,]
+        names(SAR.adm) <- SAR.adm[1,]
+        
+        SAR.1st <- SAR.1st[-c(1:2),]
+        SAR.adm <- SAR.adm[-c(1:2),]
+        
+    }else if(kpi=="kpi.3.2"){
+        path.1st <- grep("(.*kpi.3.2.1 .*)", source.kpi$filepath, value = TRUE)
+        path.adm <- grep("(.*kpi.3.2.2 .*)", source.kpi$filepath, value = TRUE)
+        
+        SAR.1st <- fuzzy_range(path.1st, 71:210, 1:22)
+        SAR.adm <- fuzzy_range(path.adm, 120:250, 1:22)
+        
+    }
+
+    names(SAR.1st) <- gsub("(Row Total)", "HA", names(SAR.1st))
+    names(SAR.adm) <- gsub("(Row Total)", "HA", names(SAR.adm))
+    
+    names(SAR.1st) <- gsub("( \\(.*\\))", "", names(SAR.1st))
+    names(SAR.adm) <- gsub("( \\(.*\\))", "", names(SAR.adm))
+    
+    names(SAR.1st) <- gsub("( $)", "", names(SAR.1st))
+    names(SAR.adm) <- gsub("( $)", "", names(SAR.adm))
+    
+    names(SAR.1st) <- gsub("( )", "_", names(SAR.1st))
+    names(SAR.adm) <- gsub("( )", "_", names(SAR.adm))
+    
+    for (i in 1:(22-4)){
+        SAR.1st[,i+4] <- as.numeric(SAR.1st[,i+4])
+        SAR.adm[,i+4] <- as.numeric(SAR.adm[,i+4])
+    }
+    
+    # Select KWC hospitals & HA
+    
+    SAR.1st <- SAR.1st %>% filter(!grepl("Total", Admission_Age)) %>%
+        mutate(KWC = CMC + KWH + NLTH + PMH + YCH + HA) %>%
+        select(Admission_Age, Sex, Ambulance_Case, Triage_Category, CMC.1 = CMC, KWH.1 = KWH, NLTH.1 = NLTH, PMH.1 = PMH, YCH.1 = YCH, KWC.1 = KWC, HA.1 = HA)
+    
+    SAR.adm <- SAR.adm %>% filter(!grepl("Total", Admission_Age)) %>%
+        mutate(KWC = CMC + KWH + NLTH + PMH + YCH + HA) %>%
+        select(Admission_Age, Sex, Ambulance_Case, Triage_Category, CMC.a = CMC, KWH.a = KWH, NLTH.a = NLTH, PMH.a = PMH, YCH.a = YCH, KWC.a = KWC, HA.a = HA)
+    
+    SAR <- full_join(SAR.1st, SAR.adm)
+    
+    for (i in 1:(ncol(SAR)-4)){
+        SAR[,i+4] <- sapply(SAR[,i+4], FUN = function(x){ifelse(is.na(x), 0, x)})
+    }
+    
+    SAR.req <- SAR %>% select(-Admission_Age, -Sex, -Ambulance_Case, -Triage_Category) %>% mutate(HA = HA.a/HA.1) %>%
+        mutate(CMC = CMC.1 * HA, KWH = KWH.1 * HA,  NLTH = NLTH.1 * HA, PMH = PMH.1 * HA, YCH = YCH.1 * HA, KWC = KWC.1 * HA) %>%
+        summarise_each(funs(sum))
+    
+    SAR.frame$HA[1] <- SAR.req$HA.a/SAR.req$HA.1
+    SAR.frame$CMC[1] <- SAR.req$CMC.a/SAR.req$CMC*SAR.req$HA
+    SAR.frame$KWH[1] <- SAR.req$KWH.a/SAR.req$KWH*SAR.req$HA
+    SAR.frame$NLTH[1] <- SAR.req$NLTH.a/SAR.req$NLTH*SAR.req$HA
+    SAR.frame$PMH[1] <- SAR.req$PMH.a/SAR.req$PMH*SAR.req$HA
+    SAR.frame$YCH[1] <- SAR.req$YCH.a/SAR.req$YCH*SAR.req$HA
+    SAR.frame$KWC[1] <- SAR.req$KWC.a/SAR.req$KWC*SAR.req$HA
+    
+    # Replace NA with N.A. for use in Excel
+    
+    SAR.prod <- data.frame(lapply(MRSA.frame, FUN = function(x){ifelse(is.na(x), "N.A.", x)}), stringsAsFactors = FALSE)
+    
+    for (i in 1:ncol(SAR.prod)){
+        if ("N.A." %in% SAR.prod[,i]){
+        } else {
+            SAR.prod[,i] <- as.numeric(SAR.prod[,i])
+        }
+    }
+    
+    SAR.prod
+    
+}
+
 kpi.3.3 <- function(Mmm, trend = FALSE, row){
     
     require("tidyr")
@@ -830,6 +924,88 @@ kpi.6 <- function(kpi, Mmm){
     
     TJR.prod
  
+}
+
+
+# kpi.7 Waiting Time for diagnostic radiological investigations -----------
+
+kpi.7 <- function(kpi, Mmm){
+    
+    kpi_source_helper(Mmm)
+    
+    path <- grep("(.*kpi.7 .*)", source.kpi$filepath, value = TRUE)
+    
+    RAD <- raw_range(path, 1:113, 1:11)
+    
+    # Cleaning variable names and datatype
+    
+    RAD[1,] <- gsub("(^[0-9]{2})", "p.\\1", RAD[1,])
+    RAD[1,] <- gsub("( pcntile)", "", RAD[1,])
+    RAD[1,] <- gsub("(. waiting time)", "", RAD[1,])
+    RAD[1,] <- gsub("(Type)", "H24_case", RAD[1,])
+    
+    names(RAD) <- RAD[1,]
+    RAD <- RAD[-1,]
+    
+    
+    for (i in 1:5){
+        RAD[,i+6] <- as.numeric(RAD[,i+6])
+    }
+    
+    RAD$Period <- gsub("( [0-9]{2})", "", RAD$Period)
+    RAD$Hospital <- gsub("( Average$)", "", RAD$Hospital)
+    
+    RAD <- RAD %>% filter(grepl("^Including ", H24_case))
+    
+    # Select columns
+    
+    RAD.req <- RAD %>% select(Period, Hospital, Modality, p.90)
+    
+    # Filter period
+    
+    Mmm.regex <- paste("(- ", Mmm, "$)", sep = "")
+    
+    RAD.req <- RAD.req %>% filter(grepl(Mmm.regex, Period))
+    
+    # Filter required Modality
+    
+    if (kpi=="kpi.7.1"){
+        RAD.req <- RAD.req %>% filter(Modality=="CT")
+    } else if (kpi=="kpi.7.2"){
+        RAD.req <- RAD.req %>% filter(Modality=="MRI")
+    } else if (kpi=="kpi.7.3"){
+        RAD.req <- RAD.req %>% filter(Modality=="US")
+    } else if (kpi=="kpi.7.3"){
+        RAD.req <- RAD.req %>% filter(Modality=="MAMMO")
+    }
+    
+    # Simplify to required columns
+    
+    RAD.req <- RAD.req %>% select(Hospital, p.90) %>%
+        t() %>% as.data.frame(stringsAsFactors=FALSE)
+    
+    
+    # Reformat
+    
+    names(RAD.req) <- RAD.req[1,]
+    RAD.req <- RAD.req[-1,]
+    
+    RAD.req <- data.frame(lapply(RAD.req[1,], FUN = function(x) as.numeric(x)))
+    
+    for (i in 1:ncol(RAD.frame)){
+        if (names(RAD.frame)[i] %in% names(RAD.req)){
+            RAD.frame[i] <- RAD.req[names(RAD.frame)[i]]
+        }
+    }
+    
+    # Replace NA with N.A. for use in Excel
+    
+    RAD.prod <- lapply(RAD.frame, function(x){ifelse(is.na(x), "N.A.", x)})
+    RAD.prod <- data.frame(RAD.prod)
+    
+    # Return production dataframe
+    
+    RAD.prod
 }
 
 # kpi.3.4 & 10 Quality - Unplanned Readmission Rate within 28 days for g --------
