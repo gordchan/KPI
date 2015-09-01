@@ -581,8 +581,9 @@ kpi.4.3 <- function(Mmm){
 
     AMI <- AMI[-1,]
 
-    AMI <- data.frame(lapply(AMI[1,], FUN = function(x) as.numeric(x)))
-
+    AMI <- data.frame(lapply(AMI[1,], FUN = function(x){as.numeric(x)}))
+    AMI <- data.frame(lapply(AMI[1,], FUN = function(x){x/100}))
+    
     for (i in 1:length(AMI.frame)){
         if (names(AMI.frame)[i] %in% names(AMI)){
             AMI.frame[i] <- AMI[names(AMI.frame)[i]]
