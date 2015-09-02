@@ -349,6 +349,17 @@ kpi.3 <- function(kpi, Mmm){
         SAR.1st <- fuzzy_range(path.1st, 71:210, 1:22)
         SAR.adm <- fuzzy_range(path.adm, 120:250, 1:22)
         
+        for (i in 1:4){
+            SAR.1st[1,i] <- SAR.1st[2,i]
+            SAR.adm[1,i] <- SAR.adm[2,i]
+        }
+        
+        names(SAR.1st) <- SAR.1st[1,]
+        names(SAR.adm) <- SAR.adm[1,]
+        
+        SAR.1st <- SAR.1st[-c(1:2),]
+        SAR.adm <- SAR.adm[-c(1:2),]
+        
     }
 
     names(SAR.1st) <- gsub("(Row Total)", "HA", names(SAR.1st))
@@ -388,17 +399,17 @@ kpi.3 <- function(kpi, Mmm){
         mutate(CMC = CMC.1 * HA, KWH = KWH.1 * HA,  NLTH = NLTH.1 * HA, PMH = PMH.1 * HA, YCH = YCH.1 * HA, KWC = KWC.1 * HA) %>%
         summarise_each(funs(sum))
     
-    SAR.frame$HA[1] <- SAR.req$HA.a/SAR.req$HA.1
-    SAR.frame$CMC[1] <- SAR.req$CMC.a/SAR.req$CMC*SAR.req$HA
-    SAR.frame$KWH[1] <- SAR.req$KWH.a/SAR.req$KWH*SAR.req$HA
-    SAR.frame$NLTH[1] <- SAR.req$NLTH.a/SAR.req$NLTH*SAR.req$HA
-    SAR.frame$PMH[1] <- SAR.req$PMH.a/SAR.req$PMH*SAR.req$HA
-    SAR.frame$YCH[1] <- SAR.req$YCH.a/SAR.req$YCH*SAR.req$HA
-    SAR.frame$KWC[1] <- SAR.req$KWC.a/SAR.req$KWC*SAR.req$HA
+    SAR.frame$HA <- SAR.req$HA.a/SAR.req$HA.1
+    SAR.frame$CMC <- SAR.req$CMC.a/SAR.req$CMC*SAR.frame$HA
+    SAR.frame$KWH <- SAR.req$KWH.a/SAR.req$KWH*SAR.frame$HA
+    SAR.frame$NLTH <- SAR.req$NLTH.a/SAR.req$NLTH*SAR.frame$HA
+    SAR.frame$PMH <- SAR.req$PMH.a/SAR.req$PMH*SAR.frame$HA
+    SAR.frame$YCH <- SAR.req$YCH.a/SAR.req$YCH*SAR.frame$HA
+    SAR.frame$KWC <- SAR.req$KWC.a/SAR.req$KWC*SAR.frame$HA
     
     # Replace NA with N.A. for use in Excel
     
-    SAR.prod <- data.frame(lapply(MRSA.frame, FUN = function(x){ifelse(is.na(x), "N.A.", x)}), stringsAsFactors = FALSE)
+    SAR.prod <- data.frame(lapply(SAR.frame, FUN = function(x){ifelse(is.na(x), "N.A.", x)}), stringsAsFactors = FALSE)
     
     for (i in 1:ncol(SAR.prod)){
         if ("N.A." %in% SAR.prod[,i]){
@@ -937,6 +948,9 @@ kpi.7 <- function(kpi, Mmm){
     
     RAD <- raw_range(path, 1:113, 1:11)
     
+    RAD.frame <- empty.frame
+    RAD.frame[1,] <- NA
+    
     # Cleaning variable names and datatype
     
     RAD[1,] <- gsub("(^[0-9]{2})", "p.\\1", RAD[1,])
@@ -975,7 +989,7 @@ kpi.7 <- function(kpi, Mmm){
         RAD.req <- RAD.req %>% filter(Modality=="MRI")
     } else if (kpi=="kpi.7.3"){
         RAD.req <- RAD.req %>% filter(Modality=="US")
-    } else if (kpi=="kpi.7.3"){
+    } else if (kpi=="kpi.7.4"){
         RAD.req <- RAD.req %>% filter(Modality=="MAMMO")
     }
     
@@ -989,6 +1003,8 @@ kpi.7 <- function(kpi, Mmm){
     
     names(RAD.req) <- RAD.req[1,]
     RAD.req <- RAD.req[-1,]
+    
+    names(RAD.req) <- gsub(" *$", "", names(RAD.req))
     
     RAD.req <- data.frame(lapply(RAD.req[1,], FUN = function(x) as.numeric(x)))
     
