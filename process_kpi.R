@@ -389,7 +389,7 @@ kpi.3 <- function(kpi, Mmm){
         mutate(KWC = CMC + KWH + NLTH + PMH + YCH + HA) %>%
         select(Admission_Age, Sex, Ambulance_Case, Triage_Category, CMC.a = CMC, KWH.a = KWH, NLTH.a = NLTH, PMH.a = PMH, YCH.a = YCH, KWC.a = KWC, HA.a = HA)
     
-    SAR <- full_join(SAR.1st, SAR.adm)
+    SAR <- suppressMessages(full_join(SAR.1st, SAR.adm))
     
     for (i in 1:(ncol(SAR)-4)){
         SAR[,i+4] <- sapply(SAR[,i+4], FUN = function(x){ifelse(is.na(x), 0, x)})
