@@ -963,7 +963,7 @@ kpi.7 <- function(kpi, Mmm){
     
     
     for (i in 1:5){
-        RAD[,i+6] <- as.numeric(RAD[,i+6])
+        RAD[,i+6] <- suppressWarnings(as.numeric(RAD[,i+6]))
     }
     
     RAD$Period <- gsub("( [0-9]{2})", "", RAD$Period)
