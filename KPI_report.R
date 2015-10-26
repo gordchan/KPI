@@ -139,64 +139,64 @@ as.KPI <- loadWorkbook(KPI_files$temp.paths[1])
     
     # Update reporting month and period -----------------------------------
     
-    addDataFrame(dates, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=1, startColumn=2)
+    addDataFrame(dates, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=1, startColumn=2)
     
     # Write to Excel templates -----------------------------------------------
     # kpi.t ## Prototype not functioning pending rewrite of kpi.t()
     for (i in 1:25){
         kpi.t.i <- kpi.t(i, to.MmmYY)
-        addDataFrame(kpi.t.i, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=(3+i), startColumn=13)
+        addDataFrame(kpi.t.i, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=(3+i), startColumn=13)
     }
     # kpi.1
-    addDataFrame(kpi.1.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=4, startColumn=3)
+    addDataFrame(kpi.1.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=3, startColumn=3)
     
-    addDataFrame(kpi.1.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=4, startColumn=22)
+    addDataFrame(kpi.1.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=3, startColumn=13)
     # kpi.2
-    addDataFrame(kpi.2.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=8, startColumn=3)
+    addDataFrame(kpi.2.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=7, startColumn=3)
     
-    addDataFrame(kpi.2.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=8, startColumn=22)
+    addDataFrame(kpi.2.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=7, startColumn=13)
     # kpi.3
-    addDataFrame(kpi.3.1.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=13, startColumn=3)
-    addDataFrame(kpi.3.2.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=14, startColumn=3)
-    addDataFrame(kpi.3.3.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=15, startColumn=3)
-    addDataFrame(kpi.3.4.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=16, startColumn=3)
+    addDataFrame(kpi.3.1.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=12, startColumn=3)
+    addDataFrame(kpi.3.2.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=13, startColumn=3)
+    addDataFrame(kpi.3.3.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=14, startColumn=3)
+    addDataFrame(kpi.3.4.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=18, startColumn=3)
     
-    addDataFrame(kpi.3.1.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=13, startColumn=22)
-    addDataFrame(kpi.3.2.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=14, startColumn=22)
-    addDataFrame(kpi.3.3.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=15, startColumn=22)
-    addDataFrame(kpi.3.4.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=16, startColumn=22)
+    addDataFrame(kpi.3.1.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=12, startColumn=13)
+    addDataFrame(kpi.3.2.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=13, startColumn=13)
+    addDataFrame(kpi.3.3.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=14, startColumn=13)
+    addDataFrame(kpi.3.4.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=18, startColumn=13)
     # kpi.4
-    addDataFrame(kpi.4.1.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=17, startColumn=3)
-    addDataFrame(kpi.4.2.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=18, startColumn=3)
-    addDataFrame(kpi.4.3.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=19, startColumn=3)
+    addDataFrame(kpi.4.1.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=21, startColumn=3)
+    addDataFrame(kpi.4.2.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=24, startColumn=3)
+    addDataFrame(kpi.4.3.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=25, startColumn=3)
     
-    addDataFrame(kpi.4.1.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=17, startColumn=22)
-    addDataFrame(kpi.4.2.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=18, startColumn=22)
-    addDataFrame(kpi.4.3.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=19, startColumn=22)
+    addDataFrame(kpi.4.1.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=21, startColumn=13)
+    addDataFrame(kpi.4.2.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=24, startColumn=13)
+    addDataFrame(kpi.4.3.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=25, startColumn=13)
     # kpi.5
-    addDataFrame(kpi.5.1.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=20, startColumn=3)
-    addDataFrame(kpi.5.2.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=21, startColumn=3)
-    addDataFrame(kpi.5.3.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=22, startColumn=3)
+    addDataFrame(kpi.5.1.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=28, startColumn=3)
+    addDataFrame(kpi.5.2.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=29, startColumn=3)
+    addDataFrame(kpi.5.3.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=30, startColumn=3)
     
-    addDataFrame(kpi.5.1.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=20, startColumn=22)
-    addDataFrame(kpi.5.2.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=21, startColumn=22)
-    addDataFrame(kpi.5.3.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=22, startColumn=22)
+    addDataFrame(kpi.5.1.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=28, startColumn=13)
+    addDataFrame(kpi.5.2.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=29, startColumn=13)
+    addDataFrame(kpi.5.3.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=30, startColumn=13)
     # kpi.6
-    addDataFrame(kpi.6.1.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=23, startColumn=3)
-    addDataFrame(kpi.6.2.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=24, startColumn=3)
+    addDataFrame(kpi.6.1.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=26, startColumn=3)
+    addDataFrame(kpi.6.2.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=27, startColumn=3)
     
-    addDataFrame(kpi.6.1.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=23, startColumn=22)
-    addDataFrame(kpi.6.2.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=24, startColumn=22)
+    addDataFrame(kpi.6.1.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=26, startColumn=13)
+    addDataFrame(kpi.6.2.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=27, startColumn=13)
     # kpi.7
-    addDataFrame(kpi.7.1.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=25, startColumn=3)
-    addDataFrame(kpi.7.2.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=26, startColumn=3)
-    addDataFrame(kpi.7.3.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=27, startColumn=3)
-    addDataFrame(kpi.7.4.c, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=28, startColumn=3)
+    addDataFrame(kpi.7.1.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=31, startColumn=3)
+    addDataFrame(kpi.7.2.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=32, startColumn=3)
+    addDataFrame(kpi.7.3.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=33, startColumn=3)
+    addDataFrame(kpi.7.4.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=34, startColumn=3)
     
-    addDataFrame(kpi.7.1.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=25, startColumn=22)
-    addDataFrame(kpi.7.2.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=26, startColumn=22)
-    addDataFrame(kpi.7.3.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=27, startColumn=22)
-    addDataFrame(kpi.7.4.p, sheets.KPI$source, col.names=FALSE, row.names=FALSE, startRow=28, startColumn=22)
+    addDataFrame(kpi.7.1.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=31, startColumn=13)
+    addDataFrame(kpi.7.2.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=32, startColumn=13)
+    addDataFrame(kpi.7.3.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=33, startColumn=13)
+    addDataFrame(kpi.7.4.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=34, startColumn=13)
     
     
 # Saving xls reports ----------------------------------------------------
