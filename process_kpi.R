@@ -228,7 +228,7 @@ kpi_source_helper(Mmm)
 
 # kpi.2 Access(SOP waiting time) ------------------------------------------
 
-kpi.2 <- function(Mmm, specialty = "Overall"){
+kpi.2 <- function(Mmm, specialty = "Overall", index = 1:5){
     
     kpi_source_helper(Mmm)
     
@@ -316,6 +316,8 @@ kpi.2 <- function(Mmm, specialty = "Overall"){
     SOP_WT.prod[1,] <- gsub("^0.*", "<1", SOP_WT.prod[1,])
     
     # Return production ready dataframe
+    
+    SOP_WT.prod <- SOP_WT.prod[index,]
     
     SOP_WT.prod
     
