@@ -228,61 +228,64 @@ kpi_source_helper(Mmm)
 
 # kpi.2 Access(SOP waiting time) ------------------------------------------
 
-kpi.2 <- function(Mmm, specialty = "Ovr"){
+kpi.2 <- function(Mmm, specialty = "Overall"){
     
     kpi_source_helper(Mmm)
     
     path <- grep("(.*kpi.2 .*)", source.kpi$filepath, value = TRUE)
     path.HA <- grep("(.*kpi.2.HA .*)", source.kpi$filepath, value = TRUE)
     
-    SOP_WT <- read_range(path, 5:28, 1:55)
-    SOP_WT.HA <- read_range(path.HA, 5:28, 1:10)
-        row.index <- c(3:4, 10, 14, 20)
-
+    SOP_WT <- fuzzy_range(path, 5:32, 1:60)
+    SOP_WT.HA <- fuzzy_range(path.HA, 5:32, 1:10)
+    
+    # Screen relevant rows
+    row.break <- grep("   SOP$", SOP_WT.HA[,1])
+    
+    row.index <- numeric(0)
+    
+    row.data1 <- which(as.numeric(row.names(SOP_WT.HA)) > row.break[1] & as.numeric(row.names(SOP_WT.HA)) < row.break[2]-1)
+    row.data2 <- which(as.numeric(row.names(SOP_WT.HA)) > row.break[2] & as.numeric(row.names(SOP_WT.HA)) < row.break[3]-1)
+    row.data3 <- which(as.numeric(row.names(SOP_WT.HA)) > row.break[3] & as.numeric(row.names(SOP_WT.HA)) < row.break[4]-1)
+    row.data4 <- which(as.numeric(row.names(SOP_WT.HA)) > row.break[4])
+    
+    row.index[1] <- which(grepl(".*Tri P1$", SOP_WT.HA[row.data1, 1])) + row.break[1]
+    row.index[2] <- which(grepl(".*Tri P2$", SOP_WT.HA[row.data1, 1])) + row.break[1]
+    row.index[3] <- which(grepl(".*Tri P1$", SOP_WT.HA[row.data2, 1])) + row.break[2]
+    row.index[4] <- which(grepl(".*Tri P2$", SOP_WT.HA[row.data3, 1])) + row.break[3]
+    row.index[5] <- which(grepl(".*Tri R$", SOP_WT.HA[row.data4, 1])) + row.break[4]
+    
+    
     SOP_WT.frame <- empty.frame
     
-            for (i in 1:length(row.index)){
-                SOP_WT.frame[i,] <- rep(NA, length(SOP_WT.frame))
-            }
+    for (i in 1:length(row.index)){
+        SOP_WT.frame[i,] <- rep(NA, length(SOP_WT.frame))
+    }
     
     # Split data into dataframes per specialty and show NA data
     
-    SOP_WT <- SOP_WT[row.index,]
-    SOP_WT.HA <- SOP_WT.HA[row.index,]
+    col.start <- which(SOP_WT[1,] == specialty)
+    specialty.index <- which(!is.na(SOP_WT[1,]))
+    col.end <- if(specialty=="Overall"){
+        length(SOP_WT[1,])
+    }else{
+        specialty.index[which(specialty.index == col.start) + 1]
+    }
+    col.HA <- which(SOP_WT.HA[1,] == specialty)
     
-    colnames(SOP_WT) <- gsub("( Mgt)", "", colnames(SOP_WT))
-    colnames(SOP_WT.HA) <- gsub("( Inst.$)", "", colnames(SOP_WT.HA))
+    SOP_WT[2,] <- gsub("( Mgt)", "", SOP_WT[2,])
+    SOP_WT.HA[2,] <- gsub("( Inst.$)", "", SOP_WT.HA[2,])
     
-    for (i in 1:(length(SOP_WT)-1)){
-        SOP_WT[,i+1] <- as.numeric(SOP_WT[,i+1])
+    SOP_WT.Spl <- cbind.data.frame(SOP_WT[,c(col.start:col.end)], SOP_WT.HA[,c(col.HA)], stringsAsFactors = FALSE)
+    
+    colnames(SOP_WT.Spl) <- SOP_WT.Spl[2,]
+    
+    SOP_WT.Spl <- SOP_WT.Spl[row.index,]
+    
+    
+    for (i in 1:(length(SOP_WT.Spl)-1)){
+        SOP_WT.Spl[,i+1] <- as.numeric(SOP_WT.Spl[,i+1])
     }
     
-    for (i in 1:(length(SOP_WT.HA)-1)){
-        SOP_WT.HA[,i+1] <- as.numeric(SOP_WT.HA[,i+1])
-    }
-    
-    
-    if (specialty=="ENT"){
-            SOP_WT.Spl <- cbind(SOP_WT[,c(1,2:6)], SOP_WT.HA[,c(2,1)])
-    } else if (specialty=="GYN"){
-            SOP_WT.Spl <- cbind(SOP_WT[,c(1,7:12)], SOP_WT.HA[,c(3,1)]) 
-    } else if (specialty=="MED"){
-            SOP_WT.Spl <- cbind(SOP_WT[,c(1,13:19)], SOP_WT.HA[,c(4,1)])
-    } else if (specialty=="OPH"){
-            SOP_WT.Spl <- cbind(SOP_WT[,c(1,20:23)], SOP_WT.HA[,c(5,1)])
-    } else if (specialty=="ORT"){
-            SOP_WT.Spl <- cbind(SOP_WT[,c(1,24:30)], SOP_WT.HA[,c(6,1)])
-    } else if (specialty=="PAE"){
-            SOP_WT.Spl <- cbind(SOP_WT[,c(1,31:46)], SOP_WT.HA[,c(7,1)])
-    } else if (specialty=="PSY"){
-            SOP_WT.Spl <- cbind(SOP_WT[,c(1,37:40)], SOP_WT.HA[,c(8,1)])
-    } else if (specialty=="SUR"){
-            SOP_WT.Spl <- cbind(SOP_WT[,c(1,41:47)], SOP_WT.HA[,c(9,1)])
-    } else if (specialty=="Ovr"){
-            SOP_WT.Spl <- cbind(SOP_WT[,c(1,48:55)], SOP_WT.HA[,c(10,1)])
-    }
-
-
     for (i in 1:length(SOP_WT.frame)){
         if (names(SOP_WT.frame)[i] %in% names(SOP_WT.Spl)){
             SOP_WT.frame[i] <- SOP_WT.Spl[names(SOP_WT.frame)[i]]
@@ -294,7 +297,7 @@ kpi.2 <- function(Mmm, specialty = "Ovr"){
     percent_row <- c(3:4)
     
     for (i in 1:length(percent_row)){
-            SOP_WT.frame[percent_row[i],] <- sapply(SOP_WT.frame[percent_row[i],], FUN = function(x) ifelse(is.numeric(x), x/100, x))
+        SOP_WT.frame[percent_row[i],] <- sapply(SOP_WT.frame[percent_row[i],], FUN = function(x) ifelse(is.numeric(x), x/100, x))
     }
     
     # Replace NA with N.A. for production use in Excel
@@ -304,9 +307,13 @@ kpi.2 <- function(Mmm, specialty = "Ovr"){
     for (i in 1:ncol(SOP_WT.prod)){
         if ("N.A." %in% SOP_WT.prod[,i]){
         } else {
-                SOP_WT.prod[,i] <- as.numeric(SOP_WT.prod[,i])
+            SOP_WT.prod[,i] <- as.numeric(SOP_WT.prod[,i])
         }
     }
+    
+    # If SOP WT for 1st priority is 0, replace as <1
+    
+    SOP_WT.prod[1,] <- gsub("^0.*", "<1", SOP_WT.prod[1,])
     
     # Return production ready dataframe
     
