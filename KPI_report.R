@@ -7,22 +7,55 @@
 # Aug 2015
 
 
-# y = 2015
-# m = 5
-
 kpi_report <- function(y = 2015, m = 5){
 
 # Libraries -----------------------------------------------------------------------
 
 require("xlsx")
 require("dplyr")
+require("reshape2")
 require("lubridate")
+
+# Reporting period --------------------------------------------------------
+
+reportDates <- function(y, m){
+    
+    to.YY <- paste(unlist(strsplit(as.character(y), ""))[3:4], collapse = "") ## Input from func
+    from.YY <- paste(unlist(strsplit(as.character(y-1), ""))[3:4], collapse = "") ## Input from func
+    prev.from.YY <- paste(unlist(strsplit(as.character(y-2), ""))[3:4], collapse = "") ## Input from func
+    
+    to.month <- m ## Input from func
+    to.Mmm <- month(to.month, label = TRUE, abbr = TRUE)
+    from.Mmm <- month(to.month + 1, label = TRUE, abbr = TRUE)
+    
+    to.MmmYY <- paste(to.Mmm , to.YY, sep = "")
+    to.MmmYY_ <- paste(" ", to.MmmYY, sep = "") # Keep leading zero for use as text in Excel
+    
+    from.MmmYY <- paste(from.Mmm, from.YY, sep = "")
+    
+    prev.to.MmmYY <- paste(to.Mmm, from.YY, sep = "")
+    prev.from.MmmYY <- paste(from.Mmm, prev.from.YY, sep = "")
+    
+    cy.period <- paste(from.MmmYY, to.MmmYY, sep = "-")
+    py.period <- paste(prev.from.MmmYY, prev.to.MmmYY, sep = "-")
+    
+    df <- data.frame(dates = c(to.MmmYY, # 1 Reporting month
+                                  to.MmmYY_, # 2 Reporting month w/ leading zero
+                                  prev.to.MmmYY, # 3 Last year's reporting month
+                                  cy.period, # 4 Current year reporting period
+                                  py.period), # 5 Previous year reporting period
+                        stringsAsFactors = FALSE)
+}
+
+Dates <<- reportDates(y = y, m = m)
 
 source("read_xlsx.R")
 source("process_kpi.R")
 
 
-# Validate function input -------------------------------------------------
+# Validation  -------------------------------------------------
+
+# Function input
 
     if(nchar(y)!=4 | !is.numeric(y)){
         return("Please input a year in 4 digits")
@@ -30,31 +63,10 @@ source("process_kpi.R")
         return("Please input a month in integers")
     }
 
-# Reporting period --------------------------------------------------------
+# Source file completness
 
-to.YY <- paste(unlist(strsplit(as.character(y), ""))[3:4], collapse = "") ## Input from func
-from.YY <- paste(unlist(strsplit(as.character(y-1), ""))[3:4], collapse = "") ## Input from func
-prev.from.YY <- paste(unlist(strsplit(as.character(y-2), ""))[3:4], collapse = "") ## Input from func
 
-to.month <- m ## Input from func
-    to.Mmm <- month(to.month, label = TRUE, abbr = TRUE)
-    from.Mmm <- month(to.month + 1, label = TRUE, abbr = TRUE)
 
-to.MmmYY <- paste(to.Mmm , to.YY, sep = "")
-    to.MmmYY_ <- paste(" ", to.MmmYY, sep = "") # Keep leading zero for use as text in Excel
-
-from.MmmYY <- paste(from.Mmm, from.YY, sep = "")
-
-prev.to.MmmYY <- paste(to.Mmm, from.YY, sep = "")
-prev.from.MmmYY <- paste(from.Mmm, prev.from.YY, sep = "")
-
-cy.period <- paste(from.MmmYY, to.MmmYY, sep = "-")
-py.period <- paste(prev.from.MmmYY, prev.to.MmmYY, sep = "-")
-
-dates <- data.frame(dates = c(to.MmmYY_,
-                    cy.period,
-                    py.period),
-                    stringsAsFactors = FALSE)
 
 # Create filepath table ----------------------------------------------------------
 
@@ -65,7 +77,7 @@ KPI_files <-
     stringsAsFactors = FALSE)
 
 KPI_files <- KPI_files %>%
-    mutate(file.paths = gsub("(\\.xls$)", paste(to.MmmYY_, ".xls", sep = ""), temp.paths)) %>%
+    mutate(file.paths = gsub("(\\.xls$)", paste(Dates[2,], ".xls", sep = ""), temp.paths)) %>%
         mutate(file.paths = gsub("(^template)", "report", file.paths)) %>%
             arrange(desc(temp.names))
 
@@ -80,132 +92,32 @@ for (i in 1:nrow(KPI_files)){
 
 # Loading xls template ------------------------------------------------------
 
-as.KPI <- loadWorkbook(KPI_files$temp.paths[1])
-    sheets.KPI <- getSheets(as.KPI)
+as.KPI <<- loadWorkbook(KPI_files$file.paths[which(grepl("KWC Clinical", KPI_files[,1]))])
+    sheets.KPI <<- getSheets(as.KPI)
 
-# as.SOP <- loadWorkbook(KPI_files$temp.paths[2])
-#     sheets.SOP <- getSheets(as.SOP)
-#     
-# as.TRE <- loadWorkbook(KPI_files$temp.paths[3])
-#     sheets.TRE <- getSheets(as.TRE)
+as.SOP <<- loadWorkbook(KPI_files$file.paths[which(grepl("SOP", KPI_files[,1]))])
+    sheets.SOP <<- getSheets(as.SOP)
+    
+# as.TRE <<- loadWorkbook(KPI_files$file.paths[which(grepl("Trend", KPI_files[,1]))])
+#     sheets.TRE <<- getSheets(as.TRE)
 
 
     
-    # Load and prepare KPI source data -----------------------------------
-    
-    # kpi.1
-    kpi.1.c <- kpi.1(to.MmmYY)
-    kpi.1.p <- kpi.1(prev.to.MmmYY)
-    # kpi.2
-    kpi.2.c <- kpi.2(to.MmmYY)
-    kpi.2.p <- kpi.2(prev.to.MmmYY)
-    # kpi.3
-    kpi.3.1.c <- kpi.3("kpi.3.1", to.MmmYY)
-    kpi.3.1.p <- kpi.3("kpi.3.1", prev.to.MmmYY)
-    kpi.3.2.c <- kpi.3("kpi.3.2", to.MmmYY)
-    kpi.3.2.p <- kpi.3("kpi.3.2", prev.to.MmmYY)
-    kpi.3.3.c <- kpi.3.3(to.MmmYY)
-    kpi.3.3.p <- kpi.3.3(prev.to.MmmYY)
-    kpi.3.4.c <- kpi.10(to.MmmYY)
-    kpi.3.4.p <- kpi.10(prev.to.MmmYY)
-    # kpi.4
-    kpi.4.1.c <- kpi.4.1(to.MmmYY)
-    kpi.4.1.p <- kpi.4.1(prev.to.MmmYY)
-    kpi.4.2.c <- kpi.4.2(to.MmmYY)
-    kpi.4.2.p <- kpi.4.2(prev.to.MmmYY)
-    kpi.4.3.c <- kpi.4.3(to.MmmYY)
-    kpi.4.3.p <- kpi.4.3(prev.to.MmmYY)
-    # kpi.5
-    kpi.5.1.c <- kpi.5.1(to.MmmYY)
-    kpi.5.1.p <- kpi.5.1(prev.to.MmmYY)
-    kpi.5.2.c <- kpi.5("kpi.5.2", to.MmmYY)
-    kpi.5.2.p <- kpi.5("kpi.5.2", prev.to.MmmYY)
-    kpi.5.3.c <- kpi.5("kpi.5.3", to.MmmYY)
-    kpi.5.3.p <- kpi.5("kpi.5.3", prev.to.MmmYY)
-    # kpi.6
-    kpi.6.1.c <- kpi.6("kpi.6.1", to.MmmYY)
-    kpi.6.1.p <- kpi.6("kpi.6.1", prev.to.MmmYY)
-    kpi.6.2.c <- kpi.6("kpi.6.2", to.MmmYY)
-    kpi.6.2.p <- kpi.6("kpi.6.2", prev.to.MmmYY)
-    # kpi.7
-    kpi.7.1.c <- kpi.7("kpi.7.1", to.MmmYY)
-    kpi.7.1.p <- kpi.7("kpi.7.1", prev.to.MmmYY)
-    kpi.7.2.c <- kpi.7("kpi.7.2", to.MmmYY)
-    kpi.7.2.p <- kpi.7("kpi.7.2", prev.to.MmmYY)
-    kpi.7.3.c <- kpi.7("kpi.7.3", to.MmmYY)
-    kpi.7.3.p <- kpi.7("kpi.7.3", prev.to.MmmYY)
-    kpi.7.4.c <- kpi.7("kpi.7.4", to.MmmYY)
-    kpi.7.4.p <- kpi.7("kpi.7.4", prev.to.MmmYY)
-    
-    # Update reporting month and period -----------------------------------
-    
-    addDataFrame(dates, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=1, startColumn=2)
-    
-    # Write to Excel templates -----------------------------------------------
-    # kpi.t ## Prototype not functioning pending rewrite of kpi.t()
-    for (i in 1:25){
-        kpi.t.i <- kpi.t(i, to.MmmYY)
-        addDataFrame(kpi.t.i, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=(3+i), startColumn=13)
-    }
-    # kpi.1
-    addDataFrame(kpi.1.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=3, startColumn=3)
-    
-    addDataFrame(kpi.1.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=3, startColumn=13)
-    # kpi.2
-    addDataFrame(kpi.2.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=7, startColumn=3)
-    
-    addDataFrame(kpi.2.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=7, startColumn=13)
-    # kpi.3
-    addDataFrame(kpi.3.1.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=12, startColumn=3)
-    addDataFrame(kpi.3.2.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=13, startColumn=3)
-    addDataFrame(kpi.3.3.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=14, startColumn=3)
-    addDataFrame(kpi.3.4.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=18, startColumn=3)
-    
-    addDataFrame(kpi.3.1.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=12, startColumn=13)
-    addDataFrame(kpi.3.2.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=13, startColumn=13)
-    addDataFrame(kpi.3.3.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=14, startColumn=13)
-    addDataFrame(kpi.3.4.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=18, startColumn=13)
-    # kpi.4
-    addDataFrame(kpi.4.1.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=21, startColumn=3)
-    addDataFrame(kpi.4.2.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=24, startColumn=3)
-    addDataFrame(kpi.4.3.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=25, startColumn=3)
-    
-    addDataFrame(kpi.4.1.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=21, startColumn=13)
-    addDataFrame(kpi.4.2.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=24, startColumn=13)
-    addDataFrame(kpi.4.3.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=25, startColumn=13)
-    # kpi.5
-    addDataFrame(kpi.5.1.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=28, startColumn=3)
-    addDataFrame(kpi.5.2.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=29, startColumn=3)
-    addDataFrame(kpi.5.3.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=30, startColumn=3)
-    
-    addDataFrame(kpi.5.1.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=28, startColumn=13)
-    addDataFrame(kpi.5.2.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=29, startColumn=13)
-    addDataFrame(kpi.5.3.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=30, startColumn=13)
-    # kpi.6
-    addDataFrame(kpi.6.1.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=26, startColumn=3)
-    addDataFrame(kpi.6.2.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=27, startColumn=3)
-    
-    addDataFrame(kpi.6.1.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=26, startColumn=13)
-    addDataFrame(kpi.6.2.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=27, startColumn=13)
-    # kpi.7
-    addDataFrame(kpi.7.1.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=31, startColumn=3)
-    addDataFrame(kpi.7.2.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=32, startColumn=3)
-    addDataFrame(kpi.7.3.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=33, startColumn=3)
-    addDataFrame(kpi.7.4.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=34, startColumn=3)
-    
-    addDataFrame(kpi.7.1.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=31, startColumn=13)
-    addDataFrame(kpi.7.2.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=32, startColumn=13)
-    addDataFrame(kpi.7.3.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=33, startColumn=13)
-    addDataFrame(kpi.7.4.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=34, startColumn=13)
-    
+# Load and prepare KPI source data -----------------------------------
+
+source("consolidate_kpi.R")
+
+source("consolidate_sop.R")
+
+# source("consolidate_tre.R")
     
 # Saving xls reports ----------------------------------------------------
 
 as.KPI$setForceFormulaRecalculation(TRUE)
-# as.SOP$setForceFormulaRecalculation(TRUE)
+as.SOP$setForceFormulaRecalculation(TRUE)
 # as.TRE$setForceFormulaRecalculation(TRUE)
 
-    saveWorkbook(as.KPI, KPI_files$file.paths[1])
-#     saveWorkbook(as.SOP, KPI_files$file.paths[2])
+    saveWorkbook(as.KPI, KPI_files$file.paths[which(grepl("KWC Clinical", KPI_files[,1]))])
+    saveWorkbook(as.SOP, KPI_files$file.paths[which(grepl("SOP", KPI_files[,1]))])
 #     saveWorkbook(as.TRE, KPI_files$file.paths[3])
 }

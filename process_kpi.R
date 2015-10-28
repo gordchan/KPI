@@ -9,20 +9,20 @@
 
 # Set value for function development --------------------------------------
 
-mock <- function(){
-    require("xlsx")
-    require("dplyr")
-    require("lubridate")
-    
-    source("read_xlsx.R")
-    
-    Mmm <<- "May15"
-    
-    path <<- file.path("source", Mmm, "kpi.4.1 Stroke.xlsx")
-    
-}
-
-mock()
+# mock <- function(){
+#     require("xlsx")
+#     require("dplyr")
+#     require("lubridate")
+#     
+#     source("read_xlsx.R")
+#     
+#     Mmm <<- "May15"
+#     
+#     path <<- file.path("source", Mmm, "kpi.4.1 Stroke.xlsx")
+#     
+# }
+# 
+# mock()
 
 # Helper function to help with reading source file ----------------------------------------
 
@@ -106,7 +106,6 @@ kpi_source_helper <- function(Mmm){
             mutate(filename = paste(Query.Name, ".xlsx", sep = "")) %>%
             mutate(filepath = file.path("source", Mmm, filename))    
 }
-
 
 # File name standardisation -----------------------------------------------
 
@@ -725,7 +724,7 @@ kpi.5.1 <- function(Mmm){
     DS_SDS.frame <- empty.frame
         DS_SDS.frame[1,] <- NA
         
-    DS_SDS <- fuzzy_range(path, 118:210, 1:6)
+    DS_SDS <- fuzzy_range(path, 118:220, 1:6)
     
     names(DS_SDS) <- c("cluster", "institution", "specialty", "total", "DS", "SDS")
     
@@ -1033,9 +1032,151 @@ kpi.7 <- function(kpi, Mmm){
     RAD.prod
 }
 
+# kpi.8 Rate of Day Surgery plus Same Day Surgery for different specialty -----------
+
+kpi.8 <- function(Mmm, spec = "Overall", inst = "KWC"){
+    
+    # Check input
+    
+    specialty.list <- c("Overall",
+                        "ENT",
+                        "OG",
+                        "OPH",
+                        "ORT",
+                        "SUR")
+    
+    if(!(spec %in% specialty.list)){
+        print("specialty not allowed")
+        return(0)
+    }
+    
+    kpi_source_helper(Mmm)
+    
+    path <- grep("(.*kpi.8 .*)", source.kpi$filepath, value = TRUE)
+    
+    DS_SDS.frame <- empty.frame
+    DS_SDS.frame[1,] <- NA
+    
+    DS_SDS <- fuzzy_range(path, 118:220, 1:6)
+    
+    names(DS_SDS) <- c("cluster", "institution", "specialty", "total", "DS", "SDS")
+    
+    DS_SDS$institution <- gsub("^Subtotal.*", "Subtotal", DS_SDS$institution)
+    
+    if(specialty = "Overall"){
+        DS_SDS <- DS_SDS[-c(1),] %>% filter(cluster == "KW" | institution == "Subtotal" | is.na(institution))
+        
+        DS_SDS[nrow(DS_SDS),1] <- "HA"
+        
+        DS_SDS$institution <- gsub(".*total.*", NA, DS_SDS$institution)
+        
+        DS_SDS$cluster <- gsub(" $", "", DS_SDS$cluster)
+        DS_SDS$cluster <- sapply(DS_SDS$cluster, FUN = function(x){ifelse(x=="HA", x, paste(x,"C", sep = ""))})
+        
+        
+        for (i in 1:nrow(DS_SDS)){
+            if (is.na(DS_SDS$institution[i])){
+                DS_SDS$institution[i] <- DS_SDS$cluster[i]
+            }
+            if (is.na(DS_SDS$DS[i]) & DS_SDS$total[i]!=0){
+                DS_SDS$DS[i] <- 0
+            }
+            if (is.na(DS_SDS$SDS[i]) & DS_SDS$total[i]!=0){
+                DS_SDS$SDS[i] <- 0
+            }
+        }
+        
+        for (i in 1:3){
+            for (j in 1:nrow(DS_SDS)){
+                if(is.na(DS_SDS[j,i+3])){
+                    DS_SDS[j,i+3] <- "0"
+                }
+            }
+            DS_SDS[,i+3] <- as.numeric(DS_SDS[,i+3])
+        }
+        
+        DS_SDS <- DS_SDS %>% #filter(cluster=="KWC" | cluster=="HA") %>% 
+            group_by(institution) %>% summarise(SDS = sum(SDS), DS = sum(DS), total = sum(total)) %>%
+            t() %>% as.data.frame(stringsAsFactors = FALSE)
+        
+        names(DS_SDS) <- DS_SDS[1,]
+        
+        DS_SDS <- DS_SDS[-1,]
+        
+        for (i in 1:length(DS_SDS)){
+            DS_SDS[,i] <- sapply(DS_SDS[,i], FUN = function(x) as.numeric(x))
+        }
+        
+        if(inst == "KWC"){
+            DS_SDS.prod <- DS_SDS %>% select(CMC, KWH, NLTH, OLM, PMH, YCH, KWC, HA)
+        }else if(inst == "HA"){
+            DS_SDS.prod <- DS_SDS %>% select(HKEC, HKWC, KCC, KEC, NTEC, NTWC, KWC, HA)
+        }
+    
+    }else{
+        
+        DS_SDS <- DS_SDS[-c(1),] %>% filter(specialty==spec)
+        DS_SDS$cluster <- sapply(DS_SDS$cluster, FUN = function(x){ifelse(x=="HA", x, paste(x,"C", sep = ""))})
+        
+        for (i in 1:3){
+            for (j in 1:nrow(DS_SDS)){
+                if(is.na(DS_SDS[j,i+3])){
+                    DS_SDS[j,i+3] <- "0"
+                    }
+            }
+            DS_SDS[,i+3] <- as.numeric(DS_SDS[,i+3])
+        }
+        
+        # Cluster based
+        
+        DS_SDS.HA <- DS_SDS %>% group_by(cluster) %>% arrange(cluster) %>% summarise(SDS = sum(SDS), DS = sum(DS), total = sum(total)) %>%
+            t() %>% as.data.frame(stringsAsFactors = FALSE)
+        
+        names(DS_SDS.HA) <- DS_SDS.HA[1,]
+        
+        DS_SDS.HA <- DS_SDS.HA[-1,]
+        
+        for (k in 1:ncol(DS_SDS.HA)){
+            DS_SDS.HA[,k] <- as.numeric(DS_SDS.HA[,k])
+        }
+        
+        DS_SDS.HA <- DS_SDS.HA %>% mutate(KWC_ = KWC) %>% select(-KWC) %>% mutate(HA = rowSums(.))
+        
+        
+        
+        # Cluster based
+        
+        DS_SDS.KWC <- DS_SDS %>% filter(cluster=="KWC") %>% arrange(institution) %>% select(institution, SDS, DS, total) %>%
+            t() %>% as.data.frame(stringsAsFactors = FALSE)
+        
+        names(DS_SDS.KWC) <- DS_SDS.KWC[1,]
+        
+        DS_SDS.KWC <- DS_SDS.KWC[-1,]
+        
+        for (k in 1:ncol(DS_SDS.KWC)){
+            DS_SDS.KWC[,k] <- as.numeric(DS_SDS.KWC[,k])
+        }
+        
+        h <- ncol(DS_SDS.HA)
+        
+        DS_SDS.KWC <- bind_cols(DS_SDS.KWC, DS_SDS.HA[,c(h-1,h)])
+        
+        if(inst=="KWC"){
+            DS_SDS.prod <- DS_SDS.KWC
+        }else if(inst=="HA"){
+            DS_SDS.prod <- DS_SDS.HA
+        }
+    }
+    
+    # Return production dataframe
+    
+    DS_SDS.prod
+}
+
+
 # kpi.3.4 & 10 Quality - Unplanned Readmission Rate within 28 days for g --------
 
-kpi.10 <- function(Mnn, show_specialty = FALSE){
+kpi.10 <- function(Mmm, show_specialty = FALSE){
     
     kpi_source_helper(Mmm)
     
