@@ -48,19 +48,27 @@
     
 # DS + SDS
     
-    kpi.8.ovr <- kpi.8(Dates[1,], specialty = "Overall", inst = "KWC")
-    kpi.8.ovr.HA <- kpi.8(Dates[1,], specialty = "Overall", inst = "HA")
-    kpi.8.ent <- kpi.8(Dates[1,], specialty = "ENT", inst = "KWC")
-    kpi.8.ent.HA <- kpi.8(Dates[1,], specialty = "ENT", inst = "HA")
-    kpi.8.og <- kpi.8(Dates[1,], specialty = "OG", inst = "KWC")
-    kpi.8.og.HA <- kpi.8(Dates[1,], specialty = "OG", inst = "HA")
-    kpi.8.oph <- kpi.8(Dates[1,], specialty = "OPH", inst = "KWC")
-    kpi.8.oph.HA <- kpi.8(Dates[1,], specialty = "OPH", inst = "HA")
-    kpi.8.ort <- kpi.8(Dates[1,], specialty = "ORT", inst = "KWC")
-    kpi.8.ort.HA <- kpi.8(Dates[1,], specialty = "ORT", inst = "HA")
-    kpi.8.sur <- kpi.8(Dates[1,], specialty = "SUR", inst = "KWC")
-    kpi.8.sur.HA <- kpi.8(Dates[1,], specialty = "SUR", inst = "HA")
+    kpi.8.ovr <- kpi.8(Dates[1,], spec = "Overall", inst = "KWC")
+    kpi.8.ovr.HA <- kpi.8(Dates[1,], spec = "Overall", inst = "HA")
+    kpi.8.ent <- kpi.8(Dates[1,], spec = "ENT", inst = "KWC")
+    kpi.8.ent.HA <- kpi.8(Dates[1,], spec = "ENT", inst = "HA")
+    kpi.8.og <- kpi.8(Dates[1,], spec = "O&G", inst = "KWC")
+    kpi.8.og.HA <- kpi.8(Dates[1,], spec = "O&G", inst = "HA")
+    kpi.8.oph <- kpi.8(Dates[1,], spec = "OPH", inst = "KWC")
+    kpi.8.oph.HA <- kpi.8(Dates[1,], spec = "OPH", inst = "HA")
+    kpi.8.ort <- kpi.8(Dates[1,], spec = "ORT", inst = "KWC")
+    kpi.8.ort.HA <- kpi.8(Dates[1,], spec = "ORT", inst = "HA")
+    kpi.8.sur <- kpi.8(Dates[1,], spec = "SUR", inst = "KWC")
+    kpi.8.sur.HA <- kpi.8(Dates[1,], spec = "SUR", inst = "HA")
 
+# ALOS
+    
+    kpi.9 <- kpi.9(Dates[1,])
+    
+# URR
+    
+    kpi.10 <- kpi.10(Dates[1,], show_specialty = TRUE)
+    
 # Update reporting month and period -----------------------------------
 
 #addDataFrame(dates, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=1, startColumn=2)
@@ -74,6 +82,11 @@
 #         addDataFrame(kpi.t.i, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=(3+i), startColumn=13)
 #     }
 
+# Dates
+    
+    addDataFrame(Dates[6,], sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=31, startColumn=28)
+    addDataFrame(Dates[7,], sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=32, startColumn=28)
+    
 # Current Year
     
     addDataFrame(kpi.1.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=3, startColumn=3)
@@ -120,4 +133,25 @@
     
     addDataFrame(kpi.8.ovr, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=2, startColumn=24)
     addDataFrame(kpi.8.ovr.HA, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=2, startColumn=34)
+    addDataFrame(kpi.8.ent, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=7, startColumn=24)
+    addDataFrame(kpi.8.ent.HA, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=7, startColumn=34)
+    addDataFrame(kpi.8.og, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=12, startColumn=24)
+    addDataFrame(kpi.8.og.HA, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=12, startColumn=34)
+    addDataFrame(kpi.8.oph, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=17, startColumn=24)
+    addDataFrame(kpi.8.oph.HA, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=17, startColumn=34)
+    addDataFrame(kpi.8.ort, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=22, startColumn=24)
+    addDataFrame(kpi.8.ort.HA, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=22, startColumn=34)
+    addDataFrame(kpi.8.sur, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=27, startColumn=24)
+    addDataFrame(kpi.8.sur.HA, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=27, startColumn=34)
+
+# ALOS
     
+    addDataFrame(kpi.9, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=36, startColumn=31)
+    
+# URR
+    
+    addDataFrame(kpi.10, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=59, startColumn=31)
+    
+# Trim excess Previous Year HA data
+    
+    addDataFrame(rep("", 34), sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=1, startColumn=22)

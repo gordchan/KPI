@@ -20,6 +20,8 @@ require("lubridate")
 
 reportDates <- function(y, m){
     
+    require(lubridate)
+    
     to.YY <- paste(unlist(strsplit(as.character(y), ""))[3:4], collapse = "") ## Input from func
     from.YY <- paste(unlist(strsplit(as.character(y-1), ""))[3:4], collapse = "") ## Input from func
     prev.from.YY <- paste(unlist(strsplit(as.character(y-2), ""))[3:4], collapse = "") ## Input from func
@@ -39,11 +41,21 @@ reportDates <- function(y, m){
     cy.period <- paste(from.MmmYY, to.MmmYY, sep = "-")
     py.period <- paste(prev.from.MmmYY, prev.to.MmmYY, sep = "-")
     
+    eom <- ymd(paste(y, "-", m + 1, "-", 1)) # Find end date of reporting period this year
+        day(eom) <- day(eom) -1
+    som <- ymd(paste(y-1, "-", m + 1, "-", 1)) # Find start date of reporting period this year
+    
+    date.period <- paste(day(som), month(som, label = TRUE, abbr = TRUE), year(som), "-", day(eom), month(eom, label = TRUE, abbr = TRUE), year(eom))
+    date.eom <- paste(day(eom), "/", month(eom), "/", year(eom), sep = "")
+    
     df <- data.frame(dates = c(to.MmmYY, # 1 Reporting month
-                                  to.MmmYY_, # 2 Reporting month w/ leading zero
-                                  prev.to.MmmYY, # 3 Last year's reporting month
-                                  cy.period, # 4 Current year reporting period
-                                  py.period), # 5 Previous year reporting period
+                               to.MmmYY_, # 2 Reporting month w/ leading zero
+                               prev.to.MmmYY, # 3 Last year's reporting month
+                               cy.period, # 4 Current year reporting period
+                               py.period,# 5 Previous year reporting period
+                               date.period, # 6 Reporting period in dates (for Excel report)
+                               date.eom # 7 EOM date (for Excel report)
+                               ), 
                         stringsAsFactors = FALSE)
 }
 

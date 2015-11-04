@@ -265,7 +265,7 @@ kpi.2 <- function(Mmm, specialty = "Overall", index = 1:5){
     col.start <- which(SOP_WT[1,] == specialty)
     specialty.index <- which(!is.na(SOP_WT[1,]))
     col.end <- if(specialty=="Overall"){
-        length(SOP_WT[1,])
+        ncol(SOP_WT)
     }else{
         specialty.index[which(specialty.index == col.start) + 1]
     }
@@ -276,13 +276,14 @@ kpi.2 <- function(Mmm, specialty = "Overall", index = 1:5){
     
     SOP_WT.Spl <- cbind.data.frame(SOP_WT[,c(col.start:col.end)], SOP_WT.HA[,c(col.HA)], stringsAsFactors = FALSE)
     
+    SOP_WT.Spl[2, which(SOP_WT.Spl[2,]=="Overall")] <- "KWC"
     colnames(SOP_WT.Spl) <- SOP_WT.Spl[2,]
     
     SOP_WT.Spl <- SOP_WT.Spl[row.index,]
     
     
-    for (i in 1:(length(SOP_WT.Spl)-1)){
-        SOP_WT.Spl[,i+1] <- as.numeric(SOP_WT.Spl[,i+1])
+    for (i in 1:(length(SOP_WT.Spl))){
+        SOP_WT.Spl[,i] <- as.numeric(SOP_WT.Spl[,i])
     }
     
     for (i in 1:length(SOP_WT.frame)){
@@ -312,7 +313,7 @@ kpi.2 <- function(Mmm, specialty = "Overall", index = 1:5){
     
     # If SOP WT for 1st priority is 0, replace as <1
     
-    SOP_WT.prod[1,] <- gsub("^0.*", "<1", SOP_WT.prod[1,])
+    # SOP_WT.prod[1,] <- gsub("^0.*", "<1", SOP_WT.prod[1,])
     
     # Return production ready dataframe
     
@@ -390,11 +391,11 @@ kpi.3 <- function(kpi, Mmm){
     # Select KWC hospitals & HA
     
     SAR.1st <- SAR.1st %>% filter(!grepl("Total", Admission_Age)) %>%
-        mutate(KWC = CMC + KWH + NLTH + PMH + YCH + HA) %>%
+        mutate(KWC = CMC + KWH + NLTH + PMH + YCH) %>%
         select(Admission_Age, Sex, Ambulance_Case, Triage_Category, CMC.1 = CMC, KWH.1 = KWH, NLTH.1 = NLTH, PMH.1 = PMH, YCH.1 = YCH, KWC.1 = KWC, HA.1 = HA)
     
     SAR.adm <- SAR.adm %>% filter(!grepl("Total", Admission_Age)) %>%
-        mutate(KWC = CMC + KWH + NLTH + PMH + YCH + HA) %>%
+        mutate(KWC = CMC + KWH + NLTH + PMH + YCH) %>%
         select(Admission_Age, Sex, Ambulance_Case, Triage_Category, CMC.a = CMC, KWH.a = KWH, NLTH.a = NLTH, PMH.a = PMH, YCH.a = YCH, KWC.a = KWC, HA.a = HA)
     
     SAR <- suppressMessages(full_join(SAR.1st, SAR.adm))
@@ -694,6 +695,8 @@ kpi.4.3 <- function(Mmm){
 
     AMI <- AMI[-1,]
 
+    names(AMI)[which(names(AMI)=="NLT")] <- "NLTH"
+    
     AMI <- data.frame(lapply(AMI[1,], FUN = function(x){as.numeric(x)}))
     AMI <- data.frame(lapply(AMI[1,], FUN = function(x){x/100}))
     
@@ -1040,7 +1043,7 @@ kpi.8 <- function(Mmm, spec = "Overall", inst = "KWC"){
     
     specialty.list <- c("Overall",
                         "ENT",
-                        "OG",
+                        "O&G",
                         "OPH",
                         "ORT",
                         "SUR")
@@ -1063,7 +1066,7 @@ kpi.8 <- function(Mmm, spec = "Overall", inst = "KWC"){
     
     DS_SDS$institution <- gsub("^Subtotal.*", "Subtotal", DS_SDS$institution)
     
-    if(specialty = "Overall"){
+    if(spec == "Overall"){
         DS_SDS <- DS_SDS[-c(1),] %>% filter(cluster == "KW" | institution == "Subtotal" | is.na(institution))
         
         DS_SDS[nrow(DS_SDS),1] <- "HA"
@@ -1142,7 +1145,7 @@ kpi.8 <- function(Mmm, spec = "Overall", inst = "KWC"){
         
         DS_SDS.HA <- DS_SDS.HA %>% mutate(KWC_ = KWC) %>% select(-KWC) %>% mutate(HA = rowSums(.))
         
-        
+        names(DS_SDS.HA)[which(names(DS_SDS.HA)=="KWC_")] <- "KWC"
         
         # Cluster based
         
@@ -1159,7 +1162,9 @@ kpi.8 <- function(Mmm, spec = "Overall", inst = "KWC"){
         
         h <- ncol(DS_SDS.HA)
         
-        DS_SDS.KWC <- bind_cols(DS_SDS.KWC, DS_SDS.HA[,c(h-1,h)])
+        DS_SDS.KWC <- cbind(DS_SDS.KWC, DS_SDS.HA[,c(h-1,h)])
+        
+        names(DS_SDS.KWC)[which(names(DS_SDS.KWC)=="KWC_")] <- "KWC"
         
         if(inst=="KWC"){
             DS_SDS.prod <- DS_SDS.KWC
@@ -1173,6 +1178,44 @@ kpi.8 <- function(Mmm, spec = "Overall", inst = "KWC"){
     DS_SDS.prod
 }
 
+
+# kpi.9 ALOS by specialty ------------------------------------------------
+
+kpi.9 <- function(Mmm){
+    
+    kpi_source_helper(Mmm)
+    
+    path <- grep("(.*kpi.9 .*)", source.kpi$filepath, value = TRUE)
+    
+    ALOS <- read_range(path, 5:26, 1:16)
+    
+    for (i in 1:(ncol(ALOS)-1)){
+        ALOS[,i+1] <- as.numeric(ALOS[,i+1])
+    }
+    
+    # Check if return need to be shown by specialty and subset accordingly
+    
+    ALOS.frame <- ALOS
+    
+    ALOS.frame <- ALOS.frame[, -1]
+    
+    # Rounding to 1 decimal place
+    
+    ALOS.frame <- format(ALOS.frame, nsmall = 1)
+    
+    # Replace NA with "" for use in Excel
+    
+    if (nrow(ALOS.frame)>1){
+        ALOS.prod <- data.frame(apply(ALOS.frame, 2, FUN = function(x){ifelse(grepl("NA", x), "", x)}), stringsAsFactors = FALSE)
+    } else if (nrow(ALOS.frame)==1){
+        ALOS.prod <- lapply(ALOS.frame, function(x){ifelse(grepl("NA", x), "", x)})
+        ALOS.prod <- data.frame(ALOS.prod)
+    }
+    
+    # Return production ready dataframe
+    
+    ALOS.prod
+}
 
 # kpi.3.4 & 10 Quality - Unplanned Readmission Rate within 28 days for g --------
 
@@ -1207,29 +1250,26 @@ kpi.10 <- function(Mmm, show_specialty = FALSE){
         } else {
             URR.frame <- URR
         }
+    
+    URR.frame <- URR.frame[, -1]
 
     # Convert to decimal percentage *(Need to consider if requried for show_specialty=TRUE)*
-    
-    for (i in 1:ncol(URR.frame)){
+    if (show_specialty == FALSE){
+        for (i in 1:ncol(URR.frame)){
             URR.frame[,i] <- sapply(URR.frame[,i], FUN = function(x){ifelse(is.numeric(x), x/100, x)})
+        }
+    }else{
+        URR.frame <- format(URR.frame, nsmall = 1)
     }
     
-    # Replace NA with N.A. for use in Excel
+    # Replace NA with "" for use in Excel
     
     if (nrow(URR.frame)>1){
-        URR.prod <- data.frame(apply(URR.frame, 2, FUN = function(x){ifelse(is.na(x), "N.A.", x)}), stringsAsFactors = FALSE)
+        URR.prod <- data.frame(apply(URR.frame, 2, FUN = function(x){ifelse(grepl("NA", x), "", x)}), stringsAsFactors = FALSE)
     } else if (nrow(URR.frame)==1){
-        URR.prod <- lapply(URR.frame, function(x){ifelse(is.na(x), "N.A.", x)})
-        URR.prod <-data.frame(URR.prod)
+        URR.prod <- lapply(URR.frame, function(x){ifelse(is.na(x), "", x)})
+        URR.prod <- data.frame(URR.prod)
     }
-    
-    
-#     for (i in 1:ncol(URR.prod)){
-#         if ("N.A." %in% URR.prod[,i]){
-#         } else {
-#             URR.prod[,i] <- as.numeric(URR.prod[,i])
-#         }
-#     }
     
     # Return production ready dataframe
     
