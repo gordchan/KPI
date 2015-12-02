@@ -59,6 +59,29 @@ reportDates <- function(y, m){
                         stringsAsFactors = FALSE)
 }
 
+dateSeries <- function(y, m){
+    
+    require(lubridate)
+    require(dplyr)
+    
+    eos <- ymd(paste(y, sprintf("%02.f", m), "01", sep = ""))
+    
+    series <- data.frame(date = .POSIXct(rep(NA, 12)))
+    
+    for(i in 0:11){
+        series[12-i, 1] <- eos - months(i)
+    }
+    
+    series <- series %>% mutate(month = sapply(date, function(x) month(x, label = TRUE))) %>%
+        mutate(year = sapply(date, function(x) paste(unlist(strsplit(as.character(year(x)), ""))[3:4], collapse = ""))) %>%
+        mutate(label = paste(month, year))
+    
+    seriesLabel <- series %>% select(label) %>% t()
+    
+}
+
+Series <<- dateSeries(y = y, m = m)
+
 Dates <<- reportDates(y = y, m = m)
 
 source("read_xlsx.R")
@@ -90,8 +113,12 @@ KPI_files <-
 
 KPI_files <- KPI_files %>%
     mutate(file.paths = gsub("(\\.xls$)", paste(Dates[2,], ".xls", sep = ""), temp.paths)) %>%
-        mutate(file.paths = gsub("(^template)", "report", file.paths)) %>%
+        mutate(file.paths = gsub("(^template)", file.path("report", Dates[1,]), file.paths)) %>%
             arrange(desc(temp.names))
+
+# Creat directory Eg"Sep15" under report ------------------------------------------
+
+dir.create(file.path("report", Dates[1,]), showWarnings = FALSE)
 
 # Copy template for use as blank report -------------------------------------------
 
@@ -110,8 +137,8 @@ as.KPI <<- loadWorkbook(KPI_files$file.paths[which(grepl("KWC Clinical", KPI_fil
 as.SOP <<- loadWorkbook(KPI_files$file.paths[which(grepl("SOP", KPI_files[,1]))])
     sheets.SOP <<- getSheets(as.SOP)
     
-# as.TRE <<- loadWorkbook(KPI_files$file.paths[which(grepl("Trend", KPI_files[,1]))])
-#     sheets.TRE <<- getSheets(as.TRE)
+as.TRE <<- loadWorkbook(KPI_files$file.paths[which(grepl("Trend", KPI_files[,1]))])
+    sheets.TRE <<- getSheets(as.TRE)
 
 
     
@@ -121,15 +148,15 @@ source("consolidate_kpi.R")
 
 source("consolidate_sop.R")
 
-# source("consolidate_tre.R")
+source("consolidate_tre.R")
     
 # Saving xls reports ----------------------------------------------------
 
 as.KPI$setForceFormulaRecalculation(TRUE)
 as.SOP$setForceFormulaRecalculation(TRUE)
-# as.TRE$setForceFormulaRecalculation(TRUE)
+as.TRE$setForceFormulaRecalculation(TRUE)
 
     saveWorkbook(as.KPI, KPI_files$file.paths[which(grepl("KWC Clinical", KPI_files[,1]))])
     saveWorkbook(as.SOP, KPI_files$file.paths[which(grepl("SOP", KPI_files[,1]))])
-#     saveWorkbook(as.TRE, KPI_files$file.paths[3])
+    saveWorkbook(as.TRE, KPI_files$file.paths[3])
 }

@@ -325,7 +325,6 @@ kpi.2 <- function(Mmm, specialty = "Overall", index = 1:5){
 
 
 # kpi.3 Quality ----------------------------------------------------------
-
 kpi.3 <- function(kpi, Mmm){
     
     kpi_source_helper(Mmm)
@@ -370,7 +369,7 @@ kpi.3 <- function(kpi, Mmm){
         SAR.adm <- SAR.adm[-c(1:2),]
         
     }
-
+    
     names(SAR.1st) <- gsub("(Row Total)", "HA", names(SAR.1st))
     names(SAR.adm) <- gsub("(Row Total)", "HA", names(SAR.adm))
     
@@ -387,6 +386,11 @@ kpi.3 <- function(kpi, Mmm){
         SAR.1st[,i+4] <- as.numeric(SAR.1st[,i+4])
         SAR.adm[,i+4] <- as.numeric(SAR.adm[,i+4])
     }
+    
+    # Substitute NA with 0
+    
+    SAR.1st[is.na(SAR.1st)] <- 0 
+    SAR.adm[is.na(SAR.adm)] <- 0
     
     # Select KWC hospitals & HA
     
@@ -456,6 +460,8 @@ kpi.3.3 <- function(Mmm, trend = FALSE, row){
         MRSA[,i+2] <- as.numeric(MRSA[,i+2])
     }
     
+    MRSA <- MRSA %>% mutate(per_1000_PD = MRSA_in_Acute_Beds/Acute_Patient_Days*1000)
+    
     MRSA.HA <- MRSA %>% group_by(Period) %>%
         summarise(Hospital = "HA", MRSA_in_Acute_Beds = sum(MRSA_in_Acute_Beds), Acute_Patient_Days = sum(Acute_Patient_Days)) %>%
         mutate(per_1000_PD = MRSA_in_Acute_Beds/Acute_Patient_Days*1000)
@@ -471,14 +477,18 @@ kpi.3.3 <- function(Mmm, trend = FALSE, row){
     if(trend==TRUE){
         
         MRSA.req <- MRSA %>% select(-MRSA_in_Acute_Beds, -Acute_Patient_Days) %>% spread(key = Period, value = per_1000_PD)
-
+        
         MRSA.KWC.req <- MRSA.req %>% filter(Hospital=="KWC")
         MRSA.HA.req <- MRSA.req %>% filter(Hospital=="HA")
-        MRSA.req <- MRSA.req %>% filter(Hospital!="HA" & Hospital!="KWC") %>%
-            filter(Hospital!="KCH" & Hospital!="WTS")
-
+        MRSA.req <- MRSA.req %>% filter(Hospital!="HA" & Hospital!="KWC") #%>%
+            #filter(Hospital!="KCH" & Hospital!="WTS")
+        
         
         MRSA.req <- bind_rows(MRSA.req, MRSA.KWC.req, MRSA.HA.req)
+        
+        rownames(MRSA.req) <- MRSA.req$Hospital
+        
+        MRSA.req <- MRSA.req %>% select(-Hospital)
         
         # return row as specified
         
@@ -488,7 +498,7 @@ kpi.3.3 <- function(Mmm, trend = FALSE, row){
         
         MRSA.prod <- data.frame(lapply(MRSA.prod, FUN = function(x){ifelse(is.na(x), "N.A.", x)}), stringsAsFactors = FALSE)
         
-
+        
         
     }else{
         
@@ -497,7 +507,7 @@ kpi.3.3 <- function(Mmm, trend = FALSE, row){
             mutate(per_1000_PD = MRSA_in_Acute_Beds/Acute_Patient_Days*1000) %>%
             select(-MRSA_in_Acute_Beds, -Acute_Patient_Days) %>%
             t() %>% as.data.frame(stringsAsFactors=FALSE)
-            
+        
         names(MRSA.req) <- MRSA.req[1,]
         MRSA.req <- MRSA.req[-1,]
         
@@ -526,7 +536,7 @@ kpi.3.3 <- function(Mmm, trend = FALSE, row){
         
     }
     
-# Return production ready dataframe
+    # Return production ready dataframe
     
     MRSA.prod
 }
@@ -1249,10 +1259,9 @@ kpi.10 <- function(Mmm, show_specialty = FALSE){
 
         } else {
             URR.frame <- URR
+            URR.frame <- URR.frame[, -1]
         }
     
-    URR.frame <- URR.frame[, -1]
-
     # Convert to decimal percentage *(Need to consider if requried for show_specialty=TRUE)*
     if (show_specialty == FALSE){
         for (i in 1:ncol(URR.frame)){
@@ -1274,4 +1283,56 @@ kpi.10 <- function(Mmm, show_specialty = FALSE){
     # Return production ready dataframe
     
     URR.prod
+}
+
+# tre.1 A&E Waiting Time ----------------------------------------------------
+
+tre.1 <- function(Mmm){
+    
+}
+
+# tre.2 SOP Waiting Time ----------------------------------------------------
+
+tre.2 <- function(Mmm, specialty = "Overall"){
+    
+}
+
+# tre.3 A&E Standardised Admission Rate ------------------------------------
+
+tre.3 <- function(Mmm){
+    
+}
+
+# tre.4 MRSA ---------------------------------------------------------------
+
+    # C.f. kpi3.3
+
+# tre.5 Unplanned Readmissions Rate ----------------------------------------
+
+tre.5 <- function(Mmm){
+    
+}
+
+# tre.6 Stroke --------------------------------------------------------------
+
+tre.6 <- function(Mmm){
+    
+}
+
+# tre.7 Fracture Hip -------------------------------------------------------
+
+tre.7 <- function(Mmm){
+    
+}
+
+# tre.8 Cardiac -------------------------------------------------------------
+
+tre.8 <- function(Mmm){
+    
+}
+
+# tre.9 DS +SDS ------------------------------------------------------------
+
+tre.9 <- function(Mmm){
+    
 }
