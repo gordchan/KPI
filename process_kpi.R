@@ -36,6 +36,7 @@ kpi_source_helper <- function(Mmm){
     require("dplyr")
     
     if(!exists("read_range", mode="function")) source("read_xlsx.R")
+    if(!exists("read_html", mode="function")) source("read_html.R")
     
     # Empty dataframe
     
@@ -490,15 +491,11 @@ kpi.3.3 <- function(Mmm, trend = FALSE, row){
         
         MRSA.req <- MRSA.req %>% select(-Hospital)
         
-        # return row as specified
+        # Replace NA with ""
         
-        MRSA.prod <- MRSA.req[row,]
+        MRSA.req[is.na(MRSA.req)] <- ""
         
-        # Replace NA with N.A. for Excel use
-        
-        MRSA.prod <- data.frame(lapply(MRSA.prod, FUN = function(x){ifelse(is.na(x), "N.A.", x)}), stringsAsFactors = FALSE)
-        
-        
+        MRSA.prod <- MRSA.req
         
     }else{
         
@@ -1285,17 +1282,514 @@ kpi.10 <- function(Mmm, show_specialty = FALSE){
     URR.prod
 }
 
+
+# kpi.11 SOP Trend by Specialty ---------------------------------------------
+
+kpi.11 <- function(Mmm, specialty = "Overall"){
+    
+    kpi_source_helper(Mmm)
+    
+    path <- grep("(.*kpi.11.1 .*)", source.kpi$filepath, value = TRUE)
+    path.HA <- grep("(.*kpi.11.1.HA .*)", source.kpi$filepath, value = TRUE)
+    
+    SOP_T <- fuzzy_range(path, 5:80, 1:71)
+    SOP_T.HA <- fuzzy_range(path.HA, 5:20, 1:71)
+    
+    # Screen TriR rows
+    
+    TriR <- which(SOP_T[2,] == "Tri R")
+    TriR.HA <- which(SOP_T.HA[2,] == "Tri R")
+    
+    SOP_T.R <- SOP_T[,c(1, TriR:(TriR+11))]
+    SOP_T.R.HA <- SOP_T.HA[,c(1, TriR.HA:(TriR.HA+11))]
+    
+    
+    # Clean table
+    
+    names(SOP_T.R) <- SOP_T.R[3,]
+    names(SOP_T.R)[1] <- "Inst"
+    
+    names(SOP_T.R.HA) <- SOP_T.R.HA[3,]
+    names(SOP_T.R.HA)[1] <- "Specialty"
+    
+    
+    SOP_T.R <- SOP_T.R[-(1:3),]
+    SOP_T.R.HA <- SOP_T.R.HA[-(1:3),]
+    
+    ## Convert row lables "Overall" to "KWC"
+    
+    for (i in 1:nrow(SOP_T.R)){
+        if(grepl("*.Overall", SOP_T.R[i,1]) & !is.na(SOP_T.R[i,2])){
+            SOP_T.R[i,1] <- "KWC Mgt"
+        }
+    }
+    
+    ## Add specialty variables
+    
+    SOP_T.R$Specialty <- character(nrow(SOP_T.R))
+    SOP_T.R$Specialty <- NA
+    
+    SOP_T.R.HA$Inst <- "HA"
+    
+    for (i in 1:nrow(SOP_T.R)){
+        if(!grepl("*.Mgt$", SOP_T.R[i,1]) & is.na(SOP_T.R[i,2])){
+            SOP_T.R$Specialty[i] <- SOP_T.R[i,1]
+        }
+    }
+    
+    s.index <- which(!is.na(SOP_T.R$Specialty))
+    s.marker <- append(s.index, nrow(SOP_T.R)+1)
+    
+    for (i in 1:(length(s.marker)-1)){
+        SOP_T.R$Specialty[s.marker[i]:(s.marker[i+1]-1)] <- SOP_T.R$Specialty[s.marker[i]]
+    }
+    
+    ## Remove extra rows
+    
+    SOP_T.R <- SOP_T.R[-s.index,]
+    
+    ## Tidy up Inst names
+    
+    SOP_T.R$Inst <- gsub(" Mgt", "", SOP_T.R$Inst)
+    SOP_T.R$Inst <- gsub("^ *", "", SOP_T.R$Inst)
+    
+    ## Reorder columns in HA dataframe
+    
+    SOP_T.R.HA <- SOP_T.R.HA[,c(14, 2:13, 1)]
+    
+    ## Combine dataframes
+    
+    SOP_T.R <- bind_rows(SOP_T.R, SOP_T.R.HA)
+    
+    ## Convert to numeric datatype where applicable
+    
+    for (i in 2:13){
+        SOP_T.R[,i] <- sapply(SOP_T.R[,i], as.numeric)
+    }
+    
+    # Filter with input criteria
+    
+    SOP_T.R <- SOP_T.R %>% filter(Specialty==specialty) %>% select(-Specialty)
+    
+    row.names(SOP_T.R) <- SOP_T.R$Inst
+    
+    SOP_T.R <- SOP_T.R %>% select(-Inst)
+    
+    SOP_T.R
+    
+}
+
+kpi.11.2 <- function(Mmm){
+    
+    kpi_source_helper(Mmm)
+    
+    path <- grep("(.*kpi.11.2 .*)", source.kpi$filepath, value = TRUE)
+    
+    SexU_T <- fuzzy_range(path, 5:30, 1:66)
+    
+    # Screen TriR rows
+    
+    TriR <- which(SexU_T[2,] == "Tri R")
+
+    SexU_T.R <- SexU_T[,c(1, TriR:(TriR+11))]
+    
+    # Clean table
+    
+    names(SexU_T.R) <- SexU_T.R[3,]
+    names(SexU_T.R)[1] <- "Inst"
+    
+    SexU_T.R <- SexU_T.R[-(1:4),]
+    
+    # Remove extra rows
+    
+    SexU_T.R$Inst[which(SexU_T.R$Inst == "Overall")] <- " HA"
+    SexU_T.R$Inst[which(grepl("Overall", SexU_T.R$Inst))] <- " KWC"
+    
+    SexU_T.R <- SexU_T.R %>% filter(grepl("^ ", SexU_T.R$Inst))
+    
+    ## Tidy up Inst names
+    
+    SexU_T.R$Inst <- gsub("^ *", "", SexU_T.R$Inst)
+    
+    # Remove Inst labels
+    
+    row.names(SexU_T.R) <- SexU_T.R$Inst
+    
+    SexU_T.R <- SexU_T.R %>% select(-Inst)
+    
+    
+    ## Convert to numeric datatype where applicable
+    
+    for (i in 1:12){
+        SexU_T.R[,i] <- sapply(SexU_T.R[,i], as.numeric)
+    }
+    
+    # Return dataframe
+    
+    SexU_T.R
+    
+}
+
+
+kpi.11.3 <- function(Mmm){
+    
+    kpi_source_helper(Mmm)
+    
+    path <- grep("(.*kpi.11.3 .*)", source.kpi$filepath, value = TRUE)
+    
+    UROL_T <- fuzzy_range(path, 5:30, 1:66)
+    
+    # Screen TriR rows
+    
+    TriR <- which(UROL_T[2,] == "Tri R")
+    
+    UROL_T.R <- UROL_T[,c(1, TriR:(TriR+11))]
+    
+    # Clean table
+    
+    names(UROL_T.R) <- UROL_T.R[3,]
+    names(UROL_T.R)[1] <- "Inst"
+    
+    UROL_T.R <- UROL_T.R[-(1:4),]
+    
+    # Remove extra rows
+    
+    UROL_T.R$Inst[which(UROL_T.R$Inst == "Overall")] <- " HA"
+    UROL_T.R$Inst[which(grepl("Overall", UROL_T.R$Inst))] <- " KWC"
+    
+    ## Tidy up Inst names
+    
+    UROL_T.R$Inst <- gsub("^ *", "", UROL_T.R$Inst)
+    
+    ## Convert to numeric datatype where applicable
+    
+    for (i in 2:13){
+        UROL_T.R[,i] <- sapply(UROL_T.R[,i], as.numeric)
+    }
+    
+    # Return dataframe
+    
+    row.names(UROL_T.R) <- UROL_T.R$Inst
+    
+    UROL_T.R <- UROL_T.R %>% select(-Inst)
+    
+    UROL_T.R
+    
+}
+
 # tre.1 A&E Waiting Time ----------------------------------------------------
 
-tre.1 <- function(Mmm){
+tre.1 <- function(Mmm, triage="Tri 1"){
+    
+    kpi_source_helper(Mmm)
+    
+    path <- grep("(.*tre.1 .*)", source.kpi$filepath, value = TRUE)
+
+    AE_T <- fuzzy_range(path, 5:90, 1:14)
+    
+    # Name columns
+    
+    names(AE_T) <- AE_T[1,]
+    names(AE_T)[1] <- "Inst"
+    
+    # Remove "Overall"
+    
+    AE_T <- AE_T %>% select(-Overall)
+    
+    # Add "Triage" variable
+    
+    AE_T$Triage <- character(nrow(AE_T))
+    
+    AE_T$Triage <- NA
+    
+    Tri_i <- grepl("Tri ", AE_T$Inst)
+    
+    for(i in 1:nrow(AE_T)){
+        if(Tri_i[i]){
+            AE_T$Triage[i] <- AE_T$Inst[i]
+        }
+    }
+    
+    Tri_i2 <- which(Tri_i)
+    
+    Tri_i2 <- append(Tri_i2, nrow(AE_T)+1)
+    
+    for(i in 1:(length(Tri_i2)-1)){
+        AE_T$Triage[(Tri_i2[i]+1):(Tri_i2[i+1]-1)] <- AE_T$Triage[Tri_i2[i]]
+    }
+    
+    # Drop empty rows
+    
+    AE_Tr <- AE_T[-c(1, which(is.na(AE_T[,2]))),]
+    
+    # Tidy Inst names
+    
+    AE_Tr$Inst <- gsub("Overall$", "HA", AE_Tr$Inst)
+    AE_Tr$Inst <- gsub(".*Overall.*", "KWC", AE_Tr$Inst)
+    
+    # Filter Non-KWC Inst
+    
+    AE_Tr <- AE_Tr %>% filter(!grepl("HKEC|KCC|KEC|HKEC|HKWC|NTEC|NTWC", Inst))
+    
+    # Remove leading spaces
+    
+    AE_Tr$Inst <- gsub("^ *", "", AE_Tr$Inst)
+    AE_Tr$Triage <- gsub("^ *", "", AE_Tr$Triage)
+    
+    # Filter according to triage input
+    
+    AE_Tr <- AE_Tr %>% filter(Triage==triage)
+    
+    # Move Inst to row names
+    
+    row.names(AE_Tr) <- AE_Tr$Inst
+    
+    # Remove excess columns
+    
+    AE_Tr <- AE_Tr[-c(1, 14)]
+    
+    ## Convert to numeric datatype where applicable
+    
+    for (i in 1:12){
+        AE_Tr[,i] <- sapply(AE_Tr[,i], as.numeric)
+        AE_Tr[,i] <- AE_Tr[,i]/100
+    }
+    
+    # Return dataframe
+    
+    AE_Tr
     
 }
 
 # tre.2 SOP Waiting Time ----------------------------------------------------
 
-tre.2 <- function(Mmm, specialty = "Overall"){
+# Median WT
+tre.2 <- function(Mmm, triage = "Tri P1"){
+    
+    kpi_source_helper(Mmm)
+    
+    path <- grep("(.*tre.2 .*)", source.kpi$filepath, value = TRUE)
+    path.HA <- grep("(.*tre.2.HA .*)", source.kpi$filepath, value = TRUE)
+    
+    SOP_T <- fuzzy_range(path, 5:60, 1:14)
+    SOP_T.HA <- fuzzy_range(path.HA, 5:20, 1:14)
+    
+    # Name columns
+    
+    names(SOP_T) <- SOP_T[1,]
+    names(SOP_T.HA) <- SOP_T.HA[1,]
+    
+    names(SOP_T)[1] <- "Inst"
+    names(SOP_T.HA)[1] <- "Inst"
+    
+    # Remove "Overall"
+    
+    SOP_T <- SOP_T %>% select(-Overall)
+    SOP_T.HA <- SOP_T.HA %>% select(-Overall)
+    
+    # Add "Triage" variable
+    
+    SOP_T$Triage <- character(nrow(SOP_T))
+    SOP_T.HA$Triage <- character(nrow(SOP_T.HA))
+    
+    SOP_T$Triage <- NA
+    SOP_T.HA$Triage <- NA
+    
+    Tri_i <- grepl("Tri ", SOP_T$Inst)
+    Tri_i.HA <- grepl("Tri ", SOP_T.HA$Inst)
+    
+    for(i in 1:nrow(SOP_T)){
+        if(Tri_i[i]){
+            SOP_T$Triage[i] <- SOP_T$Inst[i]
+        }
+    }
+    
+    for(i in 1:nrow(SOP_T.HA)){
+        if(Tri_i.HA[i]){
+            SOP_T.HA$Triage[i] <- SOP_T.HA$Inst[i]
+        }
+    }
+    
+    Tri_i2 <- which(Tri_i)
+    Tri_i2.HA <- which(Tri_i.HA)
+    
+    Tri_i2 <- append(Tri_i2, nrow(SOP_T)+1)
+    Tri_i2.HA <- append(Tri_i2.HA, nrow(SOP_T.HA)+1)
+    
+    for(i in 1:(length(Tri_i2)-1)){
+        SOP_T$Triage[(Tri_i2[i]+1):(Tri_i2[i+1]-1)] <- SOP_T$Triage[Tri_i2[i]]
+    }
+    
+    for(i in 1:(length(Tri_i2.HA)-1)){
+        SOP_T.HA$Triage[(Tri_i2.HA[i]+1):(Tri_i2.HA[i+1]-1)] <- SOP_T.HA$Triage[Tri_i2.HA[i]]
+    }
+    
+    
+    # Drop empty rows
+    
+    SOP_Tr <- SOP_T[-c(1, which(is.na(SOP_T[,2]))),]
+    SOP_Tr.HA <- SOP_T.HA[-c(1, which(is.na(SOP_T.HA[,2]))),]
+    
+    # Tidy Inst names
+    
+    SOP_Tr$Inst <- gsub("Overall$", "KWC", SOP_Tr$Inst)
+    SOP_Tr$Inst <- gsub("Mgt$", "", SOP_Tr$Inst)
+    SOP_Tr$Inst <- gsub(" ", "", SOP_Tr$Inst)
+    
+    SOP_Tr.HA$Inst <- "HA"
+    
+    # Merge dataframes
+    
+    SOP_Tr <- bind_rows(SOP_Tr, SOP_Tr.HA)
+    
+    # Remove leading spaced in triage
+    
+    SOP_Tr$Triage <- gsub("^ *", "", SOP_Tr$Triage)
+    
+    # Filter according to triage input
+    
+    SOP_Tr <- SOP_Tr %>% filter(Triage==triage)
+    
+    # Move Inst to row names
+    
+    row.names(SOP_Tr) <- SOP_Tr$Inst
+    
+    # Remove excess columns
+    
+    SOP_Tr <- SOP_Tr %>% select(-Inst, -Triage)
+    
+    ## Convert to numeric datatype where applicable
+    
+    for (i in 1:12){
+        SOP_Tr[,i] <- sapply(SOP_Tr[,i], as.numeric)
+        #SOP_Tr[,i] <- sapply(SOP_Tr[,i], ceiling)
+    }
+    
+    # Return dataframe
+    
+    SOP_Tr
     
 }
+
+# % seen within WT
+tre.2.1 <- function(Mmm, triage = "Tri P1"){
+    
+    kpi_source_helper(Mmm)
+    
+    path <- grep("(.*tre.2.1 .*)", source.kpi$filepath, value = TRUE)
+    path.HA <- grep("(.*tre.2.1.HA .*)", source.kpi$filepath, value = TRUE)
+    
+    SOP_T <- fuzzy_range(path, 5:25, 1:14)
+    SOP_T.HA <- fuzzy_range(path.HA, 5:10, 1:14)
+    
+    # Name columns
+    
+    names(SOP_T) <- SOP_T[1,]
+    names(SOP_T.HA) <- SOP_T.HA[1,]
+    
+    names(SOP_T)[1] <- "Inst"
+    names(SOP_T.HA)[1] <- "Inst"
+    
+    # Remove "Overall"
+    
+    SOP_T <- SOP_T %>% select(-Overall)
+    SOP_T.HA <- SOP_T.HA %>% select(-Overall)
+    
+    # Add "Triage" variable
+    
+    SOP_T$Triage <- character(nrow(SOP_T))
+    SOP_T.HA$Triage <- character(nrow(SOP_T.HA))
+    
+    SOP_T$Triage <- NA
+    SOP_T.HA$Triage <- NA
+    
+    # Test gsub
+    
+    SOP_T$Inst <- gsub(".*triage P1.*", "Tri P1", SOP_T$Inst)
+    SOP_T$Inst <- gsub(".*triage P2.*", "Tri P2", SOP_T$Inst)
+    
+    SOP_T.HA$Inst <- gsub(".*triage P1.*", "Tri P1", SOP_T.HA$Inst)
+    SOP_T.HA$Inst <- gsub(".*triage P2.*", "Tri P2", SOP_T.HA$Inst)
+    
+    
+    Tri_i <- grepl("Tri ", SOP_T$Inst)
+    Tri_i.HA <- grepl("Tri ", SOP_T.HA$Inst)
+    
+    
+    for(i in 1:nrow(SOP_T)){
+        if(Tri_i[i]){
+            SOP_T$Triage[i] <- SOP_T$Inst[i]
+        }
+    }
+    
+    for(i in 1:nrow(SOP_T.HA)){
+        if(Tri_i.HA[i]){
+            SOP_T.HA$Triage[i] <- SOP_T.HA$Inst[i]
+        }
+    }
+    
+    Tri_i2 <- which(Tri_i)
+    Tri_i2.HA <- which(Tri_i.HA)
+    
+    Tri_i2 <- append(Tri_i2, nrow(SOP_T)+1)
+    Tri_i2.HA <- append(Tri_i2.HA, nrow(SOP_T.HA)+1)
+    
+    for(i in 1:(length(Tri_i2)-1)){
+        SOP_T$Triage[(Tri_i2[i]+1):(Tri_i2[i+1]-1)] <- SOP_T$Triage[Tri_i2[i]]
+    }
+    
+    for(i in 1:(length(Tri_i2.HA)-1)){
+        SOP_T.HA$Triage[(Tri_i2.HA[i]+1):(Tri_i2.HA[i+1]-1)] <- SOP_T.HA$Triage[Tri_i2.HA[i]]
+    }
+    
+    
+    # Drop empty rows
+    
+    SOP_Tr <- SOP_T[-c(1, which(is.na(SOP_T[,2]))),]
+    SOP_Tr.HA <- SOP_T.HA[-c(1, which(is.na(SOP_T.HA[,2]))),]
+    
+    # Tidy Inst names
+    
+    SOP_Tr$Inst <- gsub("Overall$", "KWC", SOP_Tr$Inst)
+    SOP_Tr$Inst <- gsub("Mgt$", "", SOP_Tr$Inst)
+    SOP_Tr$Inst <- gsub(" ", "", SOP_Tr$Inst)
+    
+    SOP_Tr.HA$Inst <- "HA"
+    
+    # Merge dataframes
+    
+    SOP_Tr <- bind_rows(SOP_Tr, SOP_Tr.HA)
+    
+    # Remove leading spaced in triage
+    
+    SOP_Tr$Triage <- gsub("^ *", "", SOP_Tr$Triage)
+    
+    # Filter according to triage input
+    
+    SOP_Tr <- SOP_Tr %>% filter(Triage==triage)
+    
+    # Move Inst to row names
+    
+    row.names(SOP_Tr) <- SOP_Tr$Inst
+    
+    # Remove excess columns
+    
+    SOP_Tr <- SOP_Tr %>% select(-Inst, -Triage)
+    
+    ## Convert to numeric datatype where applicable
+    
+    for (i in 1:12){
+        SOP_Tr[,i] <- sapply(SOP_Tr[,i], as.numeric)
+        SOP_Tr[,i] <- sapply(SOP_Tr[,i], function(x)(x/100))
+    }
+    
+    # Return dataframe
+    
+    SOP_Tr
+    
+}
+
+
 
 # tre.3 A&E Standardised Admission Rate ------------------------------------
 

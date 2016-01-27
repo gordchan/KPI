@@ -7,7 +7,7 @@
 # Aug 2015
 
 
-kpi_report <- function(y = 2015, m = 5){
+kpi_report <- function(y = 2015, m = 10){
 
 # Libraries -----------------------------------------------------------------------
 
@@ -18,6 +18,8 @@ require("lubridate")
 
 # Reporting period --------------------------------------------------------
 
+# if(RAD==TRUE){RAD<<-TRUE}else{RAD<<-FALSE}
+    
 reportDates <- function(y, m){
     
     require(lubridate)
@@ -158,5 +160,5 @@ as.TRE$setForceFormulaRecalculation(TRUE)
 
     saveWorkbook(as.KPI, KPI_files$file.paths[which(grepl("KWC Clinical", KPI_files[,1]))])
     saveWorkbook(as.SOP, KPI_files$file.paths[which(grepl("SOP", KPI_files[,1]))])
-    saveWorkbook(as.TRE, KPI_files$file.paths[3])
+    saveWorkbook(as.TRE, KPI_files$file.paths[which(grepl("Trend", KPI_files[,1]))])
 }

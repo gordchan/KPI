@@ -20,10 +20,13 @@
     kpi.5.3.c <- kpi.5("kpi.5.3", Dates[1,])	
     kpi.6.1.c <- kpi.6("kpi.6.1", Dates[1,])	
     kpi.6.2.c <- kpi.6("kpi.6.2", Dates[1,])
-    kpi.7.1.c <- kpi.7("kpi.7.1", Dates[1,])	
-    kpi.7.2.c <- kpi.7("kpi.7.2", Dates[1,])	
-    kpi.7.3.c <- kpi.7("kpi.7.3", Dates[1,])	
-    kpi.7.4.c <- kpi.7("kpi.7.4", Dates[1,])	
+    # if(RAD == TRUE){
+        kpi.7.1.c <- kpi.7("kpi.7.1", Dates[1,])	
+        kpi.7.2.c <- kpi.7("kpi.7.2", Dates[1,])	
+        kpi.7.3.c <- kpi.7("kpi.7.3", Dates[1,])	
+        kpi.7.4.c <- kpi.7("kpi.7.4", Dates[1,])
+    # }
+	
 
 # Previous Year	
 
@@ -41,10 +44,12 @@
     kpi.5.3.p <- kpi.5("kpi.5.3", Dates[3,])
     kpi.6.1.p <- kpi.6("kpi.6.1", Dates[3,])
     kpi.6.2.p <- kpi.6("kpi.6.2", Dates[3,])
-    kpi.7.1.p <- kpi.7("kpi.7.1", Dates[3,])
-    kpi.7.2.p <- kpi.7("kpi.7.2", Dates[3,])
-    kpi.7.3.p <- kpi.7("kpi.7.3", Dates[3,])
-    kpi.7.4.p <- kpi.7("kpi.7.4", Dates[3,])
+    # if(RAD == TRUE){
+        kpi.7.1.p <- kpi.7("kpi.7.1", Dates[3,])
+        kpi.7.2.p <- kpi.7("kpi.7.2", Dates[3,])
+        kpi.7.3.p <- kpi.7("kpi.7.3", Dates[3,])
+        kpi.7.4.p <- kpi.7("kpi.7.4", Dates[3,])
+    # }
     
 # DS + SDS
     
@@ -103,11 +108,12 @@
     addDataFrame(kpi.5.3.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=30, startColumn=3)
     addDataFrame(kpi.6.1.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=26, startColumn=3)
     addDataFrame(kpi.6.2.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=27, startColumn=3)
-    addDataFrame(kpi.7.1.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=31, startColumn=3)
-    addDataFrame(kpi.7.2.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=32, startColumn=3)
-    addDataFrame(kpi.7.3.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=33, startColumn=3)
-    addDataFrame(kpi.7.4.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=34, startColumn=3)
-    
+    # if(RAD == TRUE){
+        addDataFrame(kpi.7.1.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=31, startColumn=3)
+        addDataFrame(kpi.7.2.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=32, startColumn=3)
+        addDataFrame(kpi.7.3.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=33, startColumn=3)
+        addDataFrame(kpi.7.4.c, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=34, startColumn=3)
+    # }
 # Previous Year
     
     addDataFrame(kpi.1.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=3, startColumn=13)
@@ -124,10 +130,12 @@
     addDataFrame(kpi.5.3.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=30, startColumn=13)
     addDataFrame(kpi.6.1.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=26, startColumn=13)
     addDataFrame(kpi.6.2.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=27, startColumn=13)
-    addDataFrame(kpi.7.1.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=31, startColumn=13)
-    addDataFrame(kpi.7.2.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=32, startColumn=13)
-    addDataFrame(kpi.7.3.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=33, startColumn=13)
-    addDataFrame(kpi.7.4.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=34, startColumn=13)
+    # if(RAD == TRUE){
+        addDataFrame(kpi.7.1.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=31, startColumn=13)
+        addDataFrame(kpi.7.2.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=32, startColumn=13)
+        addDataFrame(kpi.7.3.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=33, startColumn=13)
+        addDataFrame(kpi.7.4.p, sheets.KPI$NEW_INTERFACE, col.names=FALSE, row.names=FALSE, startRow=34, startColumn=13)
+    # }
 
 # DS + SDS
     
