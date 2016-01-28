@@ -9,7 +9,14 @@
 
 kpi_report <- function(y = 2015, m = 10){
 
-# Libraries -----------------------------------------------------------------------
+# Log ---------------------------------------------------------------------
+
+print(paste("Job Started:", Sys.time()))
+    
+fileConn<-"Log.txt"
+cat(paste("Job Started:", Sys.time()), file=fileConn, append=TRUE, sep = "\n")
+    
+# Libraries ---------------------------------------------------------------
 
 require("xlsx")
 require("dplyr")
@@ -161,4 +168,13 @@ as.TRE$setForceFormulaRecalculation(TRUE)
     saveWorkbook(as.KPI, KPI_files$file.paths[which(grepl("KWC Clinical", KPI_files[,1]))])
     saveWorkbook(as.SOP, KPI_files$file.paths[which(grepl("SOP", KPI_files[,1]))])
     saveWorkbook(as.TRE, KPI_files$file.paths[which(grepl("Trend", KPI_files[,1]))])
+    
+# Log ---------------------------------------------------------------------
+
+print(paste("Job End:", Sys.time()))   
+    
+cat(paste("Job End:", Sys.time()), file=fileConn, append=TRUE, sep = "\n")
+
+    
 }
+

@@ -1865,11 +1865,216 @@ tre.5 <- function(Mmm){
 
 tre.6 <- function(Mmm){
     
+    kpi_source_helper(Mmm)
+    
+    path <- grep("(.*tre.6 .*)", source.kpi$filepath, value = TRUE)
+    
+    
+    ASU_T <- fuzzy_range(path, 138:170, 1:27)
+    
+    index <- c(1, 2, 3, 3+11, 3+12, ncol(ASU_T)-1)
+    
+    
+    # Name columns
+    
+    names(ASU_T) <- ASU_T[2,]
+    
+    for(i in index[3]:index[4]){
+        names(ASU_T)[i] <- paste(ASU_T[2,i], "ASU", sep="")
+    }
+    
+    names(ASU_T)[1] <- "Cluster"
+    names(ASU_T)[2] <- "Inst"
+    names(ASU_T)[ncol(ASU_T)] <- "RowSum"
+    
+    # Tidy names
+    
+    for(i in 1:nrow(ASU_T)){
+        if(grepl("Subtotal", ASU_T[i,2])){
+            ASU_T[i,2] <- ASU_T[i,1]
+        }
+    }
+    
+    ASU_T[nrow(ASU_T),1] <- "HA"
+    ASU_T[nrow(ASU_T),2] <- "HA"
+    
+    ASU_T$Cluster <- gsub(" ", "", ASU_T$Cluster)
+    
+    # Filter unused rows
+    
+    ASU_T <- ASU_T %>% filter(Cluster=="KW"|Cluster=="HA")
+    ASU_T$Cluster <- 1:nrow(ASU_T)
+    names(ASU_T)[1] <- "Order"
+    
+    # Melt dataframe
+    
+    ASU_Tr <- ASU_T %>% select(index[1], index[2], index[3]:index[6]) %>% melt(id=c("Order", "Inst"))
+    
+    
+    
+    # Add Month variable
+    
+    ASU_Tr$Month <- gsub("ASU", "", ASU_Tr$variable)
+    ASU_Tr$value <-sapply(ASU_Tr$value, function(x)as.numeric(x))
+    ASU_Tr$ASU <- sapply(ASU_Tr$variable, function(x)if(grepl("ASU", x)){"Treated"}else{"NotTreated"})
+    
+    
+    ASU_Tr <- ASU_Tr %>% select(Order, Inst, Month, ASU, value) %>% dcast(Order + Inst + Month ~ ASU) %>% mutate(Total=Treated + NotTreated)
+    
+    ## Logic to handle NA values
+    
+    for (i in 1:nrow(ASU_Tr)){
+        
+        if(is.na(ASU_Tr$Treated[i])){
+            if(!is.na(ASU_Tr$NotTreated[i])){
+                ASU_Tr$Treated[i] <- 0
+            }
+        }
+        
+        
+        if(is.na(ASU_Tr$Total[i])){
+            if(!is.na(ASU_Tr$NotTreated[i])|!is.na(ASU_Tr$Treated[i])){
+                ASU_Tr$Total[i] <- sum(ASU_Tr$NotTreated[i], ASU_Tr$Treated[i], na.rm = TRUE)
+            }
+        }
+    }
+    
+    # Calculate % treated in ASU
+    
+    ASU_Tr <- ASU_Tr %>% mutate(PercentTreated = Treated/Total) %>% select(Order, Inst, Month, PercentTreated)
+    
+    # Filter NON-KWC inst
+    
+    ASU_Tr <- dcast(ASU_Tr, Order + Inst ~ Month, value.var = "PercentTreated")
+    
+    # Move Inst to row names
+    
+    row.names(ASU_Tr) <- ASU_Tr$Inst
+    
+    # Remove excess columns
+    
+    ASU_Tr <- ASU_Tr %>% select(-Order, -Inst)
+    
+    
+    # Return dataframe
+    
+    ASU_Tr
+    
 }
 
 # tre.7 Fracture Hip -------------------------------------------------------
 
 tre.7 <- function(Mmm){
+    
+    kpi_source_helper(Mmm)
+    
+    path <- grep("(.*tre.7 .*)", source.kpi$filepath, value = TRUE)
+    
+    
+    HIP_T <- fuzzy_range(path, 84:120, 1:39)
+    
+    index <- c(1, 2, 3, 3+11, 3+12, 3+23, 3+24, ncol(HIP_T)-1)
+    
+    
+    # Name columns
+    
+    names(HIP_T) <- HIP_T[2,]
+    
+    for(i in index[3]:index[4]){
+        names(HIP_T)[i] <- paste(HIP_T[2,i], "D2", sep="")
+    }
+    
+    for(i in index[5]:index[6]){
+        names(HIP_T)[i] <- paste(HIP_T[2,i], "D4", sep="")
+    }
+    
+    for(i in index[7]:index[8]){
+        names(HIP_T)[i] <- paste(HIP_T[2,i], "O", sep="")
+    }
+    
+    
+    names(HIP_T)[1] <- "Cluster"
+    names(HIP_T)[2] <- "Inst"
+    names(HIP_T)[ncol(HIP_T)] <- "RowSum"
+    
+    # Tidy names
+    
+    for(i in 1:nrow(HIP_T)){
+        if(grepl("Subtotal", HIP_T[i,2])){
+            HIP_T[i,2] <- HIP_T[i,1]
+        }
+    }
+    
+    HIP_T[nrow(HIP_T),1] <- "HA"
+    HIP_T[nrow(HIP_T),2] <- "HA"
+    
+    HIP_T$Cluster <- gsub(" ", "", HIP_T$Cluster)
+    
+    # Filter unused rows
+    
+    HIP_T <- HIP_T %>% filter(Cluster=="KW"|Cluster=="HA")
+    HIP_T$Cluster <- 1:nrow(HIP_T)
+    names(HIP_T)[1] <- "Order"
+    
+    # Melt dataframe
+    
+    HIP_Tr <- HIP_T %>% select(index[1], index[2], index[3]:index[4], index[5]:index[6], index[7]:index[8]) %>% melt(id=c("Order", "Inst"))
+    
+    
+    # Add Month variable
+    
+    HIP_Tr$Month <- gsub("D2", "", HIP_Tr$variable)
+    HIP_Tr$Month <- gsub("D4", "", HIP_Tr$Month)
+    HIP_Tr$Month <- gsub("O", "", HIP_Tr$Month)
+    HIP_Tr$value <-sapply(HIP_Tr$value, function(x)as.numeric(x))
+    HIP_Tr$Time <- sapply(HIP_Tr$variable, function(x)if(grepl("D2", x)){"Within"}else{"Outside"})
+    
+    
+    HIP_Tr <- HIP_Tr %>% select(Order, Inst, Month, Time, value) %>% dcast(Order + Inst + Month ~ Time, value.var = "value", fun.aggregate = sum, na.rm = TRUE) %>% mutate(Total=Within + Outside)
+    
+    ## Logic to handle NA values
+    
+    for (i in 1:nrow(HIP_Tr)){
+        
+        if(is.na(HIP_Tr$Within[i])){
+            if(!is.na(HIP_Tr$Outside[i])){
+                HIP_Tr$Within[i] <- 0
+            }
+        }
+        
+        if(is.na(HIP_Tr$Outside[i])){
+            if(!is.na(HIP_Tr$Within[i])){
+                HIP_Tr$Outside[i] <- 0
+            }
+        }
+        
+        if(is.na(HIP_Tr$Total[i])){
+            if(!is.na(HIP_Tr$Outside[i])|!is.na(HIP_Tr$Within[i])){
+                HIP_Tr$Total[i] <- sum(HIP_Tr$Outside[i], HIP_Tr$Within[i], na.rm = TRUE)
+            }
+        }
+    }
+    
+    # Calculate % treated in ASU
+    
+    HIP_Tr <- HIP_Tr %>% mutate(PercentWithin = Within/Total) %>% select(Order, Inst, Month, PercentWithin)
+    
+    # Filter NON-KWC inst
+    
+    HIP_Tr <- dcast(HIP_Tr, Order + Inst ~ Month, value.var = "PercentWithin")
+    
+    # Move Inst to row names
+    
+    row.names(HIP_Tr) <- HIP_Tr$Inst
+    
+    # Remove excess columns
+    
+    HIP_Tr <- HIP_Tr %>% select(-Order, -Inst)
+    
+    
+    # Return dataframe
+    
+    HIP_Tr
     
 }
 
@@ -1882,6 +2087,63 @@ tre.8 <- function(Mmm){
 # tre.9 DS +SDS ------------------------------------------------------------
 
 tre.9 <- function(Mmm){
+    
+    kpi_source_helper(Mmm)
+    
+    path <- grep("(.*tre.9 .*)", source.kpi$filepath, value = TRUE)
+    
+    
+    SDS_T <- fuzzy_range(path, 120:310, 1:15)
+    i_row_start <- which(grepl("Total$", SDS_T[,1]))
+    
+    SDS_T <- SDS_T[i_row_start:nrow(SDS_T),]
+    
+    # Name columns
+    
+    names(SDS_T) <- SDS_T[2,]
+    
+    names(SDS_T)[1] <- "Cluster"
+    names(SDS_T)[2] <- "Inst"
+    names(SDS_T)[ncol(SDS_T)] <- "RowSum"
+    
+    # Tidy names
+    
+    for(i in 1:nrow(SDS_T)){
+        if(grepl("Subtotal", SDS_T[i,2])){
+            SDS_T[i,2] <- SDS_T[i,1]
+        }
+    }
+    
+    SDS_T[nrow(SDS_T),1] <- "HA"
+    SDS_T[nrow(SDS_T),2] <- "HA"
+    
+    SDS_T$Cluster <- gsub(" ", "", SDS_T$Cluster)
+    
+    # Filter unused rows
+    
+    SDS_T <- SDS_T %>% filter(Cluster=="KW"|Cluster=="HA")
+    SDS_T$Cluster <- 1:nrow(SDS_T)
+    names(SDS_T)[1] <- "Order"
+    
+    # Move Inst to row names
+    
+    row.names(SDS_T) <- SDS_T$Inst
+    
+    # Remove excess columns
+    
+    SDS_Tr <- SDS_T %>% select(-Order, -Inst, -RowSum)
+    
+    ## Convert to numeric datatype where applicable
+    
+    for (i in 1:12){
+        SDS_Tr[,i] <- sapply(SDS_Tr[,i], as.numeric)
+        SDS_Tr[,i] <- sapply(SDS_Tr[,i], function(x)(x/100))
+    }
+    
+    
+    # Return dataframe
+    
+    SDS_Tr
     
 }
 
@@ -1964,5 +2226,68 @@ tre.10 <- function(Mmm, item){
     # Return dataframe
     
     BED_Tr
+    
+}
+
+# tre.12 Radiology WT------------------------------------------------------
+tre.12 <- function(Mmm, Mode){
+    
+    kpi_source_helper(Mmm)
+    
+    path <- grep("(.*tre.12 .*)", source.kpi$filepath, value = TRUE)
+    
+    
+    RAD_T <- fuzzy_range(path, 1:55, 1:17)
+    
+    # Name columns
+    
+    names(RAD_T) <- RAD_T[1,]
+    
+    # Filter unused rows
+    
+    RAD_T <- RAD_T[2:nrow(RAD_T),]
+    
+    # Remove unused columns
+    
+    RAD_T <- RAD_T %>% filter(grepl("Including", RAD_T$Type)) %>% select(-(1:2), -4)
+    
+    # Rename ALL to HA
+    
+    RAD_T$Hosp[RAD_T$Hosp=="ALL"] <- "HA"
+    
+    
+    # Give order of display
+    
+    RAD_T$Order[RAD_T$Hosp=="CMC"] <- 1
+    RAD_T$Order[RAD_T$Hosp=="KWH"] <- 2
+    RAD_T$Order[RAD_T$Hosp=="OLM"] <- 3
+    RAD_T$Order[RAD_T$Hosp=="PMH"] <- 4
+    RAD_T$Order[RAD_T$Hosp=="YCH"] <- 5
+    RAD_T$Order[RAD_T$Hosp=="KWC"] <- 6
+    RAD_T$Order[RAD_T$Hosp=="HA"] <- 7
+    
+    RAD_T <- RAD_T %>% arrange(Modality, Order)
+    
+    
+    # Filter according to Modality input
+    
+    RAD_Tr <- RAD_T %>% filter(Modality==Mode)
+    
+    row.names(RAD_Tr) <- RAD_Tr$Hosp
+    
+    # Remove excess columns
+    
+    RAD_Tr <- RAD_Tr %>% select(-Order, -Hosp, -Modality)
+    
+    ## Convert to numeric datatype where applicable
+    
+    for (i in 1:12){
+        RAD_Tr[,i] <- sapply(RAD_Tr[,i], as.numeric)
+    }
+    
+    
+    # Return dataframe
+    
+    RAD_Tr
     
 }
