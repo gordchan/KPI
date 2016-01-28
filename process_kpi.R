@@ -1805,6 +1805,60 @@ tre.3 <- function(Mmm){
 
 tre.5 <- function(Mmm){
     
+    kpi_source_helper(Mmm)
+    
+    path <- grep("(.*tre.5 .*)", source.kpi$filepath, value = TRUE)
+    
+    
+    URR_T <- fuzzy_range(path, 5:25, 1:14)
+    
+    
+    # Name columns
+    
+    names(URR_T) <- URR_T[1,]
+    
+    
+    names(URR_T)[1] <- "Inst"
+    
+    
+    # Remove "Overall"
+    
+    URR_T <- URR_T %>% select(-Overall)
+    
+    
+    # Drop empty rows
+    
+    URR_Tr <- URR_T[-c(1, which(is.na(URR_T[,2]))),]
+    
+    # Tidy Inst names
+    
+    URR_Tr$Inst <- gsub(".*KWC.$", "KWC", URR_Tr$Inst)
+    URR_Tr$Inst <- gsub(".*Overall$", "HA", URR_Tr$Inst)
+    URR_Tr$Inst <- gsub(" ", "", URR_Tr$Inst)
+    
+    # Filter NON-KWC inst
+    
+    URR_Tr <- URR_Tr %>% filter(Inst!="HKEC"&Inst!="HKWC"&Inst!="NTEC"&Inst!="NTWC"&Inst!="KCC"&Inst!="KEC")
+    
+    # Move Inst to row names
+    
+    row.names(URR_Tr) <- URR_Tr$Inst
+    
+    # Remove excess columns
+    
+    URR_Tr <- URR_Tr %>% select(-Inst)
+    
+    ## Convert to numeric datatype where applicable
+    
+    for (i in 1:12){
+        URR_Tr[,i] <- sapply(URR_Tr[,i], as.numeric)
+        URR_Tr[,i] <- sapply(URR_Tr[,i], function(x)(x/100))
+    }
+    
+    # Return dataframe
+    
+    URR_Tr
+    
 }
 
 # tre.6 Stroke --------------------------------------------------------------
@@ -1828,5 +1882,87 @@ tre.8 <- function(Mmm){
 # tre.9 DS +SDS ------------------------------------------------------------
 
 tre.9 <- function(Mmm){
+    
+}
+
+# tre.10 Bed ------------------------------------------------------------
+
+tre.10 <- function(Mmm, item){
+    
+    kpi_source_helper(Mmm)
+    
+    path <- grep("(.*tre.10 .*)", source.kpi$filepath, value = TRUE)
+    
+    
+    BED_T <- fuzzy_range(path, 5:45, 1:14)
+    
+    
+    # Name columns
+    
+    names(BED_T) <- BED_T[1,]
+    
+    
+    names(BED_T)[1] <- "Inst"
+    
+    
+    # Remove "Overall"
+    
+    BED_T <- BED_T %>% select(-Overall)
+    
+    # Choose Bed Occ Rate / ALOS
+    
+    BED_T$Item <- character(nrow(BED_T))
+    BED_T$Item <- NA
+    
+    index <- c(
+        which(grepl("occupancy", BED_T$Inst))+2,
+        which(grepl("ALOS", BED_T$Inst))-1,
+        which(grepl("ALOS", BED_T$Inst))+2,
+        nrow(BED_T)
+    )
+    
+    BED_T$Item[index[1]:index[2]] <- "Occ"
+    BED_T$Item[index[3]:index[4]] <- "ALOS"
+    
+    # Drop unrelated rows
+    
+    if(item=="Occ"){
+        BED_Tr <- BED_T[index[1]:index[2],]
+    }else if(item=="ALOS"){
+        BED_Tr <- BED_T[index[3]:index[4],]
+    }
+    
+    # Tidy Inst names
+    
+    BED_Tr$Inst <- gsub(".*KWC.$", "KWC", BED_Tr$Inst)
+    BED_Tr$Inst <- gsub(".*Overall$", "HA", BED_Tr$Inst)
+    BED_Tr$Inst <- gsub(" ", "", BED_Tr$Inst)
+    
+    # Filter NON-KWC inst
+    
+    BED_Tr <- BED_Tr %>% filter(Inst!="HKEC"&Inst!="HKWC"&Inst!="NTEC"&Inst!="NTWC"&Inst!="KCC"&Inst!="KEC")
+    
+    # Move Inst to row names
+    
+    row.names(BED_Tr) <- BED_Tr$Inst
+    
+    # Remove excess columns
+    
+    BED_Tr <- BED_Tr %>% select(-Inst, -Item)
+    
+    ## Convert to numeric datatype where applicable
+    
+    for (i in 1:12){
+        BED_Tr[,i] <- sapply(BED_Tr[,i], as.numeric)
+        
+        if(item=="Occ"){
+            BED_Tr[,i] <- sapply(BED_Tr[,i], function(x)(x/100))
+        }
+        
+    }
+    
+    # Return dataframe
+    
+    BED_Tr
     
 }
