@@ -4,7 +4,7 @@
 
 # Load and prepare TRE source data -----------------------------------
 
-# 12 Months Trend
+# 12 Months Trend 
 
 ## % AE cases within pledged WT
 tre.1.a <- tre.1(Dates[1,], triage = "Tri 1")
@@ -22,6 +22,10 @@ tre.2.b <- tre.2(Dates[1,], triage = "Tri P2")
 tre.2.1.a <- tre.2.1(Dates[1,], triage = "Tri P1")
 tre.2.1.b <- tre.2.1(Dates[1,], triage = "Tri P2")
 
+## Standardised Admission Rate for Patient attending A&E
+tre.3.a <- tre.3("Nov15", MED = FALSE, write_db = TRUE)
+tre.3.b <- tre.3("Nov15", MED = TRUE, write_db = TRUE)
+
 ## MRSA Bacteremia in Acute Beds/1000 Acute Patient Days
 tre.4.a <- kpi.3.3(Dates[1,], trend = TRUE)
 
@@ -33,6 +37,9 @@ tre.6.a <- tre.6(Dates[1,])
 
 ## % of hip fracture surgery done within 2 days
 tre.7.a <- tre.7(Dates[1,])
+
+## % of AMI patients prescribed with Statin at discharge
+tre.8.a <- tre.8(Dates[1,])
 
 ## % of Day Surgery (DS) plus Same Day Surgery (SDS)
 tre.9.a <- tre.9(Dates[1,])
@@ -86,6 +93,19 @@ for(i in 1:nrow(tre.2.1.a)){
 for(i in 1:nrow(tre.2.1.b)){
     temp_df <- t(as.numeric(tre.2.1.b[i,]))
     temp_ri <- 65+i-1
+    addDataFrame(temp_df, sheets.TRE$interface, col.names=FALSE, row.names=FALSE, startRow=temp_ri, startColumn=2)
+}
+
+## Standardised Admission Rate for Patient attending A&E
+for(i in 1:nrow(tre.3.a)){
+    temp_df <- t(as.numeric(tre.3.a[i,]))
+    temp_ri <- 75+i-1
+    addDataFrame(temp_df, sheets.TRE$interface, col.names=FALSE, row.names=FALSE, startRow=temp_ri, startColumn=2)
+}
+
+for(i in 1:nrow(tre.3.b)){
+    temp_df <- t(as.numeric(tre.3.b[i,]))
+    temp_ri <- 83+i-1
     addDataFrame(temp_df, sheets.TRE$interface, col.names=FALSE, row.names=FALSE, startRow=temp_ri, startColumn=2)
 }
 
@@ -145,11 +165,21 @@ for(i in 4:6){
     temp_ri <- 128+i-1
     addDataFrame(temp_df, sheets.TRE$interface, col.names=FALSE, row.names=FALSE, startRow=temp_ri, startColumn=2)
 }
-    
+
+## % of AMI patients prescribed with Statin at discharge
+temp_df <- t(as.numeric(tre.8.a[1,]))
+temp_ri <- 135
+    addDataFrame(temp_df, sheets.TRE$interface, col.names=FALSE, row.names=FALSE, startRow=temp_ri, startColumn=2)
+for(i in 2:9){
+    temp_df <- t(as.numeric(tre.8.a[i,]))
+    temp_ri <- 136+i-1
+    addDataFrame(temp_df, sheets.TRE$interface, col.names=FALSE, row.names=FALSE, startRow=temp_ri, startColumn=2)
+}
+
 ## % of Day Surgery (DS) plus Same Day Surgery (SDS)
 temp_df <- t(as.numeric(tre.9.a[1,]))
 temp_ri <- 146
-addDataFrame(temp_df, sheets.TRE$interface, col.names=FALSE, row.names=FALSE, startRow=temp_ri, startColumn=2)
+    addDataFrame(temp_df, sheets.TRE$interface, col.names=FALSE, row.names=FALSE, startRow=temp_ri, startColumn=2)
 for(i in 2:5){
     temp_df <- t(as.numeric(tre.9.a[i,]))
     temp_ri <- 147+i-1

@@ -1793,7 +1793,348 @@ tre.2.1 <- function(Mmm, triage = "Tri P1"){
 
 # tre.3 A&E Standardised Admission Rate ------------------------------------
 
-tre.3 <- function(Mmm){
+tre.3 <- function(Mmm, MED, write_db = FALSE){
+    
+    kpi_source_helper(Mmm)
+    
+    if(MED==FALSE){
+        path.Atn <- grep("(.*tre.3.1.1 .*)", source.kpi$filepath, value = TRUE)
+        path.Adm <- grep("(.*tre.3.1.2 .*)", source.kpi$filepath, value = TRUE)
+        
+        ATN_T <- fuzzy_range(path.Atn, 67:229, 1:22)
+        ADM_T <- fuzzy_range(path.Adm, 116:278, 1:22)
+        
+    }else if(MED==TRUE){
+        path.Atn <- grep("(.*tre.3.2.2 .*)", source.kpi$filepath, value = TRUE)
+        path.Adm <- grep("(.*tre.3.2.1 .*)", source.kpi$filepath, value = TRUE)
+        
+        ATN_T <- fuzzy_range(path.Atn, 71:193, 1:22)
+        ADM_T <- fuzzy_range(path.Adm, 120:242, 1:22)
+    }
+    
+    # Name columns
+    
+    names(ATN_T) <- ATN_T[1,]
+    names(ADM_T) <- ADM_T[1,]
+    
+    names(ATN_T)[1] <- "Age"
+    names(ADM_T)[1] <- "Age"
+    
+    names(ATN_T)[2] <- "Sex"
+    names(ADM_T)[2] <- "Sex"
+    
+    names(ATN_T)[3] <- "Amb"
+    names(ADM_T)[3] <- "Amb"
+    
+    names(ATN_T)[4] <- "Tri"
+    names(ADM_T)[4] <- "Tri"
+    
+    names(ATN_T)[ncol(ATN_T)] <- "HA"
+    names(ADM_T)[ncol(ADM_T)] <- "HA"
+    
+    # Filter unused rows
+    
+    ATN_T <- ATN_T[3:nrow(ATN_T),]
+    ADM_T <- ADM_T[3:nrow(ADM_T),]
+    
+    ATN_T <- ATN_T %>% filter(!is.na(Sex))
+    ADM_T <- ADM_T %>% filter(!is.na(Sex))
+    
+    # Use numbers to code groups
+    
+    ## Age
+    if(MED==FALSE){
+        ATN_T$Age <- gsub("^0 .*", 1, ATN_T$Age)
+        ATN_T$Age <- gsub("^5 .*", 2, ATN_T$Age)
+        ATN_T$Age <- gsub("^15 .*", 3, ATN_T$Age)
+        ATN_T$Age <- gsub("^35 .*", 4, ATN_T$Age)
+        ATN_T$Age <- gsub("^55 .*", 5, ATN_T$Age)
+        ATN_T$Age <- gsub("^65 .*", 6, ATN_T$Age)
+        ATN_T$Age <- gsub("^75 .*", 7, ATN_T$Age)
+        ATN_T$Age <- gsub("^85.*", 8, ATN_T$Age)
+        
+        ADM_T$Age <- gsub("^0 .*", 1, ADM_T$Age)
+        ADM_T$Age <- gsub("^5 .*", 2, ADM_T$Age)
+        ADM_T$Age <- gsub("^15 .*", 3, ADM_T$Age)
+        ADM_T$Age <- gsub("^35 .*", 4, ADM_T$Age)
+        ADM_T$Age <- gsub("^55 .*", 5, ADM_T$Age)
+        ADM_T$Age <- gsub("^65 .*", 6, ADM_T$Age)
+        ADM_T$Age <- gsub("^75 .*", 7, ADM_T$Age)
+        ADM_T$Age <- gsub("^85.*", 8, ADM_T$Age)
+    }else if(MED==TRUE){
+        ATN_T$Age <- gsub("^18 .*", 1, ATN_T$Age)
+        ATN_T$Age <- gsub("^35 .*", 2, ATN_T$Age)
+        ATN_T$Age <- gsub("^55 .*", 3, ATN_T$Age)
+        ATN_T$Age <- gsub("^65 .*", 4, ATN_T$Age)
+        ATN_T$Age <- gsub("^75 .*", 5, ATN_T$Age)
+        ATN_T$Age <- gsub("^85.*", 6, ATN_T$Age)
+        
+        ADM_T$Age <- gsub("^18 .*", 1, ADM_T$Age)
+        ADM_T$Age <- gsub("^35 .*", 2, ADM_T$Age)
+        ADM_T$Age <- gsub("^55 .*", 3, ADM_T$Age)
+        ADM_T$Age <- gsub("^65 .*", 4, ADM_T$Age)
+        ADM_T$Age <- gsub("^75 .*", 5, ADM_T$Age)
+        ADM_T$Age <- gsub("^85.*", 6, ADM_T$Age)
+    }
+    
+    
+    ## Sex
+    ATN_T$Sex <- gsub("F", 1, ATN_T$Sex)
+    ATN_T$Sex <- gsub("M", 2, ATN_T$Sex)
+    
+    ADM_T$Sex <- gsub("F", 1, ADM_T$Sex)
+    ADM_T$Sex <- gsub("M", 2, ADM_T$Sex)
+    
+    ## Amblatory Case
+    ATN_T$Amb <- gsub("N", 1, ATN_T$Amb)
+    ATN_T$Amb <- gsub("Y", 2, ATN_T$Amb)
+    
+    ADM_T$Amb <- gsub("N", 1, ADM_T$Amb)
+    ADM_T$Amb <- gsub("Y", 2, ADM_T$Amb)
+    
+    ## Triage
+    ATN_T$Tri <- gsub(" .*$", "", ATN_T$Tri)
+    ADM_T$Tri <- gsub(" .*$", "", ADM_T$Tri)
+    
+    
+    
+    # Select relevant columns
+    
+    ATN_T <- ATN_T %>% select(Age, Sex, Amb, Tri, CMC, KWH, NLTH, PMH, YCH, HA)
+    
+    ADM_T <- ADM_T %>% select(Age, Sex, Amb, Tri, CMC, KWH, NLTH, PMH, YCH, HA)
+    
+    # Convert to numeric format
+    
+    for (i in 1:ncol(ATN_T)){
+        ATN_T[,i] <- sapply(ATN_T[,i], as.numeric)
+        ADM_T[,i] <- sapply(ADM_T[,i], as.numeric)
+    }
+    
+    # Check missing rows
+    
+    ## Check Attendance
+    if(MED==FALSE){
+        x <- 8
+    }else if(MED==TRUE){
+        x <- 6
+    }
+    
+    for (i in 1:x){ # 8/6 age groups
+        for (j in 1:2){ # 2 sex groups
+            for (k in 1:2){ # 2 ambulatory care groups
+                for (t in 1:5){ # 5 triage groups
+                    
+                    count <- ATN_T %>% filter(Age==i, Sex==j, Amb==k, Tri==t)
+                    
+                    if (nrow(count) != 1){
+                        temp_df <- data.frame(i, j, k, t, NA, NA, NA, NA, NA, NA)
+                        names(temp_df) <- names(ATN_T)
+                        ATN_T <- bind_rows(ATN_T, temp_df)
+                    }
+                    
+                }
+            }
+        }
+    }
+    ## Check Admission
+    for (i in 1:x){ # 8/6 age groups
+        for (j in 1:2){ # 2 sex groups
+            for (k in 1:2){ # 2 ambulatory care groups
+                for (t in 1:5){ # 5 triage groups
+                    
+                    count <- ADM_T %>% filter(Age==i, Sex==j, Amb==k, Tri==t)
+                    
+                    if (nrow(count) != 1){
+                        temp_df <- data.frame(i, j, k, t, NA, NA, NA, NA, NA, NA)
+                        names(temp_df) <- names(ADM_T)
+                        ADM_T <- bind_rows(ADM_T, temp_df)
+                    }
+                    
+                }
+            }
+        }
+    }
+    
+    # Melt into narrow format
+    
+    ATN_Tr <- melt(ATN_T, id=c("Age", "Sex", "Amb", "Tri")) %>% arrange(Age, Sex, Amb, Tri, variable)
+    ADM_Tr <- melt(ADM_T, id=c("Age", "Sex", "Amb", "Tri")) %>% arrange(Age, Sex, Amb, Tri, variable)
+    
+    # Name columns
+    
+    names(ATN_Tr)[5] <- "Hosp"
+    names(ATN_Tr)[6] <- "Attndance"
+    names(ADM_Tr)[6] <- "Admission"
+    
+    # Merge into single dataframe
+    
+    RATE <- bind_cols(ATN_Tr, ADM_Tr[6])
+    
+    RATE$Attndance[is.na(RATE$Attndance)] <- 0
+    RATE$Admission[is.na(RATE$Admission)] <- 0
+    
+    # Order Hosp with code
+    
+    RATE$Hosp <- as.character(RATE$Hosp)
+    
+    RATE$Hosp[which(RATE$Hosp=="CMC")] <- 1
+    RATE$Hosp[which(RATE$Hosp=="KWH")] <- 2
+    RATE$Hosp[which(RATE$Hosp=="NLTH")] <- 3
+    RATE$Hosp[which(RATE$Hosp=="PMH")] <- 4
+    RATE$Hosp[which(RATE$Hosp=="YCH")] <- 5
+    RATE$Hosp[which(RATE$Hosp=="HA")] <- 7
+    
+    RATE$Hosp <- as.numeric(RATE$Hosp)
+    
+    ## Generate Cluster Sum
+    for (i in 1:8){ # 8 age groups
+        for (j in 1:2){ # 2 sex groups
+            for (k in 1:2){ # 2 ambulatory care groups
+                for (t in 1:5){ # 5 triage groups
+                    
+                    grouped <- RATE %>% filter(Age==i, Sex==j, Amb==k, Tri==t) %>%
+                        summarise(Atn=sum(Attndance), Adm=sum(Admission))
+                    
+                    temp_df <- data.frame(i, j, k, t, 6, as.numeric(grouped$Atn), as.numeric(grouped$Adm))
+                    
+                    names(temp_df) <- names(RATE)
+                    RATE <- bind_rows(RATE, temp_df)
+                    
+                }
+            }
+        }
+    }
+    
+    RATE <- RATE %>% arrange(Age, Sex, Amb, Tri, Hosp)
+    
+    RATE$CrudeRate <- NA
+    
+    for (i in 1:nrow(RATE)){
+        if (RATE$Hosp[i]==7){
+            RATE$CrudeRate[i] <- RATE$Admission[i]/RATE$Attndance[i]
+        }
+    }
+    
+    RATE$CrudeRate[is.na(RATE$CrudeRate)] <- 0
+    
+    # Assign crude rate to all rows
+    
+    for (i in 0:(x*20-1)){
+        
+        si <- 1+7*i
+        ei <- 6+7*i
+        ri <- 7+7*i
+        
+        RATE$CrudeRate[si:ei] <- RATE$CrudeRate[ri]
+    }
+    
+    # Calculate expected admissions
+    
+    RATE <- RATE %>% mutate(ExpectedAdm = Attndance * CrudeRate)
+    
+    # Subset for each hosp
+    
+    R_HA <- RATE %>% filter(Hosp==7) %>% select(Attndance, Admission) %>%
+        summarise(Atn=sum(Attndance), Adm=sum(Admission)) %>% mutate(AdmRate=Adm/Atn)
+    adm_rate <- as.numeric(R_HA$AdmRate) # Overall admission rate
+    
+    R_H1 <- RATE %>% filter(Hosp==1) %>% select(Attndance, Admission, ExpectedAdm) %>%
+        summarise(Atn=sum(Attndance), Adm=sum(Admission), Exp=sum(ExpectedAdm)) %>%
+        mutate(Rate=Adm/Exp)
+    H1_rate <- as.numeric(R_H1$Rate*adm_rate) # Standardised admission rate
+    
+    R_H2 <- RATE %>% filter(Hosp==2) %>% select(Attndance, Admission, ExpectedAdm) %>%
+        summarise(Atn=sum(Attndance), Adm=sum(Admission), Exp=sum(ExpectedAdm)) %>%
+        mutate(Rate=Adm/Exp)
+    H2_rate <- as.numeric(R_H2$Rate*adm_rate) # Standardised admission rate 
+    
+    R_H3 <- RATE %>% filter(Hosp==3) %>% select(Attndance, Admission, ExpectedAdm) %>%
+        summarise(Atn=sum(Attndance), Adm=sum(Admission), Exp=sum(ExpectedAdm)) %>%
+        mutate(Rate=Adm/Exp)
+    H3_rate <- as.numeric(R_H3$Rate*adm_rate) # Standardised admission rate
+    
+    R_H4 <- RATE %>% filter(Hosp==4) %>% select(Attndance, Admission, ExpectedAdm) %>%
+        summarise(Atn=sum(Attndance), Adm=sum(Admission), Exp=sum(ExpectedAdm)) %>%
+        mutate(Rate=Adm/Exp)
+    H4_rate <- as.numeric(R_H4$Rate*adm_rate) # Standardised admission rate
+    
+    R_H5 <- RATE %>% filter(Hosp==5) %>% select(Attndance, Admission, ExpectedAdm) %>%
+        summarise(Atn=sum(Attndance), Adm=sum(Admission), Exp=sum(ExpectedAdm)) %>%
+        mutate(Rate=Adm/Exp)
+    H5_rate <- as.numeric(R_H5$Rate*adm_rate) # Standardised admission rate
+    
+    R_C <- RATE %>% filter(Hosp==6) %>% select(Attndance, Admission, ExpectedAdm) %>%
+        summarise(Atn=sum(Attndance), Adm=sum(Admission), Exp=sum(ExpectedAdm)) %>%
+        mutate(Rate=Adm/Exp)
+    HC_rate <- as.numeric(R_C$Rate*adm_rate) # Standardised admission rate
+    
+    RATE_Tr <- data.frame(
+        c(H1_rate, NA, H2_rate, H3_rate, NA, H4_rate, NA, H5_rate, HC_rate, adm_rate)
+    )
+    
+    names(RATE_Tr) <- Series[1,12]
+    
+    # Move Inst to row names
+    
+    row.names(RATE_Tr) <- c("CMC", "KCH", "KWH", "NLTH", "OLMH", "PMH", "WTSH", "YCH", "KWC", "HA")
+    
+    # Store result in database
+    
+    if(MED==FALSE){
+        
+        db <- read.csv(file.path("source", "db", "tre.3.1.db.csv"), stringsAsFactors = FALSE)
+        tmp_series <- gsub(" ", ".", Series[1,])
+        
+        tmp_df <- db[names(db) %in% tmp_series]
+        
+        row.names(tmp_df) <- row.names(RATE_Tr)
+        
+        if(!(tmp_series[12] %in% names(db))){
+            tmp_df <- bind_cols(tmp_df, RATE_Tr)
+            row.names(tmp_df) <- row.names(RATE_Tr)
+            
+            if(write_db==TRUE){
+                db <- bind_cols(db, RATE_Tr)
+                row.names(db) <- row.names(RATE_Tr)
+                
+                write.csv(db, file.path("source", "db", "tre.3.1.db.csv"), row.names = TRUE)
+            }
+        }
+        
+    }else if(MED==TRUE){
+        
+        db <- read.csv(file.path("source", "db", "tre.3.2.db.csv"), stringsAsFactors = FALSE)
+        tmp_series <- gsub(" ", ".", Series[1,])
+        
+        tmp_df <- db[names(db) %in% tmp_series]
+        
+        row.names(tmp_df) <- row.names(RATE_Tr)
+        
+        if(!(tmp_series[12] %in% names(db))){
+            tmp_df <- bind_cols(tmp_df, RATE_Tr)
+            row.names(tmp_df) <- row.names(RATE_Tr)
+            
+            if(write_db==TRUE){
+                db <- bind_cols(db, RATE_Tr)
+                row.names(db) <- row.names(RATE_Tr)
+                
+                write.csv(db, file.path("source", "db", "tre.3.2.db.csv"), row.names = TRUE)
+            }
+        }
+    }
+    
+    # Remove NA rows
+    
+    tmp_df <- tmp_df %>% mutate(Inst=row.names(tmp_df)) %>% filter(!(row.names(tmp_df) %in% c("KCH", "OLMH", "WTSH")))
+    
+    row.names(tmp_df) <- tmp_df$Inst
+    
+    tmp_df <- tmp_df %>% select(-Inst)
+    
+    # Return dataframe
+    
+    tmp_df
     
 }
 
@@ -2081,6 +2422,107 @@ tre.7 <- function(Mmm){
 # tre.8 Cardiac -------------------------------------------------------------
 
 tre.8 <- function(Mmm){
+    
+    require(stringr)
+    
+    kpi_source_helper(Mmm)
+    
+    path <- grep("(.*tre.8 .*)", source.kpi$filepath, value = TRUE)
+    path.HA <- grep("(.*tre.8.HA .*)", source.kpi$filepath, value = TRUE)
+    
+    AMI_T <- fuzzy_range(path, 10:202, 1:5, si = 2)
+    AMI.HA_T <- fuzzy_range(path.HA, 10:34, 1:5, si = 2)
+    
+    # Name columns
+    
+    names(AMI_T) <- AMI_T[1,]
+    names(AMI.HA_T) <- AMI.HA_T[1,]
+    
+    # Filter unused rows
+    
+    AMI_T <- AMI_T[2:nrow(AMI_T),]
+    AMI.HA_T <- AMI.HA_T[2:nrow(AMI.HA_T),]
+    
+    # Rename Overall to HA
+    
+    AMI.HA_T$Institution <- gsub(" Overall", "", AMI.HA_T$Institution)
+    
+    # Merge into single dataframe
+    
+    AMI_Tr <- bind_rows(AMI_T, AMI.HA_T)
+    
+    # Rename columns
+    
+    names(AMI_Tr)[2] <- "Inst"
+    names(AMI_Tr)[3] <- "WithStatin"
+    names(AMI_Tr)[4] <- "Total"
+    
+    # Convert as numeric
+    
+    for (i in 3:4){
+        AMI_Tr[,i] <- sapply(AMI_Tr[,i], as.numeric)
+    }
+    
+    # Parse period with lubridate
+    
+    AMI_Tr <- AMI_Tr %>% mutate(PeriodStart = paste(1, Period))
+    
+    AMI_Tr$PeriodStart <- dmy(AMI_Tr$PeriodStart)
+    
+    
+    # Calculate % & create Year & Month variables
+    
+    AMI_Tr <- AMI_Tr %>% mutate(Percentage = WithStatin/Total, Year = year(PeriodStart), Month = month(PeriodStart))
+    
+    # Remove unused columns
+    
+    AMI_Tr <- AMI_Tr %>% select(-PeriodStart, -WithStatin, -Total)
+    
+    # Remove leading spaces
+    
+    AMI_Tr$Inst <- gsub(" ", "", AMI_Tr$Inst)
+    
+    # Give order of display
+    
+    AMI_Tr$Order[AMI_Tr$Inst=="CMC"] <- 1
+    AMI_Tr$Order[AMI_Tr$Inst=="KWH"] <- 2
+    AMI_Tr$Order[AMI_Tr$Inst=="NLT"] <- 3    
+    AMI_Tr$Order[AMI_Tr$Inst=="OLM"] <- 4
+    AMI_Tr$Order[AMI_Tr$Inst=="PMH"] <- 5
+    AMI_Tr$Order[AMI_Tr$Inst=="WTS"] <- 6
+    AMI_Tr$Order[AMI_Tr$Inst=="YCH"] <- 7
+    AMI_Tr$Order[AMI_Tr$Inst=="KWC"] <- 8
+    AMI_Tr$Order[AMI_Tr$Inst=="HA"] <- 9
+    
+    AMI_Tr <- AMI_Tr %>% arrange(Year, Month, Order)
+    
+    
+    # Filter according to reporting period
+    
+    start_month <- as.numeric(Dates[9,])+1
+    end_month <- as.numeric(Dates[9,])
+    start_year <- as.numeric(Dates[8,])-1
+    end_year <- as.numeric(Dates[8,])
+    
+    AMI_Tr <- AMI_Tr %>% filter((Year==start_year & Month>=start_month) | (Year==end_year & Month<=end_month))
+    
+    AMI_Tr <- AMI_Tr %>% mutate(Period = paste(Year, str_pad(Month, 2, pad = "0"), sep = "-"))
+    
+    # Cast into wide format
+    
+    AMI_Tr <- dcast(AMI_Tr, Order + Inst ~ Period, value.var = "Percentage")
+    
+    # Move Inst to row names
+    
+    row.names(AMI_Tr) <- AMI_Tr$Inst
+    
+    # Remove excess columns
+    
+    AMI_Tr <- AMI_Tr %>% select(-Order, -Inst)
+    
+    # Return dataframe
+    
+    AMI_Tr
     
 }
 

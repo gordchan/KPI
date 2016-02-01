@@ -63,7 +63,9 @@ reportDates <- function(y, m){
                                cy.period, # 4 Current year reporting period
                                py.period,# 5 Previous year reporting period
                                date.period, # 6 Reporting period in dates (for Excel report)
-                               date.eom # 7 EOM date (for Excel report)
+                               date.eom, # 7 EOM date (for Excel report)
+                               y, # 8 Raw Reporting Year
+                               m # 9 Raw Reporting Month
                                ), 
                         stringsAsFactors = FALSE)
 }
