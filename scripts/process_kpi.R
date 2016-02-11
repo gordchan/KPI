@@ -80,7 +80,7 @@ kpi.1 <- function(Mmm){
     
     # Announce fx started
     
-    message("[kpi.1] Function started")
+    message("[kpi.1] Function started ", Sys.time())
     
 kpi_source_helper(Mmm)
     
@@ -135,7 +135,7 @@ kpi.2 <- function(Mmm, specialty = "Overall", index = 1:5){
     
     # Announce fx started
     
-    message("[kpi.2] Function started")
+    message("[kpi.2] Function started ", Sys.time())
     
 kpi_source_helper(Mmm)
     
@@ -237,7 +237,7 @@ kpi.3 <- function(kpi, Mmm){
     
     # Announce fx started
     
-    message("[kpi.3] Function started")
+    message("[kpi.3] Function started ", Sys.time())
     
 kpi_source_helper(Mmm)
     
@@ -351,7 +351,7 @@ kpi.3.3 <- function(Mmm, trend = FALSE, row){
     
     # Announce fx started
     
-    message("[kpi.3.3] Function started")
+    message("[kpi.3.3] Function started ", Sys.time())
     
     require("tidyr")
     
@@ -463,7 +463,7 @@ kpi.4.1 <- function(Mmm){
     
     # Announce fx started
     
-    message("[kpi.4.1] Function started")
+    message("[kpi.4.1] Function started ", Sys.time())
     
 kpi_source_helper(Mmm)
     
@@ -533,7 +533,7 @@ kpi.4.2 <- function(Mmm){
 
     # Announce fx started
     
-    message("[kpi.4.2] Function started")
+    message("[kpi.4.2] Function started ", Sys.time())
         
 kpi_source_helper(Mmm)
     
@@ -603,7 +603,7 @@ kpi.4.3 <- function(Mmm){
     
     # Announce fx started
     
-    message("[kpi.4.3] Function started")
+    message("[kpi.4.3] Function started ", Sys.time())
     
 kpi_source_helper(Mmm)
     
@@ -656,7 +656,7 @@ kpi.5.1 <- function(Mmm){
     
     # Announce fx started
     
-    message("[kpi.5.1] Function started")
+    message("[kpi.5.1] Function started ", Sys.time())
     
 kpi_source_helper(Mmm)
     
@@ -733,7 +733,7 @@ kpi.5 <- function(kpi, Mmm){
 
     # Announce fx started
     
-    message("[kpi.5] Function started")
+    message("[kpi.5] Function started ", Sys.time())
     
 kpi_source_helper(Mmm)
     
@@ -810,7 +810,7 @@ kpi.6 <- function(kpi, Mmm){
     
     # Announce fx started
     
-    message("[kpi.6] Function started")
+    message("[kpi.6] Function started ", Sys.time())
     
     require("dplyr")
     
@@ -901,7 +901,7 @@ kpi.7 <- function(kpi, Mmm){
     
     # Announce fx started
     
-    message("[kpi.7] Function started")
+    message("[kpi.7] Function started ", Sys.time())
     
 kpi_source_helper(Mmm)
     
@@ -991,7 +991,7 @@ kpi.8 <- function(Mmm, spec = "Overall", inst = "KWC"){
     
     # Announce fx started
     
-    message("[kpi.8] Function started")
+    message("[kpi.8] Function started ", Sys.time())
     
     # Check input
     
@@ -1139,7 +1139,7 @@ kpi.9 <- function(Mmm){
     
     # Announce fx started
     
-    message("[kpi.9] Function started")
+    message("[kpi.9] Function started ", Sys.time())
     
 kpi_source_helper(Mmm)
     
@@ -1181,7 +1181,7 @@ kpi.10 <- function(Mmm, show_specialty = FALSE){
     
     # Announce fx started
     
-    message("[kpi.10] Function started")
+    message("[kpi.10] Function started ", Sys.time())
     
 kpi_source_helper(Mmm)
     
@@ -1244,7 +1244,7 @@ kpi.11 <- function(Mmm, specialty = "Overall"){
     
     # Announce fx started
     
-    message("[kpi.11] Function started")
+    message("[kpi.11] Function started ", Sys.time())
     
 kpi_source_helper(Mmm)
     
@@ -1342,7 +1342,7 @@ kpi.11.2 <- function(Mmm){
     
     # Announce fx started
     
-    message("[kpi.11.2] Function started")
+    message("[kpi.11.2] Function started ", Sys.time())
     
 kpi_source_helper(Mmm)
     
@@ -1398,7 +1398,7 @@ kpi.11.3 <- function(Mmm){
     
     # Announce fx started
     
-    message("[kpi.11.3] Function started")
+    message("[kpi.11.3] Function started ", Sys.time())
     
 kpi_source_helper(Mmm)
     
@@ -1450,7 +1450,7 @@ tre.1 <- function(Mmm, triage="Tri 1"){
     
     # Announce fx started
     
-    message("[tre.1] Function started")
+    message("[tre.1] Function started ", Sys.time())
     
 kpi_source_helper(Mmm)
     
@@ -1539,7 +1539,7 @@ tre.2 <- function(Mmm, triage = "Tri P1"){
     
     # Announce fx started
     
-    message("[tre.2] Function started")
+    message("[tre.2] Function started ", Sys.time())
     
 kpi_source_helper(Mmm)
     
@@ -1651,7 +1651,7 @@ tre.2.1 <- function(Mmm, triage = "Tri P1"){
     
     # Announce fx started
     
-    message("[tre.2.1] Function started")
+    message("[tre.2.1] Function started ", Sys.time())
     
 kpi_source_helper(Mmm)
     
@@ -1776,7 +1776,7 @@ tre.3 <- function(Mmm, MED, write_db = FALSE){
     
     # Announce fx started
     
-    message("[tre.3] Function started")
+    message("[tre.3] Function started ", Sys.time())
     
 kpi_source_helper(Mmm)
     
@@ -2130,7 +2130,7 @@ tre.5 <- function(Mmm){
     
     # Announce fx started
     
-    message("[tre.5] Function started")
+    message("[tre.5] Function started ", Sys.time())
     
 kpi_source_helper(Mmm)
     
@@ -2194,7 +2194,7 @@ tre.6 <- function(Mmm){
     
     # Announce fx started
     
-    message("[tre.6] Function started")
+    message("[tre.6] Function started ", Sys.time())
     
 kpi_source_helper(Mmm)
     
@@ -2299,7 +2299,7 @@ tre.7 <- function(Mmm){
     
     # Announce fx started
     
-    message("[tre.7] Function started")
+    message("[tre.7] Function started ", Sys.time())
     
 kpi_source_helper(Mmm)
     
@@ -2419,7 +2419,7 @@ tre.8 <- function(Mmm){
     
     # Announce fx started
     
-    message("[tre.8] Function started")
+    message("[tre.8] Function started ", Sys.time())
     
     require(stringr)
     
@@ -2530,7 +2530,7 @@ tre.9 <- function(Mmm){
     
     # Announce fx started
     
-    message("[tre.9] Function started")
+    message("[tre.9] Function started ", Sys.time())
     
 kpi_source_helper(Mmm)
     
@@ -2597,7 +2597,7 @@ tre.10 <- function(Mmm, item){
     
     # Announce fx started
     
-    message("[tre.10] Function started")
+    message("[tre.10] Function started ", Sys.time())
     
 kpi_source_helper(Mmm)
     
@@ -2682,7 +2682,7 @@ tre.12 <- function(Mmm, Mode){
     
     # Announce fx started
     
-    message("[tre.12] Function started")
+    message("[tre.12] Function started ", Sys.time())
     
 kpi_source_helper(Mmm)
     

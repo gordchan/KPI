@@ -60,7 +60,7 @@ KPI_chkperiod(Dates[3,], CurrentYear = FALSE)
 # Successful validation
 
 cat(paste("Validation successful, generating report now", Sys.time()), file=fileConn, append=TRUE, sep = "\n")
-print("Validation successful, generating report...")
+message("Validation successful, generating report...")
 
 # Create filepath table ----------------------------------------------------------
 
