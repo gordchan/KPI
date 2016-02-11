@@ -1805,10 +1805,27 @@ tre.3 <- function(Mmm, MED, write_db = FALSE){
     
     # Convert to numeric format
     
-    for (i in 1:ncol(ATN_T)){
+    for (i in 1:ncol(ATN_T)){ # As No of 1st attenance is alwasy > than No of Admissions)
         ATN_T[,i] <- sapply(ATN_T[,i], as.numeric)
         ADM_T[,i] <- sapply(ADM_T[,i], as.numeric)
     }
+    
+    
+    # Calculate cluster sum
+    
+    ## Calculate Attendance
+    ATN_T$KWC <- NA
+    
+    for (i in 1:nrow(ATN_T)){
+        ATN_T$KWC[i] <- sum(ATN_T[i, 5:(ncol(ATN_T)-2)], na.rm = TRUE)
+    }
+    ## Calculate Admission
+    ADM_T$KWC <- NA
+    
+    for (i in 1:nrow(ADM_T)){
+        ADM_T$KWC[i] <- sum(ADM_T[i, 5:(ncol(ADM_T)-2)], na.rm = TRUE)
+    }
+    
     
     # Check missing rows
     
@@ -1827,7 +1844,7 @@ tre.3 <- function(Mmm, MED, write_db = FALSE){
                     count <- ATN_T %>% filter(Age==i, Sex==j, Amb==k, Tri==t)
                     
                     if (nrow(count) != 1){
-                        temp_df <- data.frame(i, j, k, t, NA, NA, NA, NA, NA, NA)
+                        temp_df <- data.frame(i, j, k, t, NA, NA, NA, NA, NA, NA, NA)
                         names(temp_df) <- names(ATN_T)
                         ATN_T <- bind_rows(ATN_T, temp_df)
                     }
@@ -1845,7 +1862,7 @@ tre.3 <- function(Mmm, MED, write_db = FALSE){
                     count <- ADM_T %>% filter(Age==i, Sex==j, Amb==k, Tri==t)
                     
                     if (nrow(count) != 1){
-                        temp_df <- data.frame(i, j, k, t, NA, NA, NA, NA, NA, NA)
+                        temp_df <- data.frame(i, j, k, t, NA, NA, NA, NA, NA, NA, NA)
                         names(temp_df) <- names(ADM_T)
                         ADM_T <- bind_rows(ADM_T, temp_df)
                     }
@@ -1882,28 +1899,10 @@ tre.3 <- function(Mmm, MED, write_db = FALSE){
     RATE$Hosp[which(RATE$Hosp=="NLTH")] <- 3
     RATE$Hosp[which(RATE$Hosp=="PMH")] <- 4
     RATE$Hosp[which(RATE$Hosp=="YCH")] <- 5
+    RATE$Hosp[which(RATE$Hosp=="KWC")] <- 6
     RATE$Hosp[which(RATE$Hosp=="HA")] <- 7
     
     RATE$Hosp <- as.numeric(RATE$Hosp)
-    
-    ## Generate Cluster Sum
-    for (i in 1:8){ # 8 age groups
-        for (j in 1:2){ # 2 sex groups
-            for (k in 1:2){ # 2 ambulatory care groups
-                for (t in 1:5){ # 5 triage groups
-                    
-                    grouped <- RATE %>% filter(Age==i, Sex==j, Amb==k, Tri==t) %>%
-                        summarise(Atn=sum(Attndance), Adm=sum(Admission))
-                    
-                    temp_df <- data.frame(i, j, k, t, 6, as.numeric(grouped$Atn), as.numeric(grouped$Adm))
-                    
-                    names(temp_df) <- names(RATE)
-                    RATE <- bind_rows(RATE, temp_df)
-                    
-                }
-            }
-        }
-    }
     
     RATE <- RATE %>% arrange(Age, Sex, Amb, Tri, Hosp)
     
