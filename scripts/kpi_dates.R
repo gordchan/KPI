@@ -22,12 +22,19 @@ KPI_dates <- function(y, m){
     cy.period <- paste(from.MmmYY, to.MmmYY, sep = "-")
     py.period <- paste(prev.from.MmmYY, prev.to.MmmYY, sep = "-")
     
-    eom <- ymd(paste(y, "-", m + 1, "-", 1)) # Find end date of reporting period this year
+    eom <- ymd(paste(y, "-", m , "-", 1)) # Find end date of reporting period this year
+    month(eom) <- month(eom) + 1
     day(eom) <- day(eom) -1
-    som <- ymd(paste(y-1, "-", m + 1, "-", 1)) # Find start date of reporting period this year
+    
+    som <- eom # Find start date of reporting period this year
+    year(som) <- year(som) -1
+    day(som) <- day(som) +1
+    
     
     date.period <- paste(day(som), month(som, label = TRUE, abbr = TRUE), year(som), "-", day(eom), month(eom, label = TRUE, abbr = TRUE), year(eom))
     date.eom <- paste(day(eom), "/", month(eom), "/", year(eom), sep = "")
+    
+    date.eom.prev <- paste(day(eom), "/", month(eom), "/", year(eom)-1, sep = "")
     
     df <- data.frame(dates = c(to.MmmYY, # 1 Reporting month
                                to.MmmYY_, # 2 Reporting month w/ leading zero
@@ -36,8 +43,9 @@ KPI_dates <- function(y, m){
                                py.period,# 5 Previous year reporting period
                                date.period, # 6 Reporting period in dates (for Excel report)
                                date.eom, # 7 EOM date (for Excel report)
-                               y, # 8 Raw Reporting Year
-                               m # 9 Raw Reporting Month
+                               date.eom.prev, # 8 EOM date (for Excel report)
+                               y, # 9 Raw Reporting Year
+                               m # 10 Raw Reporting Month
     ), 
     stringsAsFactors = FALSE)
     

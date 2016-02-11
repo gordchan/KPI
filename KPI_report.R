@@ -25,8 +25,13 @@ require("reshape2")
 require("lubridate")
 
 source("scripts/kpi_dates.R")
+source("scripts/kpi_filechk.R")
+source("scripts/kpi_chkperiod.R")
+
 source("scripts/read_xlsx.R")
 source("scripts/process_kpi.R")
+
+source("scripts/kpi_helper.R")
 
 # Reporting period --------------------------------------------------------
 
@@ -37,16 +42,25 @@ KPI_dates(y, m)
 
 # Function input
 
-    if(nchar(y)!=4 | !is.numeric(y)){
-        return("Please input a year in 4 digits")
-    } else if(!is.numeric(m)){
-        return("Please input a month in integers")
-    }
+if(nchar(y)!=4 | !is.numeric(y)){
+    return("Please input a year in 4 digits")
+} else if(!is.numeric(m)|nchar(m)>2){
+    return("Please input a month in 1 or 2 integers")
+}
 
 # Source file completness
 
+KPI_filechk(y, m)
 
+# Check source file sample period
 
+KPI_chkperiod(Dates[1,], CurrentYear = TRUE)
+KPI_chkperiod(Dates[3,], CurrentYear = FALSE)
+
+# Successful validation
+
+cat(paste("Validation successful, generating report now", Sys.time()), file=fileConn, append=TRUE, sep = "\n")
+print("Validation successful, generating report...")
 
 # Create filepath table ----------------------------------------------------------
 
