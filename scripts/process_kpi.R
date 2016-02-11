@@ -78,6 +78,10 @@ file.std <- function(Mmm){
 
 kpi.1 <- function(Mmm){
     
+    # Announce fx started
+    
+    message("[kpi.1] Function started")
+    
 kpi_source_helper(Mmm)
     
     path <- grep("(.*kpi.1 .*)", source.kpi$filepath, value = TRUE)
@@ -129,7 +133,11 @@ kpi_source_helper(Mmm)
 
 kpi.2 <- function(Mmm, specialty = "Overall", index = 1:5){
     
-    kpi_source_helper(Mmm)
+    # Announce fx started
+    
+    message("[kpi.2] Function started")
+    
+kpi_source_helper(Mmm)
     
     path <- grep("(.*kpi.2 .*)", source.kpi$filepath, value = TRUE)
     path.HA <- grep("(.*kpi.2.HA .*)", source.kpi$filepath, value = TRUE)
@@ -227,7 +235,11 @@ kpi.2 <- function(Mmm, specialty = "Overall", index = 1:5){
 # kpi.3 Quality ----------------------------------------------------------
 kpi.3 <- function(kpi, Mmm){
     
-    kpi_source_helper(Mmm)
+    # Announce fx started
+    
+    message("[kpi.3] Function started")
+    
+kpi_source_helper(Mmm)
     
     SAR.frame <- empty.frame
     SAR.frame[1,] <- NA
@@ -337,9 +349,13 @@ kpi.3 <- function(kpi, Mmm){
 
 kpi.3.3 <- function(Mmm, trend = FALSE, row){
     
+    # Announce fx started
+    
+    message("[kpi.3.3] Function started")
+    
     require("tidyr")
     
-    kpi_source_helper(Mmm)
+kpi_source_helper(Mmm)
     
     path <- grep("(.*kpi.3.3 .*)", source.kpi$filepath, value = TRUE)
     
@@ -445,6 +461,10 @@ kpi.3.3 <- function(Mmm, trend = FALSE, row){
 
 kpi.4.1 <- function(Mmm){
     
+    # Announce fx started
+    
+    message("[kpi.4.1] Function started")
+    
 kpi_source_helper(Mmm)
     
     path <- grep("(.*kpi.4.1 .*)", source.kpi$filepath, value = TRUE)
@@ -510,8 +530,12 @@ kpi_source_helper(Mmm)
 }
 
 kpi.4.2 <- function(Mmm){
+
+    # Announce fx started
     
-    kpi_source_helper(Mmm)
+    message("[kpi.4.2] Function started")
+        
+kpi_source_helper(Mmm)
     
     path <- grep("(.*kpi.4.2 .*)", source.kpi$filepath, value = TRUE)
     
@@ -577,7 +601,11 @@ kpi.4.2 <- function(Mmm){
 
 kpi.4.3 <- function(Mmm){
     
-    kpi_source_helper(Mmm)
+    # Announce fx started
+    
+    message("[kpi.4.3] Function started")
+    
+kpi_source_helper(Mmm)
     
     path <- grep("(.*kpi.4.3 .*)", source.kpi$filepath, value = TRUE)
     
@@ -626,7 +654,11 @@ kpi.4.3 <- function(Mmm){
 
 kpi.5.1 <- function(Mmm){
     
-    kpi_source_helper(Mmm)
+    # Announce fx started
+    
+    message("[kpi.5.1] Function started")
+    
+kpi_source_helper(Mmm)
     
     path <- grep("(.*kpi.8 .*)", source.kpi$filepath, value = TRUE)
     
@@ -698,8 +730,12 @@ kpi.5.1 <- function(Mmm){
 }
 
 kpi.5 <- function(kpi, Mmm){
+
+    # Announce fx started
     
-    kpi_source_helper(Mmm)
+    message("[kpi.5] Function started")
+    
+kpi_source_helper(Mmm)
     
     path <- grep("(.*kpi.5 .*)", source.kpi$filepath, value = TRUE)
     
@@ -772,9 +808,13 @@ kpi.5 <- function(kpi, Mmm){
 
 kpi.6 <- function(kpi, Mmm){
     
+    # Announce fx started
+    
+    message("[kpi.6] Function started")
+    
     require("dplyr")
     
-    kpi_source_helper(Mmm)
+kpi_source_helper(Mmm)
 
         regex <- "(.*kpi.6 .*)"
         regex.HA <- "(.*kpi.6.HA .*)"
@@ -859,7 +899,11 @@ kpi.6 <- function(kpi, Mmm){
 
 kpi.7 <- function(kpi, Mmm){
     
-    kpi_source_helper(Mmm)
+    # Announce fx started
+    
+    message("[kpi.7] Function started")
+    
+kpi_source_helper(Mmm)
     
     path <- grep("(.*kpi.7 .*)", source.kpi$filepath, value = TRUE)
     
@@ -945,6 +989,10 @@ kpi.7 <- function(kpi, Mmm){
 
 kpi.8 <- function(Mmm, spec = "Overall", inst = "KWC"){
     
+    # Announce fx started
+    
+    message("[kpi.8] Function started")
+    
     # Check input
     
     specialty.list <- c("Overall",
@@ -959,7 +1007,7 @@ kpi.8 <- function(Mmm, spec = "Overall", inst = "KWC"){
         return(0)
     }
     
-    kpi_source_helper(Mmm)
+kpi_source_helper(Mmm)
     
     path <- grep("(.*kpi.8 .*)", source.kpi$filepath, value = TRUE)
     
@@ -1089,7 +1137,11 @@ kpi.8 <- function(Mmm, spec = "Overall", inst = "KWC"){
 
 kpi.9 <- function(Mmm){
     
-    kpi_source_helper(Mmm)
+    # Announce fx started
+    
+    message("[kpi.9] Function started")
+    
+kpi_source_helper(Mmm)
     
     path <- grep("(.*kpi.9 .*)", source.kpi$filepath, value = TRUE)
     
@@ -1127,7 +1179,11 @@ kpi.9 <- function(Mmm){
 
 kpi.10 <- function(Mmm, show_specialty = FALSE){
     
-    kpi_source_helper(Mmm)
+    # Announce fx started
+    
+    message("[kpi.10] Function started")
+    
+kpi_source_helper(Mmm)
     
     path <- grep("(.*kpi.10 .*)", source.kpi$filepath, value = TRUE)
     
@@ -1186,7 +1242,11 @@ kpi.10 <- function(Mmm, show_specialty = FALSE){
 
 kpi.11 <- function(Mmm, specialty = "Overall"){
     
-    kpi_source_helper(Mmm)
+    # Announce fx started
+    
+    message("[kpi.11] Function started")
+    
+kpi_source_helper(Mmm)
     
     path <- grep("(.*kpi.11.1 .*)", source.kpi$filepath, value = TRUE)
     path.HA <- grep("(.*kpi.11.1.HA .*)", source.kpi$filepath, value = TRUE)
@@ -1280,7 +1340,11 @@ kpi.11 <- function(Mmm, specialty = "Overall"){
 
 kpi.11.2 <- function(Mmm){
     
-    kpi_source_helper(Mmm)
+    # Announce fx started
+    
+    message("[kpi.11.2] Function started")
+    
+kpi_source_helper(Mmm)
     
     path <- grep("(.*kpi.11.2 .*)", source.kpi$filepath, value = TRUE)
     
@@ -1332,7 +1396,11 @@ kpi.11.2 <- function(Mmm){
 
 kpi.11.3 <- function(Mmm){
     
-    kpi_source_helper(Mmm)
+    # Announce fx started
+    
+    message("[kpi.11.3] Function started")
+    
+kpi_source_helper(Mmm)
     
     path <- grep("(.*kpi.11.3 .*)", source.kpi$filepath, value = TRUE)
     
@@ -1380,7 +1448,11 @@ kpi.11.3 <- function(Mmm){
 
 tre.1 <- function(Mmm, triage="Tri 1"){
     
-    kpi_source_helper(Mmm)
+    # Announce fx started
+    
+    message("[tre.1] Function started")
+    
+kpi_source_helper(Mmm)
     
     path <- grep("(.*tre.1 .*)", source.kpi$filepath, value = TRUE)
 
@@ -1465,7 +1537,11 @@ tre.1 <- function(Mmm, triage="Tri 1"){
 # Median WT
 tre.2 <- function(Mmm, triage = "Tri P1"){
     
-    kpi_source_helper(Mmm)
+    # Announce fx started
+    
+    message("[tre.2] Function started")
+    
+kpi_source_helper(Mmm)
     
     path <- grep("(.*tre.2 .*)", source.kpi$filepath, value = TRUE)
     path.HA <- grep("(.*tre.2.HA .*)", source.kpi$filepath, value = TRUE)
@@ -1573,7 +1649,11 @@ tre.2 <- function(Mmm, triage = "Tri P1"){
 # % seen within WT
 tre.2.1 <- function(Mmm, triage = "Tri P1"){
     
-    kpi_source_helper(Mmm)
+    # Announce fx started
+    
+    message("[tre.2.1] Function started")
+    
+kpi_source_helper(Mmm)
     
     path <- grep("(.*tre.2.1 .*)", source.kpi$filepath, value = TRUE)
     path.HA <- grep("(.*tre.2.1.HA .*)", source.kpi$filepath, value = TRUE)
@@ -1694,7 +1774,11 @@ tre.2.1 <- function(Mmm, triage = "Tri P1"){
 
 tre.3 <- function(Mmm, MED, write_db = FALSE){
     
-    kpi_source_helper(Mmm)
+    # Announce fx started
+    
+    message("[tre.3] Function started")
+    
+kpi_source_helper(Mmm)
     
     if(MED==FALSE){
         path.Atn <- grep("(.*tre.3.1.1 .*)", source.kpi$filepath, value = TRUE)
@@ -2044,7 +2128,11 @@ tre.3 <- function(Mmm, MED, write_db = FALSE){
 
 tre.5 <- function(Mmm){
     
-    kpi_source_helper(Mmm)
+    # Announce fx started
+    
+    message("[tre.5] Function started")
+    
+kpi_source_helper(Mmm)
     
     path <- grep("(.*tre.5 .*)", source.kpi$filepath, value = TRUE)
     
@@ -2104,7 +2192,11 @@ tre.5 <- function(Mmm){
 
 tre.6 <- function(Mmm){
     
-    kpi_source_helper(Mmm)
+    # Announce fx started
+    
+    message("[tre.6] Function started")
+    
+kpi_source_helper(Mmm)
     
     path <- grep("(.*tre.6 .*)", source.kpi$filepath, value = TRUE)
     
@@ -2205,7 +2297,11 @@ tre.6 <- function(Mmm){
 
 tre.7 <- function(Mmm){
     
-    kpi_source_helper(Mmm)
+    # Announce fx started
+    
+    message("[tre.7] Function started")
+    
+kpi_source_helper(Mmm)
     
     path <- grep("(.*tre.7 .*)", source.kpi$filepath, value = TRUE)
     
@@ -2321,9 +2417,13 @@ tre.7 <- function(Mmm){
 
 tre.8 <- function(Mmm){
     
+    # Announce fx started
+    
+    message("[tre.8] Function started")
+    
     require(stringr)
     
-    kpi_source_helper(Mmm)
+kpi_source_helper(Mmm)
     
     path <- grep("(.*tre.8 .*)", source.kpi$filepath, value = TRUE)
     path.HA <- grep("(.*tre.8.HA .*)", source.kpi$filepath, value = TRUE)
@@ -2428,7 +2528,11 @@ tre.8 <- function(Mmm){
 
 tre.9 <- function(Mmm){
     
-    kpi_source_helper(Mmm)
+    # Announce fx started
+    
+    message("[tre.9] Function started")
+    
+kpi_source_helper(Mmm)
     
     path <- grep("(.*tre.9 .*)", source.kpi$filepath, value = TRUE)
     
@@ -2491,7 +2595,11 @@ tre.9 <- function(Mmm){
 
 tre.10 <- function(Mmm, item){
     
-    kpi_source_helper(Mmm)
+    # Announce fx started
+    
+    message("[tre.10] Function started")
+    
+kpi_source_helper(Mmm)
     
     path <- grep("(.*tre.10 .*)", source.kpi$filepath, value = TRUE)
     
@@ -2572,7 +2680,11 @@ tre.10 <- function(Mmm, item){
 # tre.12 Radiology WT------------------------------------------------------
 tre.12 <- function(Mmm, Mode){
     
-    kpi_source_helper(Mmm)
+    # Announce fx started
+    
+    message("[tre.12] Function started")
+    
+kpi_source_helper(Mmm)
     
     path <- grep("(.*tre.12 .*)", source.kpi$filepath, value = TRUE)
     
