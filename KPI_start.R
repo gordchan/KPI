@@ -7,4 +7,4 @@ source("scripts/KPI_report.R")
 
 # Main Process
 
-kpi_report(y = 2015, m = 11)
+kpi_report(y = 2015, m = 12)
