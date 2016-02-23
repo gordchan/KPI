@@ -1772,7 +1772,7 @@ kpi_source_helper(Mmm)
 
 # tre.3 A&E Standardised Admission Rate ------------------------------------
 
-tre.3 <- function(Mmm, MED, write_db = FALSE){
+tre.3 <- function(Mmm, MED, write_db = FALSE, backup = FALSE){
     
     # Announce fx started
     
@@ -2077,12 +2077,36 @@ kpi_source_helper(Mmm)
             row.names(tmp_df) <- row.names(RATE_Tr)
             
             if(write_db==TRUE){
+                # db backup
+                if(backup==TRUE){
+                dir.create(file.path("source", "db", "backup", Dates[1,]), showWarnings = FALSE)
+                file.copy(from = file.path("source", "db", "tre.3.1.db.csv"),
+                          to = file.path("source", "db", "backup", Dates[1,], "tre.3.1.db.csv"),
+                          overwrite = TRUE)    
+                }
+
                 db <- bind_cols(db, RATE_Tr)
-                row.names(db) <- row.names(RATE_Tr)
-                
-                write.csv(db, file.path("source", "db", "tre.3.1.db.csv"), row.names = TRUE)
+                write.csv(db, file.path("source", "db", "tre.3.1.db.csv"), row.names = FALSE)
             }
+            
+        }else{
+            tmp_df[,which(names(tmp_df)==tmp_series[12])] <- RATE_Tr[,1]
+            
+            if(write_db==TRUE){
+                # db backup
+                if(backup==TRUE){
+                    dir.create(file.path("source", "db", "backup", Dates[1,]), showWarnings = FALSE)
+                    file.copy(from = file.path("source", "db", "tre.3.1.db.csv"),
+                              to = file.path("source", "db", "backup", Dates[1,], "tre.3.1.db.csv"),
+                              overwrite = TRUE)    
+                }
+                
+                db[,which(names(db)==tmp_series[12])] <- RATE_Tr[,1]
+                write.csv(db, file.path("source", "db", "tre.3.1.db.csv"), row.names = FALSE)
+            }
+            
         }
+
         
     }else if(MED==TRUE){
         
@@ -2098,12 +2122,36 @@ kpi_source_helper(Mmm)
             row.names(tmp_df) <- row.names(RATE_Tr)
             
             if(write_db==TRUE){
-                db <- bind_cols(db, RATE_Tr)
-                row.names(db) <- row.names(RATE_Tr)
+                # db backup
+                if(backup==TRUE){
+                    dir.create(file.path("source", "db", "backup", Dates[1,]), showWarnings = FALSE)
+                    file.copy(from = file.path("source", "db", "tre.3.2.db.csv"),
+                              to = file.path("source", "db", "backup", Dates[1,], "tre.3.2.db.csv"),
+                              overwrite = TRUE)    
+                }
                 
-                write.csv(db, file.path("source", "db", "tre.3.2.db.csv"), row.names = TRUE)
+                db <- bind_cols(db, RATE_Tr)
+                write.csv(db, file.path("source", "db", "tre.3.2.db.csv"), row.names = FALSE)
             }
+            
+        }else{
+            tmp_df[,which(names(tmp_df)==tmp_series[12])] <- RATE_Tr[,1]
+            
+            if(write_db==TRUE){
+                # db backup
+                if(backup==TRUE){
+                    dir.create(file.path("source", "db", "backup", Dates[1,]), showWarnings = FALSE)
+                    file.copy(from = file.path("source", "db", "tre.3.2.db.csv"),
+                              to = file.path("source", "db", "backup", Dates[1,], "tre.3.2.db.csv"),
+                              overwrite = TRUE)    
+                }
+                
+                db[,which(names(db)==tmp_series[12])] <- RATE_Tr[,1]
+                write.csv(db, file.path("source", "db", "tre.3.2.db.csv"), row.names = FALSE)
+            }
+            
         }
+        
     }
     
     # Remove NA rows

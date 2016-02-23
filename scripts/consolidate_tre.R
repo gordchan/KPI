@@ -23,8 +23,8 @@ tre.2.1.a <- tre.2.1(Dates[1,], triage = "Tri P1")
 tre.2.1.b <- tre.2.1(Dates[1,], triage = "Tri P2")
 
 ## Standardised Admission Rate for Patient attending A&E
-tre.3.a <- tre.3(Dates[1,], MED = FALSE, write_db = TRUE)
-tre.3.b <- tre.3(Dates[1,], MED = TRUE, write_db = TRUE)
+tre.3.a <- tre.3(Dates[1,], MED = FALSE, write_db = TRUE, backup = TRUE)
+tre.3.b <- tre.3(Dates[1,], MED = TRUE, write_db = TRUE, backup = TRUE)
 
 ## MRSA Bacteremia in Acute Beds/1000 Acute Patient Days
 tre.4.a <- kpi.3.3(Dates[1,], trend = TRUE)
