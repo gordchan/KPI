@@ -1637,7 +1637,7 @@ kpi_source_helper(Mmm)
     
     for (i in 1:12){
         SOP_Tr[,i] <- sapply(SOP_Tr[,i], as.numeric)
-        #SOP_Tr[,i] <- sapply(SOP_Tr[,i], ceiling)
+        SOP_Tr[,i] <- sapply(SOP_Tr[,i], ceiling)
     }
     
     # Return dataframe
