@@ -13,9 +13,9 @@ read_html <- function (input){
     
     # Read & parse HTML as df
     
-    html <- file.path("Test", "simple.html")
+    # html <- file.path("Test", "simple.html")
     
-    parse <- htmlParse(html, validate = TRUE)
+    parse <- htmlParse(input, validate = TRUE)
     
     df <- htmltab(parse, which = "//table[@id='datatable']", header = 1, complementary = FALSE)
     
@@ -35,5 +35,5 @@ read_html <- function (input){
     
     # Return df
     
-    html_data
+    df
 }
