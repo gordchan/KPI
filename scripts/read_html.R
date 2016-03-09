@@ -9,14 +9,31 @@
 
 read_html <- function (input){
     
-    require("XML")
-    require("dplyr")
+    require(htmltab)
     
-    # Read spreadsheet with deliberate over read to accomodate variations in table length
+    # Read & parse HTML as df
     
-    html_data <- readHTMLTable(source.xls, header = FALSE)
+    html <- file.path("Test", "simple.html")
     
-    html_data <- html_data$datatable
+    parse <- htmlParse(html, validate = TRUE)
+    
+    df <- htmltab(parse, which = "//table[@id='datatable']", header = 1, complementary = FALSE)
+    
+    names(df) <- c(1:ncol(df))
+    
+    # tidy corrupted last column, truncate repetition of next row data
+    
+    for (i in 1:nrow(df)){
+        # regex: ([[:alnum:]| ]*?) *KEY.*
+        
+        key <- df[i+1,1]
+        rx <- paste("([[:alnum:]| ]*?) *", key, ".*", sep = "")
+        
+        df[i,ncol(df)] <- gsub(rx, "\\1", df[i,ncol(df)])
+        
+    }
+    
+    # Return df
     
     html_data
 }

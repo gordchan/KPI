@@ -99,6 +99,7 @@ raw_range <- function (input, ri, ci, si = 1){
 
 fuzzy_range <- function (input, fuzzy.ri, ci, si = 1){
     
+    require("xlsx")
     require("dplyr")
     
     # Read spreadsheet with deliberate over read to accomodate variations in table length
