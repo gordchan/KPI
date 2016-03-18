@@ -1,39 +1,48 @@
 # HTML data direct
 #
-# To load html page disguised as .xls file
+# To load system generated html page disguised as .xls file
 #
-# Dec 2015
+# March 2016
 
+input <- "source/Dec15/kpi.3.1.1 3849208_kpi311_(KPI)_AE_1st_Attendance.html"
+headerRow <- 1:2
 
-# read_html -----------------------------------------------------------------------
+# read_Chtml -----------------------------------------------------------------------
 
-read_html <- function (input){
+read_Chtml <- function (input, headerRow){
     
     require(htmltab)
+    require(XML)
     
-    # Read & parse HTML as df
+# Acquire html lines
     
-    # html <- file.path("Test", "simple.html")
+    con <- file(input, "r")
+    lines <- readLines(con)
+    close(con)
+    rm(input)
+    rm(con)
     
-    parse <- htmlParse(input, validate = TRUE)
+# File formatting
     
-    df <- htmltab(parse, which = "//table[@id='datatable']", header = 1, complementary = FALSE)
+    # Indexing
+    A <- 1:4 # Header
+    B <- 5 # Name
+    E <- (length(lines)-6):length(lines) # Disclaimer
+    D <- which(grepl("<table id", lines)):(E[1]-1) # Cream of the Crops Datatable    
+    C <- 6:(D[1]-1) # Quere details
     
-    names(df) <- c(1:ncol(df))
+    lines <- lines[c(B, D)]
     
-    # tidy corrupted last column, truncate repetition of next row data
+    lines <- gsub("<\\/?font.{0,20}>", "", lines)
+    lines <- gsub("<tr", "<\\/tr><tr", lines)
+    lines[2] <- sub("<\\/tr>", "", lines[2])
     
-    for (i in 1:nrow(df)){
-        # regex: ([[:alnum:]| ]*?) *KEY.*
-        
-        key <- df[i+1,1]
-        rx <- paste("([[:alnum:]| ]*?) *", key, ".*", sep = "")
-        
-        df[i,ncol(df)] <- gsub(rx, "\\1", df[i,ncol(df)])
-        
-    }
+# Parse and return dataframe
     
-    # Return df
+    parse <- htmlParse(lines, asText = TRUE)
+    df <- htmltab(parse, which = "//table[@id='datatable']", header = headerRow)
+    
+# Return df
     
     df
 }
