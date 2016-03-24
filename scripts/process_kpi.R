@@ -245,8 +245,8 @@ kpi_source_helper(Mmm)
     SAR.frame[1,] <- NA
     
     if(kpi=="kpi.3.1"){
-        path.1st <- grep("(.*kpi.3.1.1 .*)", source.kpi$filepath, value = TRUE)
-        path.adm <- grep("(.*kpi.3.1.2 .*)", source.kpi$filepath, value = TRUE)
+        path.1st <- grep("(.*kpi.3.1.1 .*xls.?)", source.kpi$filepath, value = TRUE)
+        path.adm <- grep("(.*kpi.3.1.2 .*xls.?)", source.kpi$filepath, value = TRUE)
         
         SAR.1st <- fuzzy_range(path.1st, 67:240, 1:22)
         SAR.adm <- fuzzy_range(path.adm, 116:290, 1:22)
@@ -263,8 +263,8 @@ kpi_source_helper(Mmm)
         SAR.adm <- SAR.adm[-c(1:2),]
         
     }else if(kpi=="kpi.3.2"){
-        path.1st <- grep("(.*kpi.3.2.1 .*)", source.kpi$filepath, value = TRUE)
-        path.adm <- grep("(.*kpi.3.2.2 .*)", source.kpi$filepath, value = TRUE)
+        path.1st <- grep("(.*kpi.3.2.1 .*xls.?)", source.kpi$filepath, value = TRUE)
+        path.adm <- grep("(.*kpi.3.2.2 .*xls.?)", source.kpi$filepath, value = TRUE)
         
         SAR.1st <- fuzzy_range(path.1st, 71:210, 1:22)
         SAR.adm <- fuzzy_range(path.adm, 120:250, 1:22)
@@ -357,7 +357,7 @@ kpi.3.3 <- function(Mmm, trend = FALSE, row){
     
 kpi_source_helper(Mmm)
     
-    path <- grep("(.*kpi.3.3 .*)", source.kpi$filepath, value = TRUE)
+    path <- grep("(.*kpi.3.3 .*xls.?)", source.kpi$filepath, value = TRUE)
     
     MRSA.frame <- empty.frame
     
@@ -467,7 +467,7 @@ kpi.4.1 <- function(Mmm){
     
 kpi_source_helper(Mmm)
     
-    path <- grep("(.*kpi.4.1 .*)", source.kpi$filepath, value = TRUE)
+    path <- grep("(.*kpi.4.1 .*xls.?)", source.kpi$filepath, value = TRUE)
 
     Stroke.frame <- empty.frame
     Stroke.frame[1,] <- NA
@@ -537,7 +537,7 @@ kpi.4.2 <- function(Mmm){
         
 kpi_source_helper(Mmm)
     
-    path <- grep("(.*kpi.4.2 .*)", source.kpi$filepath, value = TRUE)
+    path <- grep("(.*kpi.4.2 .*xls.?)", source.kpi$filepath, value = TRUE)
     
     Hip.frame <- empty.frame
         Hip.frame[1,] <- NA
@@ -607,7 +607,7 @@ kpi.4.3 <- function(Mmm){
     
 kpi_source_helper(Mmm)
     
-    path <- grep("(.*kpi.4.3 .*)", source.kpi$filepath, value = TRUE)
+    path <- grep("(.*kpi.4.3 .*xls.?)", source.kpi$filepath, value = TRUE)
     
     AMI.frame <- empty.frame
     AMI.frame[1,] <- NA
@@ -660,7 +660,7 @@ kpi.5.1 <- function(Mmm){
     
 kpi_source_helper(Mmm)
     
-    path <- grep("(.*kpi.8 .*)", source.kpi$filepath, value = TRUE)
+    path <- grep("(.*kpi.8 .*xls.?)", source.kpi$filepath, value = TRUE)
     
     DS_SDS.frame <- empty.frame
         DS_SDS.frame[1,] <- NA
@@ -1009,7 +1009,7 @@ kpi.8 <- function(Mmm, spec = "Overall", inst = "KWC"){
     
 kpi_source_helper(Mmm)
     
-    path <- grep("(.*kpi.8 .*)", source.kpi$filepath, value = TRUE)
+    path <- grep("(.*kpi.8 .*xls.?)", source.kpi$filepath, value = TRUE)
     
     DS_SDS.frame <- empty.frame
     DS_SDS.frame[1,] <- NA
@@ -1781,15 +1781,15 @@ tre.3 <- function(Mmm, MED, write_db = FALSE, backup = FALSE){
 kpi_source_helper(Mmm)
     
     if(MED==FALSE){
-        path.Atn <- grep("(.*tre.3.1.1 .*)", source.kpi$filepath, value = TRUE)
-        path.Adm <- grep("(.*tre.3.1.2 .*)", source.kpi$filepath, value = TRUE)
+        path.Atn <- grep("(.*tre.3.1.1 .*xls.?)", source.kpi$filepath, value = TRUE)
+        path.Adm <- grep("(.*tre.3.1.2 .*xls.?)", source.kpi$filepath, value = TRUE)
         
         ATN_T <- fuzzy_range(path.Atn, 67:229, 1:22)
         ADM_T <- fuzzy_range(path.Adm, 116:278, 1:22)
         
     }else if(MED==TRUE){
-        path.Atn <- grep("(.*tre.3.2.1 .*)", source.kpi$filepath, value = TRUE)
-        path.Adm <- grep("(.*tre.3.2.2 .*)", source.kpi$filepath, value = TRUE)
+        path.Atn <- grep("(.*tre.3.2.1 .*xls.?)", source.kpi$filepath, value = TRUE)
+        path.Adm <- grep("(.*tre.3.2.2 .*xls.?)", source.kpi$filepath, value = TRUE)
         
         ATN_T <- fuzzy_range(path.Atn, 71:193, 1:22)
         ADM_T <- fuzzy_range(path.Adm, 120:242, 1:22)
@@ -2246,7 +2246,7 @@ tre.6 <- function(Mmm){
     
 kpi_source_helper(Mmm)
     
-    path <- grep("(.*tre.6 .*)", source.kpi$filepath, value = TRUE)
+    path <- grep("(.*tre.6 .*xls.?)", source.kpi$filepath, value = TRUE)
     
     
     ASU_T <- fuzzy_range(path, 138:170, 1:27)
@@ -2351,7 +2351,7 @@ tre.7 <- function(Mmm){
     
 kpi_source_helper(Mmm)
     
-    path <- grep("(.*tre.7 .*)", source.kpi$filepath, value = TRUE)
+    path <- grep("(.*tre.7 .*xls.?)", source.kpi$filepath, value = TRUE)
     
     
     HIP_T <- fuzzy_range(path, 84:120, 1:39)
@@ -2582,7 +2582,7 @@ tre.9 <- function(Mmm){
     
 kpi_source_helper(Mmm)
     
-    path <- grep("(.*tre.9 .*)", source.kpi$filepath, value = TRUE)
+    path <- grep("(.*tre.9 .*xls.?)", source.kpi$filepath, value = TRUE)
     
     
     SDS_T <- fuzzy_range(path, 120:310, 1:15)

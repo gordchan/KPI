@@ -4,12 +4,9 @@
 #
 # March 2016
 
-input <- "source/Dec15/kpi.3.1.1 3849208_kpi311_(KPI)_AE_1st_Attendance.html"
-headerRow <- 1:2
-
 # read_Chtml -----------------------------------------------------------------------
 
-read_Chtml <- function (input, headerRow){
+read_Chtml <- function (input, hi){
     
     require(htmltab)
     require(XML)
@@ -28,7 +25,8 @@ read_Chtml <- function (input, headerRow){
     A <- 1:4 # Header
     B <- 5 # Name
     E <- (length(lines)-6):length(lines) # Disclaimer
-    D <- which(grepl("<table id", lines)):(E[1]-1) # Cream of the Crops Datatable    
+    
+    D <- which(grepl("<table id", lines))[length(which(grepl("<table id", lines)))]:(E[1]-1) # Cream of the Crops Datatable (if multiple datatable the last will be used)
     C <- 6:(D[1]-1) # Quere details
     
     lines <- lines[c(B, D)]
@@ -39,8 +37,10 @@ read_Chtml <- function (input, headerRow){
     
 # Parse and return dataframe
     
+    hi <<- hi
+
     parse <- htmlParse(lines, asText = TRUE)
-    df <- htmltab(parse, which = "//table[@id='datatable']", header = headerRow)
+    df <- htmltab(parse, which = "//table[@id='datatable']", header = hi)
     
 # Return df
     
