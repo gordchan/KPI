@@ -2591,6 +2591,7 @@ tre.9.html <- function(Mmm){
     
     SDS_Tr <- as.data.frame(lapply(SDS_Tr, as.numeric))
     SDS_Tr <- as.data.frame(lapply(SDS_Tr, function(x) x/100))
+    SDS_Tr <- as.data.frame(lapply(SDS_Tr, function(x) ifelse(x==0, NA, x)))
     
     row.names(SDS_Tr) <- row_names
     
