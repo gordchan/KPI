@@ -2726,7 +2726,7 @@ kpi_source_helper(Mmm)
     
     RAD_Tr <- RAD_T %>% filter(Modality==Mode)
     
-    row.names(RAD_Tr) <- RAD_Tr$Hosp
+    row_names <- RAD_Tr$Hosp
     
     # Remove excess columns
     
@@ -2735,7 +2735,9 @@ kpi_source_helper(Mmm)
     ## Convert to numeric datatype where applicable
     
     RAD_Tr <- as.data.frame(lapply(RAD_Tr, as.numeric))
+    RAD_Tr <- as.data.frame(lapply(RAD_Tr, function(x) ifelse(x==0, NA, x)))
     
+    row.names(RAD_Tr) <- row_names
     
     # Return dataframe
     
