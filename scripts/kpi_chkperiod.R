@@ -39,13 +39,17 @@ KPI_chkperiod_fx <- function(Mmm, regx, type, CurrentYear){
 # Get file paths & lists
 
     if(type=="CDARS"){
-        df <- raw_range(input = path, ri = 1:100, ci = 1, si = 1)
+        # df <- raw_range(input = path, ri = 1:100, ci = 1, si = 1)
+        lines <- readLines(con = path, n = 7)
+        lines <- lines[7]
     }else if(type=="EIS"){
         df <- raw_range(input = path, ri = 1:100, ci = 2, si = 1)
     }else if(type=="MIPO"){
         df <- raw_range(input = path, ri = 1:50, ci = 1, si = 2)
     }else if(type=="CDARS_Std"){
-        df <- raw_range(input = path, ri = 1:4, ci = 2, si = 1)
+        # df <- raw_range(input = path, ri = 1:4, ci = 2, si = 1)
+        lines <- readLines(con = path, n = 66)
+        lines <- lines[66]
     }else if(type=="RAD"){
         df <- raw_range(input = path, ri = 2:120, ci = 2, si = 1)
     }
@@ -56,7 +60,8 @@ KPI_chkperiod_fx <- function(Mmm, regx, type, CurrentYear){
     # Raw info to be validated
     
     if(type=="CDARS"){
-        cell <- df[which(grepl("(Date between .*[[:digit:]]{4})", df[,1])),1] # Single cell containing info
+        # cell <- df[which(grepl("(Date between .*[[:digit:]]{4})", df[,1])),1] # Single cell containing info
+        cell <- lines
     }else if(type=="EIS"){
         cell <- df[which(grepl("(Month:.*[[:digit:]]{2})", df[,1])),1] # Single cell containing info
     }else if(type=="MIPO"){
@@ -67,7 +72,8 @@ KPI_chkperiod_fx <- function(Mmm, regx, type, CurrentYear){
         cell <- cell %>% unique() %>% mutate(From = gsub("(.*?) - .*", "\\1", LabelPeriod), To = gsub(".*? - (.*)", "\\1", LabelPeriod)) %>%
             mutate(From = paste("1", From), To = paste("1", To))
     }else if(type=="CDARS_Std"){
-        cell <- df[1,1]
+        # cell <- df[1,1]
+        cell <- lines
     }else if(type=="RAD"){
         cell <- df
         names(cell) <- "LabelPeriod"
@@ -79,8 +85,8 @@ KPI_chkperiod_fx <- function(Mmm, regx, type, CurrentYear){
     # Parse info to date format
     
     if(type=="CDARS"){
-        start <- sub(".*?between (.*?) and.*", "\\1", cell)
-        end <- sub(".*?and (.*?)AND.*?", "\\1", cell)
+        start <- sub(".*?between ([0-9]{2}.[0-9]{2}.[0-9]{4}) and.*", "\\1", cell)
+        end <- sub(".*?Date between .* and ([0-9]{2}.[0-9]{2}.[0-9]{4}).*", "\\1", cell)
         
         start <- dmy(start)
         end <- dmy(end)
@@ -108,8 +114,8 @@ KPI_chkperiod_fx <- function(Mmm, regx, type, CurrentYear){
         start <- cell$start[row_i]
         
     }else if(type=="CDARS_Std"){
-        start <- sub("^From (.*?) to .*", "\\1", cell)
-        end <- sub(".*?to (.*) .*", "\\1", cell)
+        start <- sub(".*From (.*?) to .*", "\\1", cell)
+        end <- sub(".*to (.*) .*", "\\1", cell)
         
         start <- dmy(start)
         end <- dmy(end)

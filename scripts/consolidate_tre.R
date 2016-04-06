@@ -23,26 +23,26 @@ tre.2.1.a <- tre.2.1(Dates[1,], triage = "Tri P1")
 tre.2.1.b <- tre.2.1(Dates[1,], triage = "Tri P2")
 
 ## Standardised Admission Rate for Patient attending A&E
-tre.3.a <- tre.3(Dates[1,], MED = FALSE, write_db = TRUE, backup = TRUE)
-tre.3.b <- tre.3(Dates[1,], MED = TRUE, write_db = TRUE, backup = TRUE)
+tre.3.a <- tre.3.html(Dates[1,], MED = FALSE, write_db = TRUE, backup = TRUE)
+tre.3.b <- tre.3.html(Dates[1,], MED = TRUE, write_db = TRUE, backup = TRUE)
 
 ## MRSA Bacteremia in Acute Beds/1000 Acute Patient Days
-tre.4.a <- kpi.3.3(Dates[1,], trend = TRUE)
+tre.4.a <- kpi.3.3.html(Dates[1,], trend = TRUE)
 
 ## URR
 tre.5.a <- tre.5(Dates[1,])
 
 ## % of stroke ever treated in ASU
-tre.6.a <- tre.6(Dates[1,])
+tre.6.a <- tre.6.html(Dates[1,])
 
 ## % of hip fracture surgery done within 2 days
-tre.7.a <- tre.7(Dates[1,])
+tre.7.a <- tre.7.html(Dates[1,])
 
 ## % of AMI patients prescribed with Statin at discharge
 tre.8.a <- tre.8(Dates[1,])
 
 ## % of Day Surgery (DS) plus Same Day Surgery (SDS)
-tre.9.a <- tre.9(Dates[1,])
+tre.9.a <- tre.9.html(Dates[1,])
 
 ## Bed
 tre.10.a <- tre.10(Dates[1,], item = "Occ")
@@ -69,52 +69,19 @@ addDataFrame(tre.1.c, sheets.TRE$interface, col.names=FALSE, row.names=FALSE, st
 addDataFrame(tre.1.d, sheets.TRE$interface, col.names=FALSE, row.names=FALSE, startRow=27, startColumn=2)
 
 ## SOP Median WT
-for(i in 1:nrow(tre.2.a)){
-    temp_df <- t(as.numeric(tre.2.a[i,]))
-    temp_ri <- 35+i-1
-    addDataFrame(temp_df, sheets.TRE$interface, col.names=FALSE, row.names=FALSE, startRow=temp_ri, startColumn=2)
-}
-
-
-for(i in 1:nrow(tre.2.b)){
-    temp_df <- t(as.numeric(tre.2.b[i,]))
-    temp_ri <- 45+i-1
-    addDataFrame(temp_df, sheets.TRE$interface, col.names=FALSE, row.names=FALSE, startRow=temp_ri, startColumn=2)
-}
+addDataFrame(tre.2.a, sheets.TRE$interface, col.names=FALSE, row.names=FALSE, startRow=35, startColumn=2)
+addDataFrame(tre.2.b, sheets.TRE$interface, col.names=FALSE, row.names=FALSE, startRow=45, startColumn=2)
 
 ## % SOP patient seen within WT
-for(i in 1:nrow(tre.2.1.a)){
-    temp_df <- t(as.numeric(tre.2.1.a[i,]))
-    temp_ri <- 55+i-1
-    addDataFrame(temp_df, sheets.TRE$interface, col.names=FALSE, row.names=FALSE, startRow=temp_ri, startColumn=2)
-}
-
-
-for(i in 1:nrow(tre.2.1.b)){
-    temp_df <- t(as.numeric(tre.2.1.b[i,]))
-    temp_ri <- 65+i-1
-    addDataFrame(temp_df, sheets.TRE$interface, col.names=FALSE, row.names=FALSE, startRow=temp_ri, startColumn=2)
-}
+addDataFrame(tre.2.1.a, sheets.TRE$interface, col.names=FALSE, row.names=FALSE, startRow=55, startColumn=2)
+addDataFrame(tre.2.1.b, sheets.TRE$interface, col.names=FALSE, row.names=FALSE, startRow=65, startColumn=2)
 
 ## Standardised Admission Rate for Patient attending A&E
-for(i in 1:nrow(tre.3.a)){
-    temp_df <- t(as.numeric(tre.3.a[i,]))
-    temp_ri <- 75+i-1
-    addDataFrame(temp_df, sheets.TRE$interface, col.names=FALSE, row.names=FALSE, startRow=temp_ri, startColumn=2)
-}
-
-for(i in 1:nrow(tre.3.b)){
-    temp_df <- t(as.numeric(tre.3.b[i,]))
-    temp_ri <- 83+i-1
-    addDataFrame(temp_df, sheets.TRE$interface, col.names=FALSE, row.names=FALSE, startRow=temp_ri, startColumn=2)
-}
+addDataFrame(tre.3.a, sheets.TRE$interface, col.names=FALSE, row.names=FALSE, startRow=75, startColumn=2)
+addDataFrame(tre.3.b, sheets.TRE$interface, col.names=FALSE, row.names=FALSE, startRow=83, startColumn=2)
 
 ## MRSA Bacteremia in Acute Beds/1000 Acute Patient Days
-for(i in 1:10){
-    temp_df <- t(as.numeric(tre.4.a[i,]))
-    temp_ri <- 91+i-1
-    addDataFrame(temp_df, sheets.TRE$interface, col.names=FALSE, row.names=FALSE, startRow=temp_ri, startColumn=2)
-}
+addDataFrame(tre.4.a, sheets.TRE$interface, col.names=FALSE, row.names=FALSE, startRow=91, startColumn=2)
 
 ## URR
 temp_df <- t(as.numeric(tre.5.a[1,]))

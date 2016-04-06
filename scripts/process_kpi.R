@@ -210,14 +210,14 @@ kpi_source_helper(Mmm)
     
     # Replace NA with N.A. for production use in Excel
     
-    SOP_WT.prod <- data.frame(apply(SOP_WT.frame, 2, FUN = function(x){ifelse(is.na(x), "N.A.", x)}), stringsAsFactors = FALSE)
-    
-    for (i in 1:ncol(SOP_WT.prod)){
-        if ("N.A." %in% SOP_WT.prod[,i]){
-        } else {
-            SOP_WT.prod[,i] <- as.numeric(SOP_WT.prod[,i])
-        }
-    }
+#     SOP_WT.prod <- data.frame(apply(SOP_WT.frame, 2, FUN = function(x){ifelse(is.na(x), "N.A.", x)}), stringsAsFactors = FALSE)
+#     
+#     for (i in 1:ncol(SOP_WT.prod)){
+#         if ("N.A." %in% SOP_WT.prod[,i]){
+#         } else {
+#             SOP_WT.prod[,i] <- as.numeric(SOP_WT.prod[,i])
+#         }
+#     }
     
     # If SOP WT for 1st priority is 0, replace as <1
     
@@ -225,7 +225,7 @@ kpi_source_helper(Mmm)
     
     # Return production ready dataframe
     
-    SOP_WT.prod <- SOP_WT.prod[index,]
+    SOP_WT.prod <- SOP_WT.frame[index,]
     
     SOP_WT.prod
     
@@ -347,24 +347,28 @@ kpi_source_helper(Mmm)
     
 }
 
-kpi.3.3 <- function(Mmm, trend = FALSE, row){
+kpi.3.3.html <- function(Mmm, trend = FALSE){
     
     # Announce fx started
     
     message("[kpi.3.3] Function started ", Sys.time())
     
     require("tidyr")
+    require("htmltab")
     
-kpi_source_helper(Mmm)
+    kpi_source_helper(Mmm)
     
-    path <- grep("(.*kpi.3.3 .*xls.?)", source.kpi$filepath, value = TRUE)
+    path <- grep("(.*kpi.3.3 .*html)", source.kpi$filepath, value = TRUE)
     
     MRSA.frame <- empty.frame
     
-    MRSA <- fuzzy_range(path, 12:470, 1:8)
+    # Read html file
+    lines <- readLines(path)
+    MRSA <- suppressWarnings(htmltab(doc = lines, which = 3, header = 1))
     
-    names(MRSA) <- MRSA[1,]
-    MRSA <- MRSA[-1,] %>% select(Period, Hospital, contains("acute"))
+    
+    
+    MRSA <- MRSA %>% select(Period, Hospital, contains("acute"))
     
     names(MRSA) <- gsub("(^No. of )", "", names(MRSA))
     names(MRSA) <- gsub("(^.*/.*$)", "per_1000_PD", names(MRSA))
@@ -397,20 +401,16 @@ kpi_source_helper(Mmm)
         MRSA.KWC.req <- MRSA.req %>% filter(Hospital=="KWC")
         MRSA.HA.req <- MRSA.req %>% filter(Hospital=="HA")
         MRSA.req <- MRSA.req %>% filter(Hospital!="HA" & Hospital!="KWC") #%>%
-            #filter(Hospital!="KCH" & Hospital!="WTS")
+        #filter(Hospital!="KCH" & Hospital!="WTS")
         
         
         MRSA.req <- bind_rows(MRSA.req, MRSA.KWC.req, MRSA.HA.req)
         
         rownames(MRSA.req) <- MRSA.req$Hospital
         
-        MRSA.req <- MRSA.req %>% select(-Hospital)
+        MRSA.prod <- MRSA.req %>% select(-Hospital)
         
-        # Replace NA with ""
-        
-        MRSA.req[is.na(MRSA.req)] <- ""
-        
-        MRSA.prod <- MRSA.req
+        MRSA.prod <- as.data.frame(lapply(MRSA.prod, as.numeric))
         
     }else{
         
@@ -435,16 +435,9 @@ kpi_source_helper(Mmm)
             }
         }
         
-        # Replace NA with N.A. for Excel use
+        # Return numeric dataframe
         
-        MRSA.prod <- data.frame(lapply(MRSA.frame, FUN = function(x){ifelse(is.na(x), "N.A.", x)}), stringsAsFactors = FALSE)
-        
-        for (i in 1:ncol(MRSA.prod)){
-            if ("N.A." %in% MRSA.prod[,i]){
-            } else {
-                MRSA.prod[,i] <- as.numeric(MRSA.prod[,i])
-            }
-        }
+        MRSA.prod <- as.data.frame(lapply(MRSA.frame, as.numeric))
         
     }
     
@@ -794,12 +787,12 @@ kpi_source_helper(Mmm)
     
     # Replace NA with N.A. for use in Excel
 
-    Bed.prod <- lapply(Bed.frame, function(x){ifelse(is.na(x), "N.A.", x)})
-        Bed.prod <- data.frame(Bed.prod)
+#     Bed.prod <- lapply(Bed.frame, function(x){ifelse(is.na(x), "N.A.", x)})
+#         Bed.prod <- data.frame(Bed.prod)
     
     # Return production dataframe
     
-    Bed.prod
+    Bed.frame
     
 }
     
@@ -1159,20 +1152,20 @@ kpi_source_helper(Mmm)
     
     # Rounding to 1 decimal place
     
-    ALOS.frame <- format(ALOS.frame, nsmall = 1)
+    # ALOS.frame <- format(ALOS.frame, nsmall = 1)
     
     # Replace NA with "" for use in Excel
     
-    if (nrow(ALOS.frame)>1){
-        ALOS.prod <- data.frame(apply(ALOS.frame, 2, FUN = function(x){ifelse(grepl("NA", x), "", x)}), stringsAsFactors = FALSE)
-    } else if (nrow(ALOS.frame)==1){
-        ALOS.prod <- lapply(ALOS.frame, function(x){ifelse(grepl("NA", x), "", x)})
-        ALOS.prod <- data.frame(ALOS.prod)
-    }
+#     if (nrow(ALOS.frame)>1){
+#         ALOS.prod <- data.frame(apply(ALOS.frame, 2, FUN = function(x){ifelse(grepl("NA", x), "", x)}), stringsAsFactors = FALSE)
+#     } else if (nrow(ALOS.frame)==1){
+#         ALOS.prod <- lapply(ALOS.frame, function(x){ifelse(grepl("NA", x), "", x)})
+#         ALOS.prod <- data.frame(ALOS.prod)
+#     }
     
     # Return production ready dataframe
     
-    ALOS.prod
+    ALOS.frame
 }
 
 # kpi.3.4 & 10 Quality - Unplanned Readmission Rate within 28 days for g --------
@@ -1220,21 +1213,21 @@ kpi_source_helper(Mmm)
             URR.frame[,i] <- sapply(URR.frame[,i], FUN = function(x){ifelse(is.numeric(x), x/100, x)})
         }
     }else{
-        URR.frame <- format(URR.frame, nsmall = 1)
+#         URR.frame <- format(URR.frame, nsmall = 1)
     }
     
     # Replace NA with "" for use in Excel
-    
-    if (nrow(URR.frame)>1){
-        URR.prod <- data.frame(apply(URR.frame, 2, FUN = function(x){ifelse(grepl("NA", x), "", x)}), stringsAsFactors = FALSE)
-    } else if (nrow(URR.frame)==1){
-        URR.prod <- lapply(URR.frame, function(x){ifelse(is.na(x), "", x)})
-        URR.prod <- data.frame(URR.prod)
-    }
+#     
+#     if (nrow(URR.frame)>1){
+#         URR.prod <- data.frame(apply(URR.frame, 2, FUN = function(x){ifelse(grepl("NA", x), "", x)}), stringsAsFactors = FALSE)
+#     } else if (nrow(URR.frame)==1){
+#         URR.prod <- lapply(URR.frame, function(x){ifelse(is.na(x), "", x)})
+#         URR.prod <- data.frame(URR.prod)
+#     }
     
     # Return production ready dataframe
     
-    URR.prod
+    URR.frame
 }
 
 
@@ -1521,11 +1514,9 @@ kpi_source_helper(Mmm)
     
     ## Convert to numeric datatype where applicable
     
-    for (i in 1:12){
-        AE_Tr[,i] <- sapply(AE_Tr[,i], as.numeric)
-        AE_Tr[,i] <- AE_Tr[,i]/100
-    }
-    
+        AE_Tr <- as.data.frame(lapply(AE_Tr, as.numeric))
+        AE_Tr <- as.data.frame(lapply(AE_Tr, function(x) x/100))
+
     # Return dataframe
     
     AE_Tr
@@ -1635,11 +1626,9 @@ kpi_source_helper(Mmm)
     
     ## Convert to numeric datatype where applicable
     
-    for (i in 1:12){
-        SOP_Tr[,i] <- sapply(SOP_Tr[,i], as.numeric)
-        SOP_Tr[,i] <- sapply(SOP_Tr[,i], ceiling)
-    }
-    
+        SOP_Tr <- as.data.frame(lapply(SOP_Tr, as.numeric))
+        SOP_Tr <- as.data.frame(lapply(SOP_Tr, ceiling))
+
     # Return dataframe
     
     SOP_Tr
@@ -1756,11 +1745,9 @@ kpi_source_helper(Mmm)
     SOP_Tr <- SOP_Tr %>% select(-Inst, -Triage)
     
     ## Convert to numeric datatype where applicable
-    
-    for (i in 1:12){
-        SOP_Tr[,i] <- sapply(SOP_Tr[,i], as.numeric)
-        SOP_Tr[,i] <- sapply(SOP_Tr[,i], function(x)(x/100))
-    }
+
+    SOP_Tr <- as.data.frame(lapply(SOP_Tr, as.numeric))
+    SOP_Tr <- as.data.frame(lapply(SOP_Tr, function(x) x/100))
     
     # Return dataframe
     
@@ -1768,37 +1755,34 @@ kpi_source_helper(Mmm)
     
 }
 
-
-
 # tre.3 A&E Standardised Admission Rate ------------------------------------
 
-tre.3 <- function(Mmm, MED, write_db = FALSE, backup = FALSE){
+tre.3.html <- function(Mmm, MED, write_db = FALSE, backup = FALSE){
     
     # Announce fx started
     
     message("[tre.3] Function started ", Sys.time())
     
-kpi_source_helper(Mmm)
+    require(reshape2)
+    
+    kpi_source_helper(Mmm)
     
     if(MED==FALSE){
-        path.Atn <- grep("(.*tre.3.1.1 .*xls.?)", source.kpi$filepath, value = TRUE)
-        path.Adm <- grep("(.*tre.3.1.2 .*xls.?)", source.kpi$filepath, value = TRUE)
+        path.Atn <- grep("(.*tre.3.1.1 .*html)", source.kpi$filepath, value = TRUE)
+        path.Adm <- grep("(.*tre.3.1.2 .*html)", source.kpi$filepath, value = TRUE)
         
-        ATN_T <- fuzzy_range(path.Atn, 67:229, 1:22)
-        ADM_T <- fuzzy_range(path.Adm, 116:278, 1:22)
+        ATN_T <- read_Chtml(path.Atn, 1:2)
+        ADM_T <- read_Chtml(path.Adm, 1:2)
         
     }else if(MED==TRUE){
-        path.Atn <- grep("(.*tre.3.2.1 .*xls.?)", source.kpi$filepath, value = TRUE)
-        path.Adm <- grep("(.*tre.3.2.2 .*xls.?)", source.kpi$filepath, value = TRUE)
+        path.Atn <- grep("(.*tre.3.2.1 .*html)", source.kpi$filepath, value = TRUE)
+        path.Adm <- grep("(.*tre.3.2.2 .*html)", source.kpi$filepath, value = TRUE)
         
-        ATN_T <- fuzzy_range(path.Atn, 71:193, 1:22)
-        ADM_T <- fuzzy_range(path.Adm, 120:242, 1:22)
+        ATN_T <- read_Chtml(path.Atn, 1:2)
+        ADM_T <- read_Chtml(path.Adm, 1:2)
     }
     
     # Name columns
-    
-    names(ATN_T) <- ATN_T[1,]
-    names(ADM_T) <- ADM_T[1,]
     
     names(ATN_T)[1] <- "Age"
     names(ADM_T)[1] <- "Age"
@@ -1815,13 +1799,13 @@ kpi_source_helper(Mmm)
     names(ATN_T)[ncol(ATN_T)] <- "HA"
     names(ADM_T)[ncol(ADM_T)] <- "HA"
     
+    names(ATN_T) <- gsub(" >> No. of A&E 1st Attendances", "", names(ATN_T))
+    names(ADM_T) <- gsub(" >> No. of A&E 1st Attendances", "", names(ADM_T))
+    
     # Filter unused rows
     
-    ATN_T <- ATN_T[3:nrow(ATN_T),]
-    ADM_T <- ADM_T[3:nrow(ADM_T),]
-    
-    ATN_T <- ATN_T %>% filter(!is.na(Sex))
-    ADM_T <- ADM_T %>% filter(!is.na(Sex))
+    ATN_T <- ATN_T %>% filter(Sex!="Grand Total :")
+    ADM_T <- ADM_T %>% filter(Sex!="Grand Total :")
     
     # Use numbers to code groups
     
@@ -2079,12 +2063,12 @@ kpi_source_helper(Mmm)
             if(write_db==TRUE){
                 # db backup
                 if(backup==TRUE){
-                dir.create(file.path("source", "db", "backup", Dates[1,]), showWarnings = FALSE)
-                file.copy(from = file.path("source", "db", "tre.3.1.db.csv"),
-                          to = file.path("source", "db", "backup", Dates[1,], "tre.3.1.db.csv"),
-                          overwrite = TRUE)    
+                    dir.create(file.path("source", "db", "backup", Dates[1,]), showWarnings = FALSE)
+                    file.copy(from = file.path("source", "db", "tre.3.1.db.csv"),
+                              to = file.path("source", "db", "backup", Dates[1,], "tre.3.1.db.csv"),
+                              overwrite = TRUE)    
                 }
-
+                
                 db <- bind_cols(db, RATE_Tr)
                 write.csv(db, file.path("source", "db", "tre.3.1.db.csv"), row.names = FALSE)
             }
@@ -2106,7 +2090,7 @@ kpi_source_helper(Mmm)
             }
             
         }
-
+        
         
     }else if(MED==TRUE){
         
@@ -2225,10 +2209,8 @@ kpi_source_helper(Mmm)
     
     ## Convert to numeric datatype where applicable
     
-    for (i in 1:12){
-        URR_Tr[,i] <- sapply(URR_Tr[,i], as.numeric)
-        URR_Tr[,i] <- sapply(URR_Tr[,i], function(x)(x/100))
-    }
+    URR_Tr <- as.data.frame(lapply(URR_Tr, as.numeric))
+    URR_Tr <- as.data.frame(lapply(URR_Tr, function(x) x/100))
     
     # Return dataframe
     
@@ -2238,29 +2220,25 @@ kpi_source_helper(Mmm)
 
 # tre.6 Stroke --------------------------------------------------------------
 
-tre.6 <- function(Mmm){
+tre.6.html <- function(Mmm){
     
     # Announce fx started
     
     message("[tre.6] Function started ", Sys.time())
     
-kpi_source_helper(Mmm)
+    kpi_source_helper(Mmm)
     
-    path <- grep("(.*tre.6 .*xls.?)", source.kpi$filepath, value = TRUE)
+    path <- grep("(.*tre.6 .*html)", source.kpi$filepath, value = TRUE)
     
     
-    ASU_T <- fuzzy_range(path, 138:170, 1:27)
+    ASU_T <- read_Chtml(path, 1:3)
     
     index <- c(1, 2, 3, 3+11, 3+12, ncol(ASU_T)-1)
     
     
     # Name columns
     
-    names(ASU_T) <- ASU_T[2,]
-    
-    for(i in index[3]:index[4]){
-        names(ASU_T)[i] <- paste(ASU_T[2,i], "ASU", sep="")
-    }
+    names(ASU_T) <- gsub(" >> No. of Episodes", "", names(ASU_T))
     
     names(ASU_T)[1] <- "Cluster"
     names(ASU_T)[2] <- "Inst"
@@ -2293,7 +2271,7 @@ kpi_source_helper(Mmm)
     
     # Add Month variable
     
-    ASU_Tr$Month <- gsub("ASU", "", ASU_Tr$variable)
+    ASU_Tr$Month <- gsub(".*([0-9]{4}-[0-9]{2})", "\\1", ASU_Tr$variable)
     ASU_Tr$value <-sapply(ASU_Tr$value, function(x)as.numeric(x))
     ASU_Tr$ASU <- sapply(ASU_Tr$variable, function(x)if(grepl("ASU", x)){"Treated"}else{"NotTreated"})
     
@@ -2343,38 +2321,25 @@ kpi_source_helper(Mmm)
 
 # tre.7 Fracture Hip -------------------------------------------------------
 
-tre.7 <- function(Mmm){
+tre.7.html <- function(Mmm){
     
     # Announce fx started
     
     message("[tre.7] Function started ", Sys.time())
     
-kpi_source_helper(Mmm)
+    kpi_source_helper(Mmm)
     
-    path <- grep("(.*tre.7 .*xls.?)", source.kpi$filepath, value = TRUE)
+    path <- grep("(.*tre.7 .*html)", source.kpi$filepath, value = TRUE)
     
     
-    HIP_T <- fuzzy_range(path, 84:120, 1:39)
+    HIP_T <- read_Chtml(path, 1:3)
     
     index <- c(1, 2, 3, 3+11, 3+12, 3+23, 3+24, ncol(HIP_T)-1)
     
     
     # Name columns
     
-    names(HIP_T) <- HIP_T[2,]
-    
-    for(i in index[3]:index[4]){
-        names(HIP_T)[i] <- paste(HIP_T[2,i], "D2", sep="")
-    }
-    
-    for(i in index[5]:index[6]){
-        names(HIP_T)[i] <- paste(HIP_T[2,i], "D4", sep="")
-    }
-    
-    for(i in index[7]:index[8]){
-        names(HIP_T)[i] <- paste(HIP_T[2,i], "O", sep="")
-    }
-    
+    names(HIP_T) <- gsub(" >> No. of Episodes", "", names(HIP_T))
     
     names(HIP_T)[1] <- "Cluster"
     names(HIP_T)[2] <- "Inst"
@@ -2406,11 +2371,10 @@ kpi_source_helper(Mmm)
     
     # Add Month variable
     
-    HIP_Tr$Month <- gsub("D2", "", HIP_Tr$variable)
-    HIP_Tr$Month <- gsub("D4", "", HIP_Tr$Month)
-    HIP_Tr$Month <- gsub("O", "", HIP_Tr$Month)
+    HIP_Tr$Month <- gsub(".* >> ([0-9]{4}-[0-9]{2})", "\\1", HIP_Tr$variable)
+    
     HIP_Tr$value <-sapply(HIP_Tr$value, function(x)as.numeric(x))
-    HIP_Tr$Time <- sapply(HIP_Tr$variable, function(x)if(grepl("D2", x)){"Within"}else{"Outside"})
+    HIP_Tr$Time <- sapply(HIP_Tr$variable, function(x)if(grepl("within", x)){"Within"}else{"Outside"})
     
     
     HIP_Tr <- HIP_Tr %>% select(Order, Inst, Month, Time, value) %>% dcast(Order + Inst + Month ~ Time, value.var = "value", fun.aggregate = sum, na.rm = TRUE) %>% mutate(Total=Within + Outside)
@@ -2574,25 +2538,20 @@ kpi_source_helper(Mmm)
 
 # tre.9 DS +SDS ------------------------------------------------------------
 
-tre.9 <- function(Mmm){
+tre.9.html <- function(Mmm){
     
     # Announce fx started
     
     message("[tre.9] Function started ", Sys.time())
     
-kpi_source_helper(Mmm)
+    kpi_source_helper(Mmm)
     
-    path <- grep("(.*tre.9 .*xls.?)", source.kpi$filepath, value = TRUE)
+    path <- grep("(.*tre.9 .*html)", source.kpi$filepath, value = TRUE)
     
     
-    SDS_T <- fuzzy_range(path, 120:310, 1:15)
-    i_row_start <- which(grepl("Total$", SDS_T[,1]))
-    
-    SDS_T <- SDS_T[i_row_start:nrow(SDS_T),]
+    SDS_T <- read_Chtml(path, 1:2)
     
     # Name columns
-    
-    names(SDS_T) <- SDS_T[2,]
     
     names(SDS_T)[1] <- "Cluster"
     names(SDS_T)[2] <- "Inst"
@@ -2627,11 +2586,8 @@ kpi_source_helper(Mmm)
     
     ## Convert to numeric datatype where applicable
     
-    for (i in 1:12){
-        SDS_Tr[,i] <- sapply(SDS_Tr[,i], as.numeric)
-        SDS_Tr[,i] <- sapply(SDS_Tr[,i], function(x)(x/100))
-    }
-    
+    SDS_Tr <- as.data.frame(lapply(SDS_Tr, as.numeric))
+    SDS_Tr <- as.data.frame(lapply(SDS_Tr, function(x) x/100))
     
     # Return dataframe
     
@@ -2709,16 +2665,13 @@ kpi_source_helper(Mmm)
     BED_Tr <- BED_Tr %>% select(-Inst, -Item)
     
     ## Convert to numeric datatype where applicable
-    
-    for (i in 1:12){
-        BED_Tr[,i] <- sapply(BED_Tr[,i], as.numeric)
+
+    BED_Tr <- as.data.frame(lapply(BED_Tr, as.numeric))
         
-        if(item=="Occ"){
-            BED_Tr[,i] <- sapply(BED_Tr[,i], function(x)(x/100))
-        }
-        
+    if(item=="Occ"){
+        BED_Tr <- as.data.frame(lapply(BED_Tr, function(x) x/100))
     }
-    
+
     # Return dataframe
     
     BED_Tr
@@ -2781,9 +2734,7 @@ kpi_source_helper(Mmm)
     
     ## Convert to numeric datatype where applicable
     
-    for (i in 1:12){
-        RAD_Tr[,i] <- sapply(RAD_Tr[,i], as.numeric)
-    }
+    RAD_Tr <- as.data.frame(lapply(RAD_Tr, as.numeric))
     
     
     # Return dataframe

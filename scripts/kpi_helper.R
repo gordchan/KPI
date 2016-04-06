@@ -35,50 +35,50 @@ kpi_source_helper <- function(Mmm){
     
     # Clinical KPI
     
-    source.HA.kpi <- read.xlsx("source/KPI items.xlsx",
-                               sheetName = "KPI",
-                               colIndex = 5,
-                               stringsAsFactors = FALSE)
-    names(source.HA.kpi) <- "Query.Name"
+#     source.HA.kpi <- read.xlsx("source/KPI items.xlsx",
+#                                sheetName = "KPI",
+#                                colIndex = 5,
+#                                stringsAsFactors = FALSE)
+#     names(source.HA.kpi) <- "Query.Name"
     
-    source.kpi <<- data.frame(filename = list.files(file.path("source", Mmm), pattern = ".*\\.xls.?")) %>%
+    source.kpi <<- data.frame(filename = list.files(file.path("source", Mmm), pattern = ".*\\.(xls.?|html)")) %>%
         mutate(filepath = file.path("source", Mmm, filename)) ## USED BY OTHER fx
     
     # KPI Trend
-    source.tre <- read.xlsx("source/KPI items.xlsx",
-                            sheetName = "KPI",
-                            colIndex = 4,
-                            stringsAsFactors = FALSE)
+#     source.tre <- read.xlsx("source/KPI items.xlsx",
+#                             sheetName = "KPI",
+#                             colIndex = 4,
+#                             stringsAsFactors = FALSE)
+#     
+#     source.HA.tre <- read.xlsx("source/KPI items.xlsx",
+#                                sheetName = "KPI",
+#                                colIndex = 5,
+#                                stringsAsFactors = FALSE)
+#     names(source.HA.tre) <- "Query.Name"
     
-    source.HA.tre <- read.xlsx("source/KPI items.xlsx",
-                               sheetName = "KPI",
-                               colIndex = 5,
-                               stringsAsFactors = FALSE)
-    names(source.HA.tre) <- "Query.Name"
-    
-    source.tre <- bind_rows(source.tre, source.HA.tre)
-    
-    source.tre <<- source.tre %>% filter(!is.na(Query.Name)) %>%
-        distinct(Query.Name) %>% arrange(Query.Name) %>%
-        mutate(filename = paste(Query.Name, ".xlsx", sep = "")) %>%
-        mutate(filepath = file.path("source", Mmm, filename))    
+#     source.tre <- bind_rows(source.tre, source.HA.tre)
+#     
+#     source.tre <<- source.tre %>% filter(!is.na(Query.Name)) %>%
+#         distinct(Query.Name) %>% arrange(Query.Name) %>%
+#         mutate(filename = paste(Query.Name, ".xlsx", sep = "")) %>%
+#         mutate(filepath = file.path("source", Mmm, filename))    
     
     # SOP KPI
-    source.sop <- read.xlsx("source/KPI items.xlsx",
-                            sheetName = "KPI",
-                            colIndex = 4,
-                            stringsAsFactors = FALSE)
-    
-    source.HA.sop <- read.xlsx("source/KPI items.xlsx",
-                               sheetName = "KPI",
-                               colIndex = 5,
-                               stringsAsFactors = FALSE)
-    names(source.HA.sop) <- "Query.Name"
-    
-    source.sop <- bind_rows(source.sop, source.HA.sop)
-    
-    source.sop <<- source.sop %>% filter(!is.na(Query.Name)) %>%
-        distinct(Query.Name) %>% arrange(Query.Name) %>%
-        mutate(filename = paste(Query.Name, ".xlsx", sep = "")) %>%
-        mutate(filepath = file.path("source", Mmm, filename))    
+#     source.sop <- read.xlsx("source/KPI items.xlsx",
+#                             sheetName = "KPI",
+#                             colIndex = 4,
+#                             stringsAsFactors = FALSE)
+#     
+#     source.HA.sop <- read.xlsx("source/KPI items.xlsx",
+#                                sheetName = "KPI",
+#                                colIndex = 5,
+#                                stringsAsFactors = FALSE)
+#     names(source.HA.sop) <- "Query.Name"
+#     
+#     source.sop <- bind_rows(source.sop, source.HA.sop)
+#     
+#     source.sop <<- source.sop %>% filter(!is.na(Query.Name)) %>%
+#         distinct(Query.Name) %>% arrange(Query.Name) %>%
+#         mutate(filename = paste(Query.Name, ".xlsx", sep = "")) %>%
+#         mutate(filepath = file.path("source", Mmm, filename))    
 }

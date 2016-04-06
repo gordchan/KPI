@@ -7,8 +7,8 @@ source("scripts/std_filename.R")
 
 # Input reporting year & month
 
-y <- 2015
-m <- 12
+y <- 2016
+m <- 1
 
 py <- y-1
 
@@ -21,4 +21,4 @@ std_filename(py, m)
 
 # Main Process
 
-kpi_report(y, m)
+KPI_report(y, m)

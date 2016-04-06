@@ -47,8 +47,8 @@ KPI_filechk <- function(y = 2015, m = 11){
     fault_2 <- FALSE
     fault_3 <- FALSE
     
-    filelist.Current <- list.files(file.path("source", Dates[1,]), pattern = ".*\\.xls.?")
-    filelist.Previous <- list.files(file.path("source", Dates[3,]), pattern = ".*\\.xls.?")
+    filelist.Current <- list.files(file.path("source", Dates[1,]), pattern = ".*\\.(xls.?|html)")
+    filelist.Previous <- list.files(file.path("source", Dates[3,]), pattern = ".*\\.(xls.?|html)")
     
     ## List of kpi files to check
     

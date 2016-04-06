@@ -80,7 +80,7 @@ f_RAD <- file.path("source", Dates[1,], "RAD")
 fs_CDARS <- data.frame(filename_ori = list.files(f_CDARS),
                      filename_to = NA,
                      stringsAsFactors = FALSE)
-fs_CDARS <- fs_CDARS %>% filter(grepl("xlsx$", filename_ori))
+# fs_CDARS <- fs_CDARS %>% filter(grepl("xlsx$", filename_ori))
 
 fs_CDARS$filename_to <- fs_CDARS$filename_ori # Get kpi/tre numbers
         fs_CDARS$filename_to <- sub(".*_kpi([1-9]+).*", "kpi.\\1", fs_CDARS$filename_to)
@@ -93,7 +93,11 @@ fs_CDARS$filename_to <- fs_CDARS$filename_ori # Get kpi/tre numbers
 for (i in 1:nrow(fs_CDARS)){
     fs_CDARS$filename_to[i] <- paste(fs_CDARS$filename_to[i], fs_CDARS$filename_ori[i])
 }
+
+# Copy xls files as HTML files
         
+        fs_CDARS$filename_to <- sub("xls$", "html", fs_CDARS$filename_to)
+
         
 for (i in 1:nrow(fs_CDARS)){
     

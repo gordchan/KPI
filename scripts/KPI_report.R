@@ -7,13 +7,13 @@
 # Aug 2015
 
 
-kpi_report <- function(y = 2015, m = 10){
+KPI_report <- function(y = 2015, m = 10){
 
 # Log ---------------------------------------------------------------------
 ptm <- proc.time() # Start timer
 
 print(paste("Job Started:", Sys.time()))
-    
+
 fileConn<-"Log.txt"
 cat(paste("Job Started:", Sys.time()), file=fileConn, append=TRUE, sep = "\n")
     
@@ -30,6 +30,7 @@ source("scripts/kpi_chkperiod.R")
 
 source("scripts/read_xlsx.R")
 source("scripts/process_kpi.R")
+source("scripts/process_kpi_html.R")
 
 source("scripts/kpi_helper.R")
 
