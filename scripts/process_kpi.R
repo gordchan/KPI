@@ -2578,16 +2578,21 @@ tre.9.html <- function(Mmm){
     
     # Move Inst to row names
     
-    row.names(SDS_T) <- SDS_T$Inst
+    row_names <- SDS_T$Inst
     
     # Remove excess columns
     
     SDS_Tr <- SDS_T %>% select(-Order, -Inst, -RowSum)
     
+    # Rename columns
+    names(SDS_Tr) <- gsub("([0-9]{4}-[0-9]{2}).*", "\\1", names(SDS_Tr))
+    
     ## Convert to numeric datatype where applicable
     
     SDS_Tr <- as.data.frame(lapply(SDS_Tr, as.numeric))
     SDS_Tr <- as.data.frame(lapply(SDS_Tr, function(x) x/100))
+    
+    row.names(SDS_Tr) <- row_names
     
     # Return dataframe
     
