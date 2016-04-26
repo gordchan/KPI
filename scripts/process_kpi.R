@@ -2463,7 +2463,7 @@ kpi_source_helper(Mmm)
     # Parse period with lubridate
 
     AMI_Tr <- AMI_Tr %>% mutate(PeriodMonth = gsub("([a-zA-Z]{3}) .*", "\\1", Period)) %>% mutate(PeriodYear = gsub("[a-zA-Z]{3} (.*)", "\\1", Period))
-    AMI_Tr$PeriodMonth <- match(test$PeriodMonth, month.abb)
+    AMI_Tr$PeriodMonth <- match(AMI_Tr$PeriodMonth, month.abb)
     AMI_Tr <- AMI_Tr %>% mutate(PeriodStart = paste(1, PeriodMonth, PeriodYear, sep="-"))
     
     AMI_Tr$PeriodStart <- dmy(AMI_Tr$PeriodStart)
