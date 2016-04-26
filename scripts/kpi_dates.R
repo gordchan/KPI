@@ -27,14 +27,18 @@ KPI_dates <- function(y, m){
     day(eom) <- day(eom) -1
     
     som <- eom # Find start date of reporting period this year
-    year(som) <- year(som) -1
     day(som) <- day(som) +1
-    
+    year(som) <- year(som) -1
     
     date.period <- paste(day(som), month(som, label = TRUE, abbr = TRUE), year(som), "-", day(eom), month(eom, label = TRUE, abbr = TRUE), year(eom))
     date.eom <- paste(day(eom), "/", month(eom), "/", year(eom), sep = "")
     
-    date.eom.prev <- paste(day(eom), "/", month(eom), "/", year(eom)-1, sep = "")
+    eom.py <- eom
+    day(eom.py) <- day(eom.py) + 1
+    year(eom.py) <- year(eom.py) -1
+    day(eom.py) <- day(eom.py) - 1
+    
+    date.eom.prev <- paste(day(eom.py), "/", month(eom.py), "/", year(eom.py), sep = "")
     
     df <- data.frame(dates = c(to.MmmYY, # 1 Reporting month
                                to.MmmYY_, # 2 Reporting month w/ leading zero

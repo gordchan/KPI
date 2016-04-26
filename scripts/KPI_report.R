@@ -24,19 +24,11 @@ require("dplyr")
 require("reshape2")
 require("lubridate")
 
-source("scripts/kpi_dates.R")
-source("scripts/kpi_filechk.R")
-source("scripts/kpi_chkperiod.R")
-
 source("scripts/read_xlsx.R")
 source("scripts/process_kpi.R")
 source("scripts/process_kpi_html.R")
 
 source("scripts/kpi_helper.R")
-
-# Reporting period --------------------------------------------------------
-
-KPI_dates(y, m)
 
 
 # Validation  -------------------------------------------------
@@ -49,16 +41,7 @@ if(nchar(y)!=4 | !is.numeric(y)){
     return("Please input a month in 1 or 2 integers")
 }
 
-# Source file completness
-
-KPI_filechk(y, m)
-
-# Check source file sample period
-
-KPI_chkperiod(Dates[1,], CurrentYear = TRUE)
-KPI_chkperiod(Dates[3,], CurrentYear = FALSE)
-
-# Successful validation
+# Successful validation ----------
 
 cat(paste("Validation successful, generating report now", Sys.time()), file=fileConn, append=TRUE, sep = "\n")
 message("Validation successful, generating report...")

@@ -33,8 +33,8 @@ KPI_chkperiod_fx <- function(Mmm, regx, type, CurrentYear){
     
     
     kpi_start <- kpi_end
-        year(kpi_start) <- year(kpi_start) -1
-            day(kpi_start) <- day(kpi_start) +1
+        day(kpi_start) <- day(kpi_start) +1
+            year(kpi_start) <- year(kpi_start) -1
     
 # Get file paths & lists
 
@@ -166,7 +166,9 @@ KPI_chkperiod <- function(Mmm, CurrentYear){
     }
 
     
+    # Successful Validation
     
+    return("CHECKED: ALL PERIOD CHECKED AND READY TO GO")
     
     
 }

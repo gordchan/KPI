@@ -80,7 +80,7 @@ KPI_filechk <- function(y = 2015, m = 11){
         if(sum(grepl(regx_list[i], filelist.Previous))==0){
             FAULT <- TRUE
             fault_3 <- TRUE
-            warning("ERROR: KPI source file ", regx_list[i,], "in ", Dates[3,], " not uploaded.")
+            warning("ERROR: KPI source file ", regx_list[i], "in ", Dates[3,], " not uploaded.")
         }
     }
     
