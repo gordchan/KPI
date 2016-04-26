@@ -17,8 +17,8 @@ KPI_chkperiod_fx <- function(Mmm, regx, type, CurrentYear){
     
 # Get required info -------------------------------------------------------------
 
-    start <- dmy("1 Jan 1987")
-    end <- dmy("1 Jan 1987")
+    start <- dmy("1-1-1987")
+    end <- dmy("1-1-1987")
     
     
     kpi_source_helper(Mmm)
@@ -70,7 +70,11 @@ KPI_chkperiod_fx <- function(Mmm, regx, type, CurrentYear){
         names(cell) <- "LabelPeriod"
         
         cell <- cell %>% unique() %>% mutate(From = gsub("(.*?) - .*", "\\1", LabelPeriod), To = gsub(".*? - (.*)", "\\1", LabelPeriod)) %>%
-            mutate(From = paste("1", From), To = paste("1", To))
+            mutate(FromM = gsub("([a-zA-Z]{3}) ([0-9]{4})", "\\1", From), ToM = gsub("([a-zA-Z]{3}) ([0-9]{4})", "\\1", To)) %>%
+            mutate(FromM = match(FromM, month.abb), ToM = match(ToM, month.abb)) %>%
+            mutate(FromY = gsub("([a-zA-Z]{3}) ([0-9]{4})", "\\2", From), ToY = gsub("([a-zA-Z]{3}) ([0-9]{4})", "\\2", To)) %>%
+            mutate(From = paste("1", FromM, FromY, sep = "-"), To = paste("1", ToM, ToY, sep = "-"))
+        
     }else if(type=="CDARS_Std"){
         # cell <- df[1,1]
         cell <- lines
@@ -79,7 +83,10 @@ KPI_chkperiod_fx <- function(Mmm, regx, type, CurrentYear){
         names(cell) <- "LabelPeriod"
         
         cell <- cell %>% unique() %>% mutate(From = gsub("(.*?) - .*", "\\1", LabelPeriod), To = gsub(".*? - (.*)", "\\1", LabelPeriod)) %>%
-            mutate(From = paste("1", From), To = paste("1", To))
+            mutate(FromM = gsub("([a-zA-Z]{3}) ([0-9]{4})", "\\1", From), ToM = gsub("([a-zA-Z]{3}) ([0-9]{4})", "\\1", To)) %>%
+            mutate(FromM = match(FromM, month.abb), ToM = match(ToM, month.abb)) %>%
+            mutate(FromY = gsub("([a-zA-Z]{3}) ([0-9]{4})", "\\2", From), ToY = gsub("([a-zA-Z]{3}) ([0-9]{4})", "\\2", To)) %>%
+            mutate(From = paste("1", FromM, FromY, sep = "-"), To = paste("1", ToM, ToY, sep = "-"))
     }
 
     # Parse info to date format
@@ -95,8 +102,16 @@ KPI_chkperiod_fx <- function(Mmm, regx, type, CurrentYear){
         start <- sub("^Month:(.*?) to .*", "\\1", cell)
         end <- sub(".*?to (.*)", "\\1", cell)
         
-        start <- paste("1", start)
-        end <- paste("1", end)
+        startM <- sub("([a-zA-Z]{3}) ([0-9]{2})", "\\1", start)
+        startM <- match(startM, month.abb)
+        startY <- sub("([a-zA-Z]{3}) ([0-9]{2})", "\\2", start)
+        
+        endM <- sub("([a-zA-Z]{3}) ([0-9]{2})", "\\1", end)
+        endM <- match(endM, month.abb)
+        endY <- sub("([a-zA-Z]{3}) ([0-9]{2})", "\\2", end)
+        
+        start <- paste("1", startM, startY)
+        end <- paste("1", endM, endY)
         
         start <- dmy(start)
         end <- dmy(end)
@@ -114,8 +129,23 @@ KPI_chkperiod_fx <- function(Mmm, regx, type, CurrentYear){
         start <- cell$start[row_i]
         
     }else if(type=="CDARS_Std"){
-        start <- sub(".*From (.*?) to .*", "\\1", cell)
-        end <- sub(".*to (.*) .*", "\\1", cell)
+        start <- sub(".*From ([0-9]{2}-[a-zA-Z]{3}-[0-9]{4}) to .*", "\\1", cell)
+        end <- sub(".*to ([0-9]{2}-[a-zA-Z]{3}-[0-9]{4}) .*", "\\1", cell)
+        
+        startD <- sub("([0-9]{2})-([a-zA-Z]{3})-([0-9]{4})", "\\1", start)
+        endD <- sub("([0-9]{2})-([a-zA-Z]{3})-([0-9]{4})", "\\1", end)
+        
+        startM <- sub("([0-9]{2})-([a-zA-Z]{3})-([0-9]{4})", "\\2", start)
+        endM <- sub("([0-9]{2})-([a-zA-Z]{3})-([0-9]{4})", "\\2", end)
+        
+        startM <- match(startM, month.abb)
+        endM <- match(endM, month.abb)
+        
+        startY <- sub("([0-9]{2})-([a-zA-Z]{3})-([0-9]{4})", "\\3", start)
+        endY <- sub("([0-9]{2})-([a-zA-Z]{3})-([0-9]{4})", "\\3", end)
+        
+        start <- paste(startD, startM, startY, sep = "-")
+        end <- paste(endD, endM, endY, sep = "-")
         
         start <- dmy(start)
         end <- dmy(end)
