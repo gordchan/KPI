@@ -233,57 +233,42 @@ kpi_source_helper(Mmm)
 
 
 # kpi.3 Quality ----------------------------------------------------------
-kpi.3 <- function(kpi, Mmm){
+
+kpi.3.html <- function(kpi, Mmm){
     
     # Announce fx started
     
     message("[kpi.3] Function started ", Sys.time())
     
-kpi_source_helper(Mmm)
+    kpi_source_helper(Mmm)
     
     SAR.frame <- empty.frame
     SAR.frame[1,] <- NA
     
     if(kpi=="kpi.3.1"){
-        path.1st <- grep("(.*kpi.3.1.1 .*xls.?)", source.kpi$filepath, value = TRUE)
-        path.adm <- grep("(.*kpi.3.1.2 .*xls.?)", source.kpi$filepath, value = TRUE)
+        path.1st <- grep("(.*kpi.3.1.1 .*html)", source.kpi$filepath, value = TRUE)
+        path.adm <- grep("(.*kpi.3.1.2 .*html)", source.kpi$filepath, value = TRUE)
         
-        SAR.1st <- fuzzy_range(path.1st, 67:240, 1:22)
-        SAR.adm <- fuzzy_range(path.adm, 116:290, 1:22)
-        
-        for (i in 1:4){
-            SAR.1st[1,i] <- SAR.1st[2,i]
-            SAR.adm[1,i] <- SAR.adm[2,i]
-        }
-        
-        names(SAR.1st) <- SAR.1st[1,]
-        names(SAR.adm) <- SAR.adm[1,]
-        
-        SAR.1st <- SAR.1st[-c(1:2),]
-        SAR.adm <- SAR.adm[-c(1:2),]
+        SAR.1st <- read_Chtml(path.1st, 1:2)
+        SAR.adm <- read_Chtml(path.adm, 1:2)
         
     }else if(kpi=="kpi.3.2"){
-        path.1st <- grep("(.*kpi.3.2.1 .*xls.?)", source.kpi$filepath, value = TRUE)
-        path.adm <- grep("(.*kpi.3.2.2 .*xls.?)", source.kpi$filepath, value = TRUE)
+        path.1st <- grep("(.*kpi.3.2.1 .*)", source.kpi$filepath, value = TRUE)
+        path.adm <- grep("(.*kpi.3.2.2 .*)", source.kpi$filepath, value = TRUE)
         
-        SAR.1st <- fuzzy_range(path.1st, 71:210, 1:22)
-        SAR.adm <- fuzzy_range(path.adm, 120:250, 1:22)
-        
-        for (i in 1:4){
-            SAR.1st[1,i] <- SAR.1st[2,i]
-            SAR.adm[1,i] <- SAR.adm[2,i]
-        }
-        
-        names(SAR.1st) <- SAR.1st[1,]
-        names(SAR.adm) <- SAR.adm[1,]
-        
-        SAR.1st <- SAR.1st[-c(1:2),]
-        SAR.adm <- SAR.adm[-c(1:2),]
+        SAR.1st <- read_Chtml(path.1st, 1:2)
+        SAR.adm <- read_Chtml(path.adm, 1:2)
         
     }
     
-    names(SAR.1st) <- gsub("(Row Total)", "HA", names(SAR.1st))
-    names(SAR.adm) <- gsub("(Row Total)", "HA", names(SAR.adm))
+    names(SAR.1st) <- gsub("(Row Total)(.*)", "HA\\2", names(SAR.1st))
+    names(SAR.adm) <- gsub("(Row Total)(.*)", "HA\\2", names(SAR.adm))
+    
+    names(SAR.1st) <- gsub("^(Institution .* >> )", "", names(SAR.1st))
+    names(SAR.adm) <- gsub("^(Institution .* >> )", "", names(SAR.adm))
+    
+    names(SAR.1st) <- gsub("( >> No. of A&E 1st Attendances)$", "", names(SAR.1st))
+    names(SAR.adm) <- gsub("( >> No. of A&E 1st Attendances)$", "", names(SAR.adm))
     
     names(SAR.1st) <- gsub("( \\(.*\\))", "", names(SAR.1st))
     names(SAR.adm) <- gsub("( \\(.*\\))", "", names(SAR.adm))
@@ -294,7 +279,7 @@ kpi_source_helper(Mmm)
     names(SAR.1st) <- gsub("( )", "_", names(SAR.1st))
     names(SAR.adm) <- gsub("( )", "_", names(SAR.adm))
     
-    for (i in 1:(22-4)){
+    for (i in 1:(ncol(SAR.1st)-4)){
         SAR.1st[,i+4] <- as.numeric(SAR.1st[,i+4])
         SAR.adm[,i+4] <- as.numeric(SAR.adm[,i+4])
     }
@@ -2147,6 +2132,8 @@ tre.3.html <- function(Mmm, MED, write_db = FALSE, backup = FALSE){
     tmp_df <- tmp_df %>% select(-Inst)
     
     # Return dataframe
+    
+    tmp_df <- as.data.frame(tmp_df)
     
     tmp_df
     
