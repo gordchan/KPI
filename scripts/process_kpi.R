@@ -402,27 +402,23 @@ kpi.3.3.html <- function(Mmm, trend = FALSE){
         MRSA.req <- MRSA %>% ungroup() %>% group_by(Hospital) %>%
             summarise(MRSA_in_Acute_Beds = sum(MRSA_in_Acute_Beds), Acute_Patient_Days = sum(Acute_Patient_Days)) %>%
             mutate(per_1000_PD = MRSA_in_Acute_Beds/Acute_Patient_Days*1000) %>%
-            select(-MRSA_in_Acute_Beds, -Acute_Patient_Days) %>%
-            t() %>% as.data.frame(stringsAsFactors=FALSE)
-        
-        names(MRSA.req) <- MRSA.req[1,]
-        MRSA.req <- MRSA.req[-1,]
-        
+            select(-MRSA_in_Acute_Beds, -Acute_Patient_Days)
+
         # Fill empty frame
         
-        names(MRSA.req) <- gsub("NLT", "NLTH", names(MRSA.req))
+        MRSA.req$Hospital <- gsub("NLT", "NLTH", MRSA.req$Hospital)
         
         MRSA.frame[1,] <- NA
         
         for (i in 1:length(MRSA.frame)){
-            if (names(MRSA.frame)[i] %in% names(MRSA.req)){
-                MRSA.frame[i] <- MRSA.req[names(MRSA.frame)[i]]
+            if (names(MRSA.frame)[i] %in% MRSA.req$Hospital){
+                MRSA.frame[i] <- MRSA.req$per_1000_PD[which(MRSA.req$Hospital==names(MRSA.frame)[i])]
             }
         }
         
         # Return numeric dataframe
         
-        MRSA.prod <- as.data.frame(lapply(MRSA.frame, as.numeric))
+        MRSA.prod <- MRSA.frame
         
     }
     
@@ -437,31 +433,31 @@ kpi.3.3.html <- function(Mmm, trend = FALSE){
 # Used fuzzy_range to cater for variable number of rows
 #
 
-kpi.4.1 <- function(Mmm){
+kpi.4.1.html <- function(Mmm){
     
     # Announce fx started
     
     message("[kpi.4.1] Function started ", Sys.time())
     
-kpi_source_helper(Mmm)
+    kpi_source_helper(Mmm)
     
-    path <- grep("(.*kpi.4.1 .*xls.?)", source.kpi$filepath, value = TRUE)
-
+    path <- grep("(.*kpi.4.1 .*html)", source.kpi$filepath, value = TRUE)
+    
     Stroke.frame <- empty.frame
     Stroke.frame[1,] <- NA
     
     
-    Stroke <- fuzzy_range(path, 138:170, 1:5)
+    Stroke <- read_Chtml(path, 1:2)
     
-        names(Stroke) <- c("cluster", "institution", "ASU", "other", "total")
+    names(Stroke) <- c("cluster", "institution", "ASU", "other", "total")
     
-        Stroke$institution <- gsub("^Subtotal.*", "Subtotal", Stroke$institution)
-        
-        Stroke <- Stroke[-c(1:2),] %>% filter(cluster == "KW" | institution == "Subtotal" | is.na(institution))
+    Stroke$institution <- gsub("^Subtotal.*", "Subtotal", Stroke$institution)
+    Stroke$cluster <- gsub("^Grand Total.*", "HA", Stroke$cluster)
+    Stroke$institution <- gsub("^Grand Total.*", "HA", Stroke$institution)
     
-        Stroke[nrow(Stroke),1] <- "HA"
-        
-    Stroke$institution <- gsub(".*total.*", NA, Stroke$institution)
+    Stroke <- Stroke %>% filter(cluster == "KW" | cluster == "HA" | institution == "Subtotal")
+    
+    Stroke$institution <- gsub("Subtotal", NA, Stroke$institution)
     
     Stroke$cluster <- gsub(" $", "", Stroke$cluster)
     Stroke$cluster <- sapply(Stroke$cluster, FUN = function(x){ifelse(x=="HA", x, paste(x,"C", sep = ""))})
@@ -480,56 +476,50 @@ kpi_source_helper(Mmm)
     }
     
     Stroke <- Stroke %>% mutate(ASU.rate = ASU/total) %>%
-        select(institution, ASU.rate) %>%
-        t() %>% as.data.frame(stringsAsFactors = FALSE)
-    
-    names(Stroke) <- Stroke[1,]
-    
-    Stroke <- Stroke[-1,]
-    
-    Stroke <- data.frame(lapply(Stroke[1,], FUN = function(x) as.numeric(x)))
-    
-        
+        select(institution, ASU.rate)
+
     for (i in 1:length(Stroke.frame)){
-        if (names(Stroke.frame)[i] %in% names(Stroke)){
-            Stroke.frame[i] <- Stroke[names(Stroke.frame)[i]]
+        if (names(Stroke.frame)[i] %in% Stroke$institution){
+            Stroke.frame[i] <- Stroke$ASU.rate[which(Stroke$institution==names(Stroke.frame)[i])]
         }
     }
     
     # Replace NA with N.A. for use in Excel
     
-    Stroke.prod <- lapply(Stroke.frame, function(x){ifelse(is.na(x), "N.A.", x)})
-    Stroke.prod <- data.frame(Stroke.prod)
+    #     Stroke.prod <- lapply(Stroke.frame, function(x){ifelse(is.na(x), "N.A.", x)})
+    #     Stroke.prod <- data.frame(Stroke.prod)
     
     # Return production dataframe
-
+    
+    Stroke.prod <- Stroke.frame
+    
     Stroke.prod
     
 }
 
-kpi.4.2 <- function(Mmm){
-
+kpi.4.2.html <- function(Mmm){
+    
     # Announce fx started
     
     message("[kpi.4.2] Function started ", Sys.time())
-        
-kpi_source_helper(Mmm)
     
-    path <- grep("(.*kpi.4.2 .*xls.?)", source.kpi$filepath, value = TRUE)
+    kpi_source_helper(Mmm)
+    
+    path <- grep("(.*kpi.4.2 .*html)", source.kpi$filepath, value = TRUE)
     
     Hip.frame <- empty.frame
-        Hip.frame[1,] <- NA
+    Hip.frame[1,] <- NA
     
     
-    Hip <- fuzzy_range(path, 84:110, 1:6)
+    Hip <- read_Chtml(path, 1:2)
     
     names(Hip) <- c("cluster", "institution", "within_2", "between_2_to_4", "other", "total")
     
     Hip$institution <- gsub("^Subtotal.*", "Subtotal", Hip$institution)
+    Hip$cluster <- gsub("^Grand.*", "HA", Hip$cluster)
+    Hip$institution <- gsub("^Grand.*", "HA", Hip$institution)
     
-    Hip <- Hip[-c(1:2),] %>% filter(cluster == "KW" | institution == "Subtotal" | is.na(institution))
-    
-    Hip[nrow(Hip),1] <- "HA"
+    Hip <- Hip%>% filter(cluster == "KW" | cluster == "HA" | institution == "Subtotal")
     
     Hip$institution <- gsub(".*total.*", NA, Hip$institution)
     
@@ -550,28 +540,22 @@ kpi_source_helper(Mmm)
     }
     
     Hip <- Hip %>% mutate(within_2.rate = within_2/total) %>%
-        select(institution, within_2.rate) %>%
-        t() %>% as.data.frame(stringsAsFactors = FALSE)
-    
-    names(Hip) <- Hip[1,]
-    
-    Hip <- Hip[-1,]
-    
-    Hip <- data.frame(lapply(Hip[1,], FUN = function(x) as.numeric(x)))
-    
+        select(institution, within_2.rate)
     
     for (i in 1:length(Hip.frame)){
-        if (names(Hip.frame)[i] %in% names(Hip)){
-            Hip.frame[i] <- Hip[names(Hip.frame)[i]]
+        if (names(Hip.frame)[i] %in% Hip$institution){
+            Hip.frame[i] <- Hip$within_2.rate[which(Hip$institution==names(Hip.frame)[i])]
         }
     }
     
     # Replace NA with N.A. for use in Excel
     
-    Hip.prod <- lapply(Hip.frame, function(x){ifelse(is.na(x), "N.A.", x)})
-    Hip.prod <- data.frame(Hip.prod)
+    # Hip.prod <- lapply(Hip.frame, function(x){ifelse(is.na(x), "N.A.", x)})
+    # Hip.prod <- data.frame(Hip.prod)
     
     # Return production dataframe
+    
+    Hip.prod <- Hip.frame
     
     Hip.prod
     
@@ -630,28 +614,32 @@ kpi_source_helper(Mmm)
 
 # kpi.5 Efficiency --------------------------------------------------------
 
-kpi.5.1 <- function(Mmm){
+
+kpi.5.1.html <- function(Mmm){
     
     # Announce fx started
     
     message("[kpi.5.1] Function started ", Sys.time())
     
-kpi_source_helper(Mmm)
+    kpi_source_helper(Mmm)
     
-    path <- grep("(.*kpi.8 .*xls.?)", source.kpi$filepath, value = TRUE)
+    path <- grep("(.*kpi.8 .*html)", source.kpi$filepath, value = TRUE)
     
     DS_SDS.frame <- empty.frame
-        DS_SDS.frame[1,] <- NA
-        
-    DS_SDS <- fuzzy_range(path, 118:220, 1:6)
+    DS_SDS.frame[1,] <- NA
+    
+    DS_SDS <- read_Chtml(path, 1)
+    
+    DS_SDS <- DS_SDS[,1:6]
     
     names(DS_SDS) <- c("cluster", "institution", "specialty", "total", "DS", "SDS")
     
     DS_SDS$institution <- gsub("^Subtotal.*", "Subtotal", DS_SDS$institution)
+    DS_SDS$cluster <- gsub("^Grand.*", "HA", DS_SDS$cluster)
+    DS_SDS$institution <- gsub("^Grand.*", "HA", DS_SDS$institution)
+    DS_SDS$specialty <- gsub("^Subtotal.*", NA, DS_SDS$specialty)
     
-    DS_SDS <- DS_SDS[-c(1),] %>% filter(cluster == "KW" | institution == "Subtotal" | is.na(institution))
-    
-    DS_SDS[nrow(DS_SDS),1] <- "HA"
+    DS_SDS <- DS_SDS %>% filter(cluster == "KW" | cluster == "HA" | institution == "Subtotal")
     
     DS_SDS$institution <- gsub(".*total.*", NA, DS_SDS$institution)
     
@@ -660,16 +648,16 @@ kpi_source_helper(Mmm)
     
     
     for (i in 1:nrow(DS_SDS)){
-            if (is.na(DS_SDS$institution[i])){
-                DS_SDS$institution[i] <- DS_SDS$cluster[i]
-                }
-            if (is.na(DS_SDS$DS[i]) & DS_SDS$total[i]!=0){
-                DS_SDS$DS[i] <- 0
-                }
-            if (is.na(DS_SDS$SDS[i]) & DS_SDS$total[i]!=0){
-                DS_SDS$SDS[i] <- 0
-                }
+        if (is.na(DS_SDS$institution[i])){
+            DS_SDS$institution[i] <- DS_SDS$cluster[i]
         }
+        if (is.na(DS_SDS$DS[i]) & DS_SDS$total[i]!=0){
+            DS_SDS$DS[i] <- 0
+        }
+        if (is.na(DS_SDS$SDS[i]) & DS_SDS$total[i]!=0){
+            DS_SDS$SDS[i] <- 0
+        }
+    }
     
     for (i in 1:3){
         DS_SDS[,i+3] <- as.numeric(DS_SDS[,i+3])
@@ -680,29 +668,23 @@ kpi_source_helper(Mmm)
         group_by(institution) %>% summarise(DS = sum(DS), SDS = sum(SDS), total = sum(total))
     
     DS_SDS <- DS_SDS %>% mutate(DS_SDS = DS + SDS) %>%
-        mutate(DS_SDS.rate = DS_SDS/total) %>%
-        select(institution, DS_SDS.rate) %>%
-        t() %>% as.data.frame(stringsAsFactors = FALSE)
-    
-    names(DS_SDS) <- DS_SDS[1,]
-    
-    DS_SDS <- DS_SDS[-1,]
-    
-    DS_SDS <- data.frame(lapply(DS_SDS[1,], FUN = function(x) as.numeric(x)))
+        mutate(DS_SDS.rate = DS_SDS/total)
     
     
     for (i in 1:length(DS_SDS.frame)){
-        if (names(DS_SDS.frame)[i] %in% names(DS_SDS)){
-            DS_SDS.frame[i] <- DS_SDS[names(DS_SDS.frame)[i]]
+        if (names(DS_SDS.frame)[i] %in% DS_SDS$institution){
+            DS_SDS.frame[i] <- DS_SDS$DS_SDS.rate[which(DS_SDS$institution==names(DS_SDS.frame)[i])]
         }
     }
     
     # Replace NA with N.A. for use in Excel
     
-    DS_SDS.prod <- lapply(DS_SDS.frame, function(x){ifelse(is.na(x), "N.A.", x)})
-    DS_SDS.prod <- data.frame(DS_SDS.prod)
+    # DS_SDS.prod <- lapply(DS_SDS.frame, function(x){ifelse(is.na(x), "N.A.", x)})
+    # DS_SDS.prod <- data.frame(DS_SDS.prod)
     
     # Return production dataframe
+    
+    DS_SDS.prod <- DS_SDS.frame
     
     DS_SDS.prod
 }
