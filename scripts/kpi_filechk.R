@@ -58,6 +58,10 @@ KPI_filechk <- function(y = 2015, m = 11){
                    "tre.1 ", "tre.2 ", "tre.2.HA ", "tre.2.1 ", "tre.2.1.HA ", "tre.3.1.1 ", "tre.3.1.2 ", "tre.3.2.1 ", "tre.3.2.2 ",
                    "tre.5 ", "tre.6 ", "tre.7 ", "tre.8 ", "tre.8.HA ", "tre.9 ", "tre.10 ", "tre.12 " )
     
+    regx_list.py <- c("kpi.1 ", "kpi.2 ", "kpi.2.HA ", "kpi.3.1.1 ", "kpi.3.1.2", "kpi.3.2.1", "kpi.3.2.2", "kpi.3.3",
+                   "kpi.4.1 ", "kpi.4.2 ", "kpi.4.3", "kpi.5 ", "kpi.6 ", "kpi.6.HA ", "kpi.7 ", "kpi.8 ", "kpi.9 ",
+                   "kpi.10 ")
+    
     ## Current Year
     
     for(i in 1:length(regx_list)){
@@ -76,11 +80,11 @@ KPI_filechk <- function(y = 2015, m = 11){
     
     ## Previous Year
     
-    for(i in 1:20){
-        if(sum(grepl(regx_list[i], filelist.Previous))==0){
+    for(i in 1:length(regx_list.py)){
+        if(sum(grepl(regx_list.py[i], filelist.Previous))==0){
             FAULT <- TRUE
             fault_3 <- TRUE
-            warning("ERROR: KPI source file ", regx_list[i], "in ", Dates[3,], " not uploaded.")
+            warning("ERROR: KPI source file ", regx_list.py[i], "in ", Dates[3,], " not uploaded.")
         }
     }
     

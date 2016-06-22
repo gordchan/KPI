@@ -187,10 +187,13 @@ KPI_chkperiod <- function(Mmm, CurrentYear){
     KPI_chkperiod_fx(Mmm, regx = "kpi.8 ", type = "CDARS", CurrentYear)
     KPI_chkperiod_fx(Mmm, regx = "kpi.9 ", type = "EIS", CurrentYear)
     KPI_chkperiod_fx(Mmm, regx = "kpi.10 ", type = "EIS", CurrentYear)
-    KPI_chkperiod_fx(Mmm, regx = "kpi.11.1 ", type = "EIS", CurrentYear)
-    KPI_chkperiod_fx(Mmm, regx = "kpi.11.1.HA ", type = "EIS", CurrentYear)
+
     
     if(CurrentYear==TRUE){
+        #
+        KPI_chkperiod_fx(Mmm, regx = "kpi.11.1 ", type = "EIS", CurrentYear)
+        KPI_chkperiod_fx(Mmm, regx = "kpi.11.1.HA ", type = "EIS", CurrentYear)
+        #
         KPI_chkperiod_fx(Mmm, regx = "kpi.11.2 ", type = "EIS", CurrentYear)
         KPI_chkperiod_fx(Mmm, regx = "kpi.11.3 ", type = "EIS", CurrentYear)
     }
