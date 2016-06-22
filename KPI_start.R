@@ -12,7 +12,7 @@ source("scripts/kpi_chkperiod.R")
 # Input reporting year & month ----------
 
 y <- 2016
-m <- 2
+m <- 4
 
 py <- y-1
 
@@ -31,6 +31,7 @@ KPI_filechk(y, m)
 
 # Check source file sample period ----------
 
+## Suspended pending clarification of lubridate parsing fx
 KPI_chkperiod(Dates[1,], CurrentYear = TRUE)
 KPI_chkperiod(Dates[3,], CurrentYear = FALSE)
 
